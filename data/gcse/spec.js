@@ -37,7 +37,7 @@ RM.setSpec({
      {
       "id": "el-p1-q5a",
       "name": "Descriptive or narrative writing (Q5)",
-      "desc": "Choose to write a description or the opening of a story, with clear, imaginative and well-organised ideas.",
+      "desc": "Write one piece of creative writing from a choice of tasks (for example a description or a story opening), with clear, well-organised ideas.",
       "ref": "3.1.2"
      },
      {
@@ -61,7 +61,7 @@ RM.setSpec({
      {
       "id": "el-p2-q2",
       "name": "Summarising differences (Q2)",
-      "desc": "Sum up the differences between two linked sources using evidence from both.",
+      "desc": "Sum up the similarities or the differences between two linked sources, as the question asks, using evidence from both.",
       "ref": "3.1.1"
      },
      {
@@ -2716,4 +2716,4 @@ RM.setSpec({
   ]
  }
 });
-RM.quiz=["maths", "physics", "business"];
+RM.quiz=["english_lang", "english_lit", "maths", "biology", "chemistry", "physics", "rs", "history", "dt", "business"];
