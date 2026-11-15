@@ -180,7 +180,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,add(s,qs){(this.banks[s]=this
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.3";
+const VERSION="1.3.1";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (no questions written yet). */
 const PROFILES={
@@ -699,7 +699,8 @@ function tracker(){
 }
 ACT.trkS=d=>{TRK=d.s;lsSet("trk",TRK);tracker();};
 ACT.trkCard=d=>{const el=document.getElementById(d.slot);if(el)el.innerHTML=el.innerHTML?"":cardHtml(CARDS[d.k]);};
-ACT.taught=(d,b)=>{TAUGHT[d.k]=!TAUGHT[d.k];if(!TAUGHT[d.k])delete TAUGHT[d.k];else if(NOTYET[d.k]){delete NOTYET[d.k];lsSet("notyet",NOTYET);}covSaved();b.classList.toggle("on",!!TAUGHT[d.k]);b.textContent=TAUGHT[d.k]?"✓":"";};
+ACT.taught=(d,b)=>{TAUGHT[d.k]=!TAUGHT[d.k];if(!TAUGHT[d.k])delete TAUGHT[d.k];else if(NOTYET[d.k]){delete NOTYET[d.k];lsSet("notyet",NOTYET);}covSaved();b.classList.toggle("on",!!TAUGHT[d.k]);b.textContent=TAUGHT[d.k]?"✓":"";covTabs();};
+function covTabs(){if(VIEW!=="coverage")return;document.querySelectorAll("[data-act=covS]").forEach(c=>{const s=c.dataset.s,n=((SPEC[s]||{}).groups||[]).reduce((n,g)=>n+g.topics.filter(t=>TAUGHT[s+"|"+t.id]).length,0);c.textContent=SUBJ[s].short+(n?" · "+n:"");});}
 ACT.trainT=d=>{GYM.topic=d.k;GYM.s=d.k.split("|")[0];GYM.w="sets";lsSet("gym",GYM);gymSetup();};
 
 /* =====================================================================
@@ -723,7 +724,10 @@ function coverage(back){
   const y13=g=>g.topics.every(t=>String(t.year)==="13");
   const tickList=(s,g)=>`<div class="list" style="margin-top:6px">${g.topics.map(t=>{const k=s+"|"+t.id;return `<div class="topic"><button class="tick ${TAUGHT[k]?"on":""}" data-act="taught" data-k="${esc(k)}" aria-label="Covered">${TAUGHT[k]?"✓":""}</button><div class="nm"><b>${esc(t.name)}</b></div></div>`;}).join("")}</div>`;
   const upTo=(s,g,gi)=>{const idx=coveredUpTo(s,g);return `<select data-cov="${s}|${gi}"><option value="-1" ${idx<0?"selected":""}>Not started yet</option>${g.topics.map((t,ti)=>`<option value="${ti}" ${idx===ti?"selected":""}>${ti===g.topics.length-1?"All of it, up to: ":"Up to: "}${esc(t.name)}</option>`).join("")}</select>`;};
-  const cards=SKEYS.map(s=>{
+  if(!SUBJ[COV_S])COV_S=SKEYS[0];
+  const nT=s=>((SPEC[s]||{}).groups||[]).reduce((n,g)=>n+g.topics.filter(t=>TAUGHT[s+"|"+t.id]).length,0);
+  const tabs=SKEYS.map(k=>`<button class="chip ${k===COV_S?"on":""}" data-act="covS" data-s="${k}">${esc(SUBJ[k].short)}${nT(k)?` · ${nT(k)}`:""}</button>`).join("");
+  const cards=[COV_S].map(s=>{
     const sp=SPEC[s]||{groups:[]},ticks=(s==="further"||s==="cs"||!PRO.quiz);
     const part=(g,gi)=>`<label class="small muted" style="display:block;margin-top:12px">${esc(g.name)}</label>${ticks?tickList(s,g):upTo(s,g,gi)}`;
     const now=sp.groups.map((g,gi)=>y13(g)?"":part(g,gi)).join(""),later=sp.groups.map((g,gi)=>y13(g)?part(g,gi):"").join("");
@@ -732,19 +736,22 @@ function coverage(back){
     ${later?`<details style="margin-top:12px;background:transparent;border:0"><summary class="small" style="padding:6px 0">Year 13 parts</summary>${later}</details>`:""}</div>`;}).join("");
   render(`<div class="wrap">${topBar("What have you covered?",back)}
    <p class="muted small" style="margin-top:0">Pick what you've had in class so far. ${PRO.quiz?"Workouts, quiz nights and the daily challenge then only ask about those topics.":"Your course map then shows what's done and what's still to come."}</p>
-   <div class="card" style="position:sticky;top:8px;z-index:5"><div class="row"><b id="covCount"></b><span class="spacer"></span><button class="btn" style="padding:8px 12px" data-act="covClear">Clear all</button></div></div>
+   <div class="card" style="position:sticky;top:8px;z-index:5"><div class="row"><b id="covCount"></b><span class="spacer"></span><button class="btn" style="padding:8px 12px" data-act="covClear">Clear all</button></div>
+   <div class="pchips" style="margin-top:10px">${tabs}</div></div>
    ${cards}
    <button class="btn go block" style="font-size:18px;padding:16px" data-act="${back}">Done</button></div>`,"coverage");
   document.querySelectorAll("select[data-cov]").forEach(sel=>sel.addEventListener("change",()=>{
     const [s,gi]=sel.dataset.cov.split("|"),g=SPEC[s].groups[+gi],upto=+sel.value;
     g.topics.forEach((t,ti)=>{const k=s+"|"+t.id;if(ti<=upto){TAUGHT[k]=true;delete NOTYET[k];}else delete TAUGHT[k];});
-    lsSet("notyet",NOTYET);covSaved();
+    lsSet("notyet",NOTYET);covSaved();covTabs();
   }));
   covCount();
 }
 function covSaved(){lsSet("taught",TAUGHT);lsSet("covAt",Date.now());const on=taughtOn();GYM.taught=on;HS.taught=on;lsSet("gym",GYM);lsSet("host",HS);covCount();}
 function covCount(){const el=$("#covCount");if(el)el.textContent=covSummary();}
 ACT.covClear=()=>{TAUGHT={};covSaved();coverage(VIEW_BACK||"home");};
+let COV_S=lsGet("covS",null);   // the subject tab open on the covered screen
+ACT.covS=d=>{COV_S=d.s;lsSet("covS",COV_S);coverage(VIEW_BACK||"home");};
 let VIEW_BACK=null;
 
 /* =====================================================================
