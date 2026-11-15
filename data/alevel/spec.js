@@ -993,3 +993,4 @@ RM.setSpec({
   ]
  }
 });
+RM.quiz=["maths", "further", "chem", "cs"];

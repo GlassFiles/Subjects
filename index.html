@@ -153,19 +153,20 @@ details .inner{padding:0 12px 12px}
 <canvas id="confetti"></canvas>
 <script>
 /* data/<profile>/spec.js calls RM.setSpec, data/<profile>/generators.js calls RM.gen; the questions are in data/<profile>/*.jsonl */
-window.RM={banks:{},spec:null,gens:[],profile:null,add(s,qs){(this.banks[s]=this.banks[s]||[]).push(...qs);},setSpec(x){this.spec=x;},gen(g){this.gens.push(g);}};
+window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.banks[s]=this.banks[s]||[]).push(...qs);},setSpec(x){this.spec=x;},gen(g){this.gens.push(g);}};
 </script>
 <!--rm-loader-start-->
 <script>
 /* Which course: ?p=alevel or ?p=gcse in the address (and remembered), else the one chosen before on this device.
-   A quiz-night join link always opens the A-level side, where quiz nights are, without changing the saved choice. No course yet:
+   A quiz-night join link opens the host's course (#join-ABCD is A-level, #join-ABCD-gcse is GCSE) without changing the saved choice. No course yet:
    nothing is loaded and the start screen asks. bundle.py replaces this block with the data inlined. */
 (function(){
   var OK=["alevel","gcse"],m=location.search.match(/[?&]p=(alevel|gcse)(?![A-Za-z])/),p=m?m[1]:null;
   if(p){try{localStorage.setItem("rm_profile",JSON.stringify(p));}catch(e){}}
   else{try{p=JSON.parse(localStorage.getItem("rm_profile"));}catch(e){p=null;}}
   if(OK.indexOf(p)<0)p=null;
-  if(/^#join-/.test(location.hash))p="alevel";   // quiz nights are A-level for now; a GCSE device joins without switching for good
+  var j=location.hash.match(/^#join-[A-Za-z]{4}(?:-(gcse|alevel))?$/);
+  if(j)p=j[1]||"alevel";   // a join link opens the host's course (A-level unless it says -gcse) without changing the saved choice
   window.RM.profile=p;
   if(p)document.write('<script src="data/'+p+'/spec.js"><\/script><script src="data/'+p+'/generators.js"><\/script>');
 })();
@@ -180,30 +181,32 @@ window.RM={banks:{},spec:null,gens:[],profile:null,add(s,qs){(this.banks[s]=this
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.3.1";
+const VERSION="1.4";
 const LAUNCH="2026-11-14";                 // daily challenge #1
-/* The two courses. quiz:false = course map and tracker only (no questions written yet). */
+/* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
   alevel:{label:"A-level",tag:"A-LEVEL GYM",quiz:true,subj:{
-    maths:  {name:"Maths",short:"Maths",col:"var(--maths)",em:"∑"},
-    further:{name:"Further Maths",short:"Further",col:"var(--further)",em:"∫"},
-    chem:   {name:"Chemistry",short:"Chem",col:"var(--chem)",em:"⚗️"},
-    cs:     {name:"Computer Science",short:"CS",col:"var(--cs)",em:"💻"}}},
-  gcse:{label:"GCSE",tag:"GCSE",quiz:false,subj:{
-    english_lang:{name:"English Language",short:"Eng Lang",col:"#e6a23c",em:"📖"},
-    english_lit: {name:"English Literature",short:"Eng Lit",col:"#d97757",em:"🎭"},
-    maths:       {name:"Maths",short:"Maths",col:"var(--maths)",em:"∑"},
-    biology:     {name:"Biology",short:"Bio",col:"#33d17a",em:"🧬"},
-    chemistry:   {name:"Chemistry",short:"Chem",col:"var(--chem)",em:"⚗️"},
-    physics:     {name:"Physics",short:"Phys",col:"#4da3ff",em:"⚛️"},
-    rs:          {name:"Religious Studies",short:"RS",col:"#b27cff",em:"🕊️"},
-    history:     {name:"History",short:"History",col:"#c9a227",em:"🏰"},
-    dt:          {name:"Design and Technology",short:"DT",col:"#ff7a2f",em:"🛠️"},
-    business:    {name:"Business",short:"Business",col:"#5bc0be",em:"💼"}}}
+    maths:  {name:"Maths",short:"Maths",col:"var(--maths)",em:"∑",pre:"ma"},
+    further:{name:"Further Maths",short:"Further",col:"var(--further)",em:"∫",pre:"fm"},
+    chem:   {name:"Chemistry",short:"Chem",col:"var(--chem)",em:"⚗️",pre:"ch"},
+    cs:     {name:"Computer Science",short:"CS",col:"var(--cs)",em:"💻",pre:"cs"}}},
+  gcse:{label:"GCSE",tag:"GCSE",quiz:true,subj:{
+    english_lang:{name:"English Language",short:"Eng Lang",col:"#e6a23c",em:"📖",pre:"gel"},
+    english_lit: {name:"English Literature",short:"Eng Lit",col:"#d97757",em:"🎭",pre:"gli"},
+    maths:       {name:"Maths",short:"Maths",col:"var(--maths)",em:"∑",pre:"gma"},
+    biology:     {name:"Biology",short:"Bio",col:"#33d17a",em:"🧬",pre:"gbi"},
+    chemistry:   {name:"Chemistry",short:"Chem",col:"var(--chem)",em:"⚗️",pre:"gch"},
+    physics:     {name:"Physics",short:"Phys",col:"#4da3ff",em:"⚛️",pre:"gph"},
+    rs:          {name:"Religious Studies",short:"RS",col:"#b27cff",em:"🕊️",pre:"grs"},
+    history:     {name:"History",short:"History",col:"#c9a227",em:"🏰",pre:"ghi"},
+    dt:          {name:"Design and Technology",short:"DT",col:"#ff7a2f",em:"🛠️",pre:"gdt"},
+    business:    {name:"Business",short:"Business",col:"#5bc0be",em:"💼",pre:"gbu"}}}
 };
 const PROFILE=window.RM.profile;                     // null until a course is chosen
 const PRO=PROFILES[PROFILE]||{label:"",tag:"",quiz:false,subj:{}};
+if(window.RM.quiz===false)PRO.quiz=false;            // data/<course>/spec.js says no question files exist yet
 const SUBJ=PRO.subj;
+const QSUBJ=Array.isArray(window.RM.quiz)?window.RM.quiz.filter(k=>SUBJ[k]):null;   // subjects with question files (null = all)
 const SKEYS=Object.keys(SUBJ);
 const LVNAME={1:"Warm-up",2:"Working set",3:"1-rep max"};
 const XP_LV={1:10,2:20,3:40};
@@ -272,7 +275,7 @@ function parseLines(name,text){
 async function loadAll(){
   if(!PRO.quiz)return;                                  // course map and tracker only
   for(const g of (window.RM.gens||[]))addQ({...g,gen:true},"generator "+((g&&g.id)||"?"));
-  await Promise.all(SKEYS.map(async s=>{try{parseLines(s,await readData(s)).forEach((q,i)=>addQ(q,s+".jsonl "+((q&&q.id)||"item "+(i+1))));}catch(e){LOAD_ERR.push(SUBJ[s].name);}}));
+  await Promise.all(SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(async s=>{try{parseLines(s,await readData(s)).forEach((q,i)=>addQ(q,s+".jsonl "+((q&&q.id)||"item "+(i+1))));}catch(e){LOAD_ERR.push(SUBJ[s].name);}}));
   try{for(const c of parseLines("cards",await readData("cards")))if(c&&SUBJ[c.s]&&c.t&&c.key)CARDS[c.s+"|"+c.t]=c;}catch(e){}
   BANK.sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
   if(BAD.length)console.warn("Rep Max skipped:",BAD);
@@ -363,7 +366,7 @@ function home(){
   const r=rankOf(ST.xp),pct=r.next?Math.min(100,(ST.xp-r.at)/(r.next[0]-r.at)*100):100;
   const today=londonDate(),dn=Math.max(1,dayDiff(LAUNCH,today)+1),dd=ST.daily[today];
   const nFix=s=>BANK.filter(q=>q.s===s&&!q.gen).length,nGen=BANK.filter(q=>q.gen).length;
-  const counts=SKEYS.map(s=>`${SUBJ[s].short} ${nFix(s)}`).join(" · ")+(nGen?` · plus ${nGen} number generators`:"");
+  const counts=SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(s=>`${SUBJ[s].short} ${nFix(s)}`).join(" · ")+(QSUBJ&&QSUBJ.length<SKEYS.length?` (other subjects: course map only, questions to come)`:"")+(nGen?` · plus ${nGen} number generators`:"");
   const acc=ST.done>=5?Math.round(ST.reps/ST.done*100)+"%":"–";
   const covStale=taughtOn()&&Date.now()-lsGet("covAt",Date.now())>7*864e5;
   const a2hs=!lsGet("a2hs",false)&&!isStandalone()&&!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
@@ -487,11 +490,12 @@ const WORKOUTS={
   weak:{name:"Weak spots",em:"🎯",desc:"Your misses and reviews due · 10 reps",n:10,lv:[1,2,3]}
 };
 let GYM=Object.assign({s:"mix",w:"sets",clock:false,taught:false,topic:null},lsGet("gym",{}));
+if(GYM.s!=="mix"&&(!SUBJ[GYM.s]||(QSUBJ&&!QSUBJ.includes(GYM.s))))GYM.s="mix";if(GYM.topic&&!TOPIC[GYM.topic])GYM.topic=null;
 if(!WORKOUTS[GYM.w])GYM.w="sets";
 ACT.gym=()=>gymSetup();
 function gymSetup(){
   setWide(false);
-  const sChips=["mix",...SKEYS].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="gS" data-s="${s}">${s==="mix"?"🎲 Mixed":esc(SUBJ[s].em+" "+SUBJ[s].name)}</button>`).join("");
+  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="gS" data-s="${s}">${s==="mix"?"🎲 Mixed":esc(SUBJ[s].em+" "+SUBJ[s].name)}</button>`).join("");
   const wBtns=Object.entries(WORKOUTS).map(([k,w])=>`<button class="big" data-act="gW" data-w="${k}" style="${GYM.w===k?"border-color:var(--lime)":""}"><span class="em">${w.em}</span><span><b>${w.name}</b><span>${w.desc}</span></span></button>`).join("");
   const tp=GYM.topic&&TOPIC[GYM.topic];
   render(`<div class="wrap">${topBar("Solo gym")}
@@ -629,7 +633,8 @@ ACT.again=()=>{if(RUN&&RUN.mode==="gym")ACT.gStart();};
 let DCLOCK=lsGet("dclock",false);
 function dailySet(date){
   const rnd=mulberry32(hashStr("repmax-daily-"+date));
-  const pool=playable(BANK,true);
+  let pool=playable(BANK,true);
+  if(!pool.length)pool=playable(BANK,false);   // ticks only in subjects with no questions yet: use every topic
   const subs=SKEYS.filter(s=>pool.some(q=>q.s===s&&q.lv<=2));
   const lists=Object.fromEntries(subs.map(s=>[s,shuffle(pool.filter(q=>q.s===s&&q.lv<=2),rnd)]));
   const chosen=[];let k=0;
@@ -728,7 +733,7 @@ function coverage(back){
   const nT=s=>((SPEC[s]||{}).groups||[]).reduce((n,g)=>n+g.topics.filter(t=>TAUGHT[s+"|"+t.id]).length,0);
   const tabs=SKEYS.map(k=>`<button class="chip ${k===COV_S?"on":""}" data-act="covS" data-s="${k}">${esc(SUBJ[k].short)}${nT(k)?` · ${nT(k)}`:""}</button>`).join("");
   const cards=[COV_S].map(s=>{
-    const sp=SPEC[s]||{groups:[]},ticks=(s==="further"||s==="cs"||!PRO.quiz);
+    const sp=SPEC[s]||{groups:[]},ticks=(s==="further"||s==="cs"||PROFILE==="gcse");
     const part=(g,gi)=>`<label class="small muted" style="display:block;margin-top:12px">${esc(g.name)}</label>${ticks?tickList(s,g):upTo(s,g,gi)}`;
     const now=sp.groups.map((g,gi)=>y13(g)?"":part(g,gi)).join(""),later=sp.groups.map((g,gi)=>y13(g)?part(g,gi):"").join("");
     return `<div class="card"><div class="row"><b style="font-size:17px">${esc(SUBJ[s].em+" "+SUBJ[s].name)}</b><span class="spacer"></span><span class="small muted">${esc((sp.board||"")+" "+(sp.code||""))}</span></div>
@@ -761,7 +766,7 @@ function repoUrl(){const m=location.hostname.match(/^([^.]+)\.github\.io$/i);if(
 let MK_RIGHT=0;
 ACT.maker=()=>{
   setWide(false);
-  const s=lsGet("mk_s","cs");
+  let s=lsGet("mk_s",SKEYS[0]);if(!SUBJ[s])s=SKEYS[0];
   const tops=(SPEC[s]?SPEC[s].groups.flatMap(g=>g.topics):[]);
   const repo=repoUrl();
   render(`<div class="wrap">${topBar("Write a question")}
@@ -781,7 +786,7 @@ ACT.maker=()=>{
 ACT.mkRight=d=>{MK_RIGHT=+d.i;document.querySelectorAll("[data-act=mkRight]").forEach(b=>{const on=+b.dataset.i===MK_RIGHT;b.classList.toggle("on",on);b.textContent=on?"✓":"";});};
 ACT.mkBuild=()=>{
   const s=$("#mk_s").value,o=[0,1,2,3].map(i=>$("#mk_o"+i).value.trim());
-  const pre={maths:"ma",further:"fm",chem:"ch",cs:"cs"}[s];
+  const pre=(SUBJ[s]&&SUBJ[s].pre)||s.slice(0,3);
   const q={id:pre+"-u"+Date.now().toString(36).slice(-5),s,t:$("#mk_t").value,lv:+$("#mk_lv").value,q:$("#mk_q").value.trim()};
   const code=$("#mk_code").value.replace(/\s+$/,"");if(code)q.code=code;
   q.o=o;q.a=MK_RIGHT;q.x=$("#mk_x").value.trim();
@@ -884,11 +889,12 @@ async function keepAwake(){try{if(navigator.wakeLock)wakeLock=await navigator.wa
 
 /* ---------------- HOST ---------------- */
 let H=null;
-let HS=Object.assign({subs:["maths","further","chem","cs"],lv:"mix",n:10,dur:45,auto:0,taught:false,play:false},lsGet("host",{}));
+let HS=Object.assign({subs:SKEYS.slice(),lv:"mix",n:10,dur:45,auto:0,taught:false,play:false},lsGet("host",{}));
+HS.subs=(HS.subs||[]).filter(k=>SUBJ[k]&&(!QSUBJ||QSUBJ.includes(k)));if(!HS.subs.length)HS.subs=QSUBJ?QSUBJ.slice():SKEYS.slice();
 if(![30,45,60,90].includes(HS.dur))HS.dur=45;
 ACT.hostSetup=()=>{
   setWide(false);
-  const sub=SKEYS.map(s=>`<button class="chip ${HS.subs.includes(s)?"on":""}" data-act="hsSub" data-s="${s}">${esc(SUBJ[s].em+" "+SUBJ[s].short)}</button>`).join("");
+  const sub=SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(s=>`<button class="chip ${HS.subs.includes(s)?"on":""}" data-act="hsSub" data-s="${s}">${esc(SUBJ[s].em+" "+SUBJ[s].short)}</button>`).join("");
   const seg=(key,vals,lab)=>vals.map(v=>`<button class="chip ${HS[key]===v?"on":""}" data-act="hsSet" data-k="${key}" data-v="${v}">${lab(v)}</button>`).join("");
   render(`<div class="wrap">${topBar("Host a quiz night")}
   <div class="card"><h3>Subjects</h3><div class="pchips">${sub}</div>
@@ -1015,7 +1021,7 @@ ACT.hRematch=()=>{   // same room, same players, a fresh set of questions
 ACT.hAgain=()=>{leaveLive();ACT.hostSetup();};
 ACT.hPick=d=>{if(!H||H.phase!=="q"||!HS.play)return;if(H.answers.has(H.hostPid))return;hostTakeAnswer(H.hostPid,H.i,+d.i);document.querySelectorAll(".hostq .opt").forEach(b=>{b.disabled=true;});const l=$("#hLock");if(l)l.textContent="🔒 Your answer is in";};
 ACT.hCopy=()=>copyText(joinLink(H.code)).then(()=>toast("Join link copied"));
-function joinLink(code){return location.origin+location.pathname+"#join-"+code;}
+function joinLink(code){return location.origin+location.pathname+"#join-"+code+(PROFILE==="gcse"?"-gcse":"");}
 function hostRefresh(){if(!H)return;if(H.phase==="lobby")hostRender();else{const box=$("#hPlayers");if(box)box.innerHTML=playerChips();}}
 function playerChips(){return [...H.players.values()].map(p=>`<span class="chip" style="${p.online||p.host?"":"opacity:.45"}">${esc(p.badge)} ${esc(p.name)}${p.host?" (host)":""}</span>`).join("")||`<span class="muted">Waiting for players…</span>`;}
 function boardHtml(board,meId){return `<div class="board">${board.map(b=>`<div class="brow ${b.pid===meId?"me":""}"><span class="pos">${b.pos<=3&&b.score>0?["🥇","🥈","🥉"][b.pos-1]:b.pos}</span><span class="av">${esc(b.badge)}</span><span>${esc(b.name)}</span><span class="pts">${fmt(b.score)}</span></div>`).join("")}</div>`;}
@@ -1187,7 +1193,7 @@ window.addEventListener("beforeunload",()=>{try{if(H)H.peer.destroy();if(PL&&PL.
 
 /* ---------- start ---------- */
 function route(){
-  const m=(location.hash||"").match(/^#join-([A-Za-z]{4})$/);
+  const m=(location.hash||"").match(/^#join-([A-Za-z]{4})(?:-(?:gcse|alevel))?$/);
   if(m){history.replaceState(null,"",location.pathname+location.search);ACT.join({code:m[1].toUpperCase()});return;}
   home();
 }

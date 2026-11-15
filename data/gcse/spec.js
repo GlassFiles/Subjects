@@ -2716,3 +2716,4 @@ RM.setSpec({
   ]
  }
 });
+RM.quiz=["maths", "physics", "business"];
