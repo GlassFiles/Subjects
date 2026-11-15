@@ -143,6 +143,10 @@ details .inner{padding:0 12px 12px}
 .status-dot.off{background:var(--red)}
 .linkb{text-decoration:underline;color:var(--mute);font-size:13px;padding:2px 0}
 .keycard{margin-top:10px;padding:12px 14px;border-radius:14px;background:#161d10;border:1px solid #3f5414;font-size:15px;line-height:1.45}
+.cswitch{display:flex;gap:0;margin:0 0 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel2)}
+.cswitch button{flex:1;padding:12px 8px;font-size:17px;font-weight:800;color:var(--mute);background:transparent;border:0}
+.cswitch button.on{background:var(--lime);color:#111;opacity:1}
+.cname{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--lime);margin-top:2px}
 .foot{margin-top:28px;color:var(--mute);font-size:12px;text-align:center;line-height:1.6}
 .topic:has(>.desc){flex-wrap:wrap}
 .topic>.desc{flex-basis:100%;font-size:13px;color:#c9d1dc;line-height:1.4;margin:-4px 0 0;padding-left:42px}
@@ -181,7 +185,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.4";
+const VERSION="1.4.1";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -344,7 +348,7 @@ function popText(t){const el=document.createElement("div");el.className="pop";el
 function confetti(){const cv=document.getElementById("confetti"),c=cv.getContext("2d");cv.width=innerWidth;cv.height=innerHeight;const cols=["#c6ff3d","#ff7a2f","#4da3ff","#b27cff","#33d17a","#ffffff"];const P=Array.from({length:140},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*5,c:pick(cols),a:Math.random()*6}));let n=0;(function f(){c.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.a+=.1;c.fillStyle=p.c;c.save();c.translate(p.x,p.y);c.rotate(p.a);c.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);c.restore();});if(++n<200)requestAnimationFrame(f);else c.clearRect(0,0,cv.width,cv.height);})();}
 function subjTag(s){const S=SUBJ[s]||{name:s,col:"#888"};return `<span class="subj"><i style="background:${S.col}"></i>${esc(S.name)}</span>`;}
 function lvTag(lv){return `<span class="lv ${lv===3?"l3":""}">${lv===3?"🔥 ":""}${esc(LVNAME[lv]||"")}</span>`;}
-function topBar(title,back="home"){return `<div class="top"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2></div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
+function topBar(title,back="home"){return `<div class="top"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
 function setWide(on){document.body.classList.toggle("wide",!!on);}
 let VIEW="home";
 function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);}
@@ -373,6 +377,7 @@ function home(){
   render(`<div class="wrap">
   <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="chip" data-act="profile">${esc(ME.badge)} ${esc(ME.name)}</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
+  ${courseSwitch()}
   ${LOAD_ERR.length?`<div class="card err">Couldn't load the ${esc(LOAD_ERR.join(", "))} questions. Open Rep Max from its web address: it can't read its question files from a file saved on this device.</div>`:""}
   <div class="card"><div class="rank"><div class="badge" style="font-weight:900;font-size:26px">${r.lvl}</div><div style="flex:1">
     <div class="row"><b style="font-size:18px">${esc(r.name)}</b><span class="spacer"></span><span class="muted small">${fmt(ST.xp)} XP${r.next?" · next: "+esc(r.next[1])+" at "+fmt(r.next[0]):""}</span></div>
@@ -399,6 +404,9 @@ function home(){
   Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · ${switchLink()} · v${VERSION}</div>
   </div>`,"home");
 }
+function courseSwitch(){return `<div class="cswitch" role="group" aria-label="Course">${["alevel","gcse"].map(k=>k===PROFILE
+  ?`<button class="on" aria-current="true" disabled>${esc(PROFILES[k].label)}</button>`
+  :`<button data-act="switchCourse" data-p="${k}">${esc(PROFILES[k].label)}</button>`).join("")}</div>`;}
 function switchLink(){const o=PROFILE==="gcse"?"alevel":"gcse";return `<button class="small" style="text-decoration:underline" data-act="switchCourse" data-p="${o}">Switch to ${esc(PROFILES[o].label)}</button>`;}
 function setCourse(p){try{localStorage.setItem("rm_profile",JSON.stringify(p));}catch(e){}location.replace(location.pathname);}
 ACT.switchCourse=d=>setCourse(d.p);
@@ -421,6 +429,7 @@ function homeMap(){
   render(`<div class="wrap">
   <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
+  ${courseSwitch()}
   <div class="card"><b style="font-size:18px">Your ${SKEYS.length} subjects</b><div class="small muted" style="margin-top:4px">${all.length} topics in all · ${done} ticked as covered so far</div>
     <div class="bar" style="margin-top:8px"><i style="width:${all.length?Math.round(done/all.length*100):0}%"></i></div></div>
   <div class="list">
