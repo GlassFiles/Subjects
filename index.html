@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>Rep Max · A-level gym</title>
 <meta name="theme-color" content="#0d0f13">
 <meta name="description" content="Rep Max: a revision game for A-level Maths, Further Maths, Chemistry and Computer Science. Solo training, a daily challenge and live quiz nights with friends.">
@@ -22,7 +22,18 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 input,select,textarea{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
 textarea{min-height:70px;resize:vertical}
 a{color:var(--lime)}
-.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.wrap{max-width:760px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(60px,calc(env(safe-area-inset-bottom) + 24px)) max(16px,env(safe-area-inset-left))}
+/* phone rules (FNF_Phone_Games_Guide.md, 16 Nov 2026): 44 px targets, no double-tap zoom, 16 px text in boxes */
+button,a[href],select,input:not([type=checkbox]){min-height:44px;min-width:44px;touch-action:manipulation}
+input,select,textarea{font-size:max(16px,1em)}
+/* typing view: while a text box has focus and an on-screen keyboard is up, the header and footer fold away and the
+   box's label is scrolled to the top, so the label and the box sit together above the keyboard */
+body.typing .top,body.typing .foot{display:none}
+.top .row{min-width:0;flex-wrap:nowrap}.top [data-act=profile]{display:block;max-width:36vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:30px}   /* 320 px: the nickname shortens rather than pushing the page sideways */
+body.typing .wrap{padding-bottom:100vh}
+label,textarea,input{scroll-margin-top:8px}   /* room below, so a box near the end can still be scrolled up to the top */
+#dbg{position:fixed;right:max(6px,env(safe-area-inset-right));top:max(6px,env(safe-area-inset-top));z-index:999;background:rgba(0,0,0,.82);color:#9f9;font:12px/1.35 ui-monospace,Menlo,monospace;padding:6px 8px;border-radius:8px;pointer-events:none;white-space:pre}
+#sai{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);visibility:hidden;pointer-events:none}
 .wide .wrap{max-width:1100px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
 .logo{font-weight:900;letter-spacing:.06em;font-size:26px;line-height:1;display:flex;align-items:center;gap:8px}
@@ -30,7 +41,7 @@ a{color:var(--lime)}
 .logo small{display:block;font-size:11px;letter-spacing:.12em;color:var(--mute);font-weight:700;margin-top:3px}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600}
 .chip.on{background:var(--lime);color:#111;border-color:var(--lime)}
-.icon-btn{width:38px;height:38px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:inline-grid;place-items:center;font-size:18px}
+.icon-btn{width:44px;height:44px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:inline-grid;place-items:center;font-size:18px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
 .card h2,.card h3{margin:0 0 8px}
 h1{font-size:26px;margin:6px 0 4px;font-weight:900;letter-spacing:.01em}
@@ -47,13 +58,13 @@ h3{font-size:16px;font-weight:800}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:560px){.grid2{grid-template-columns:1fr}}
 .big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;transition:transform .08s,border-color .15s}
-.big:hover{border-color:#3a4252}.big:active{transform:scale(.985)}
+@media (hover:hover){.big:hover{border-color:#3a4252}}.big:active{transform:scale(.985)}
 .big .em{font-size:30px;width:46px;height:46px;display:grid;place-items:center;background:var(--panel2);border-radius:14px;flex:none}
 .big b{display:block;font-size:17px}.big span{color:var(--mute);font-size:13px}
 .big.hero{background:linear-gradient(135deg,#25310c,#161a21 70%);border-color:#3f5414}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:14px;font-weight:800;background:var(--panel2);border:1px solid var(--line)}
 .btn.go{background:var(--lime);color:#111;border-color:var(--lime)}
-.btn.go:hover{background:var(--lime2)}
+@media (hover:hover){.btn.go:hover{background:var(--lime2)}}
 .btn.warn{background:#3a1d22;border-color:#6b2a33;color:#ffb3bb}
 .btn.block{width:100%}
 .btn:disabled{opacity:.45;cursor:default}
@@ -91,8 +102,10 @@ pre.code span::before{counter-increment:ln;content:counter(ln);position:absolute
 .feedback.ok{border-color:#2f6b24;background:#15230f}
 .feedback.no{border-color:#6b2a33;background:#24121a}
 .feedback b{font-size:18px}
-.timer{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden;margin:6px 0 0}
+.timer{position:sticky;top:max(4px,env(safe-area-inset-top));z-index:6;height:24px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden;margin:6px 0 8px}
 .timer i{display:block;height:100%;background:var(--lime);width:100%;transition:width .2s linear}
+.timer b{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000}
+@media (prefers-reduced-motion:reduce){.timer i{transition:none}}
 .timer.low i{background:var(--red)}
 .hud{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .combo{font-weight:900;color:var(--orange)}
@@ -103,8 +116,9 @@ pre.code span::before{counter-increment:ln;content:counter(ln);position:absolute
 .topic .nm span{font-size:12px;color:var(--mute)}
 .mini{width:80px;height:8px;border-radius:99px;background:#0f1218;overflow:hidden;flex:none}
 .mini i{display:block;height:100%}
-.tick{width:26px;height:26px;border-radius:8px;border:2px solid #485164;display:grid;place-items:center;flex:none;font-size:15px;font-weight:900}
-.tick.on{background:var(--lime);border-color:var(--lime);color:#111}
+.tick{width:44px;height:44px;margin:-9px;position:relative;isolation:isolate;display:grid;place-items:center;flex:none;font-size:15px;font-weight:900}
+.tick::before{content:"";position:absolute;inset:9px;border-radius:8px;border:2px solid #485164;z-index:-1}
+.tick.on{color:#111}.tick.on::before{background:var(--lime);border-color:var(--lime)}
 details{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:10px 0;overflow:hidden}
 summary{padding:14px 16px;cursor:pointer;font-weight:800;display:flex;align-items:center;gap:10px;list-style:none}
 summary::-webkit-details-marker{display:none}
@@ -121,7 +135,7 @@ details .inner{padding:0 12px 12px}
 .avs{display:flex;flex-wrap:wrap;gap:6px}
 .av-btn{width:44px;height:44px;border-radius:12px;background:var(--panel2);border:2px solid var(--line);font-size:22px}
 .av-btn.sel{border-color:var(--lime)}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#20262f;border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-weight:800;z-index:50;box-shadow:0 10px 30px #0008;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#20262f;border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-weight:800;z-index:50;box-shadow:0 10px 30px #0008;max-width:90vw;text-align:center}
 .pop{position:fixed;left:50%;top:16%;transform:translate(-50%,-50%);font-size:44px;font-weight:900;color:var(--lime);text-shadow:0 4px 24px #000;pointer-events:none;animation:pop 1s ease-out forwards;z-index:40}
 @keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-90%) scale(1)}}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
@@ -185,7 +199,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.5";
+const VERSION="1.6";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -348,6 +362,8 @@ function popText(t){const el=document.createElement("div");el.className="pop";el
 function confetti(){const cv=document.getElementById("confetti"),c=cv.getContext("2d");cv.width=innerWidth;cv.height=innerHeight;const cols=["#c6ff3d","#ff7a2f","#4da3ff","#b27cff","#33d17a","#ffffff"];const P=Array.from({length:140},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*5,c:pick(cols),a:Math.random()*6}));let n=0;(function f(){c.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.a+=.1;c.fillStyle=p.c;c.save();c.translate(p.x,p.y);c.rotate(p.a);c.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);c.restore();});if(++n<200)requestAnimationFrame(f);else c.clearRect(0,0,cv.width,cv.height);})();}
 function subjTag(s){const S=SUBJ[s]||{name:s,col:"#888"};return `<span class="subj"><i style="background:${S.col}"></i>${esc(S.name)}</span>`;}
 function lvTag(lv){return `<span class="lv ${lv===3?"l3":""}">${lv===3?"🔥 ":""}${esc(LVNAME[lv]||"")}</span>`;}
+/* timer bar: width, red when low, and the seconds printed (colour is never the only signal) */
+function tmSet(el,left,total){if(!el)return;el.querySelector("i").style.width=Math.max(0,left/total*100)+"%";el.classList.toggle("low",left<total*.25);const b=el.querySelector("b");if(b)b.textContent=Math.max(0,Math.ceil(left/1000))+" s";}
 function topBar(title,back="home"){return `<div class="top"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
 function setWide(on){document.body.classList.toggle("wide",!!on);}
 let VIEW="home";
@@ -389,6 +405,7 @@ function home(){
   <div class="list">
     <button class="big hero" data-act="daily"><span class="em">☀️</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
     <button class="big" data-act="gym"><span class="em">🏋️</span><span><b>Solo gym</b><span>Quick 5, warm-ups, working sets, 1-rep max and weak spots</span></span></button>
+    <button class="big" data-act="sprint"><span class="em">⚡</span><span><b>Sprint</b><span>As many as you can before the clock runs out. Harder questions score more</span></span></button>
     <div class="grid2">
       <button class="big" data-act="hostSetup"><span class="em">📺</span><span><b>Host a quiz night</b><span>On a laptop or TV; friends join on their phones</span></span></button>
       <button class="big" data-act="join"><span class="em">📱</span><span><b>Join a game</b><span>Got a 4-letter code?</span></span></button>
@@ -450,7 +467,7 @@ ACT.a2hsOk=()=>{lsSet("a2hs",true);home();};
 ACT.profile=()=>{
   render(`<div class="wrap">${topBar("Nickname")}
   <div class="card"><label class="small muted">Nickname (shown to friends in quiz nights; no real names needed)</label>
-  <div class="row" style="margin-top:6px"><input id="pname" maxlength="22" value="${esc(ME.name)}"><button class="btn" data-act="rname" aria-label="Random name">🎲</button></div>
+  <div class="row" style="margin-top:6px"><input id="pname" maxlength="22" enterkeyhint="done" autocapitalize="words" autocorrect="off" spellcheck="false" autocomplete="off" value="${esc(ME.name)}"><button class="btn" data-act="rname" aria-label="Random name">🎲</button></div>
   <div class="small muted" style="margin:14px 0 6px">Badge</div><div class="avs" id="avs">${BADGES.map(b=>`<button class="av-btn ${b===ME.badge?"sel":""}" data-act="badge" data-b="${b}">${b}</button>`).join("")}</div>
   <div style="margin-top:16px"><button class="btn go block" data-act="saveProfile">Save</button></div></div></div>`,"profile");
 };
@@ -464,7 +481,7 @@ ACT.settings=()=>{
   <div class="card"><h3>Move your progress to another device</h3><p class="muted small">Copy this code, then paste it into the box on your other device. It adds to what's there rather than replacing it.</p>
   <div class="kbd" id="bk">${esc(btoa(unescape(encodeURIComponent(JSON.stringify({me:ME,stats:ST,taught:TAUGHT,notyet:NOTYET})))))}</div>
   <div class="row" style="margin-top:8px"><button class="btn" data-act="copyBk">Copy code</button></div>
-  <div class="hr"></div><textarea id="bkin" placeholder="Paste a backup code here"></textarea>
+  <div class="hr"></div><label class="small muted" style="display:block">Paste a backup code from your other device</label><textarea id="bkin" placeholder="Paste a backup code here" enterkeyhint="done" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></textarea>
   <div class="row" style="margin-top:8px"><button class="btn" data-act="loadBk">Add this backup</button><span id="bkmsg" class="small muted"></span></div></div>
   <div class="card"><h3>Keep it on your home screen</h3><p class="muted small">iPhone: Share, then Add to Home Screen. Android: the ⋮ menu, then Add to Home screen. Phones can clear saved progress for websites you haven't opened for a while; the home-screen version keeps it.</p></div>
   <div class="card"><h3>Start again</h3><p class="muted small">Wipes your XP, stats and ticks on this device.</p><button class="btn warn" data-act="wipe1">Reset progress</button><span id="wipe2"></span></div>
@@ -566,7 +583,7 @@ function showQ(){
   <div class="top"><button class="icon-btn" data-act="quitRun" aria-label="Quit">✕</button>
    <div class="hud"><span class="chip">${RUN.mode==="daily"?"Daily · ":""}Rep ${RUN.i+1}/${RUN.qs.length}</span>${RUN.combo>=2?`<span class="combo">🔥 x${RUN.combo}</span>`:""}</div>
    <button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>
-  ${timed?`<div class="timer" id="tm"><i></i></div>`:""}
+  ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
    <div class="opts">${perm.map((k,i)=>`<button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
@@ -574,7 +591,7 @@ function showQ(){
    <div class="small muted" style="margin-top:12px">${esc(specRef(q))} · <span class="tag">${esc(q.id)}${q.gen?" · new numbers each time":""}</span></div></div></div>`,"run");
   if(timed){
     const dur=qDur(q)*1000;
-    RT=setInterval(()=>{const left=dur-(Date.now()-RUN.start);const el=$("#tm");if(!el){clearInterval(RT);return;}el.querySelector("i").style.width=Math.max(0,left/dur*100)+"%";el.classList.toggle("low",left<dur*.25);if(left<=0){clearInterval(RT);answer(-1);}},200);
+    tmSet($("#tm"),dur,dur);RT=setInterval(()=>{const left=dur-(Date.now()-RUN.start);const el=$("#tm");if(!el){clearInterval(RT);return;}tmSet(el,left,dur);if(left<=0){clearInterval(RT);answer(-1);}},200);
   }
 }
 ACT.pickOpt=d=>answer(+d.i);
@@ -783,10 +800,10 @@ ACT.maker=()=>{
   <div class="grid2"><div><label class="small muted">Subject</label><select id="mk_s">${SKEYS.map(k=>`<option value="${k}" ${k===s?"selected":""}>${esc(SUBJ[k].name)}</option>`).join("")}</select></div>
   <div><label class="small muted">Level</label><select id="mk_lv"><option value="1">1 · Warm-up</option><option value="2" selected>2 · Working set</option><option value="3">3 · 1-rep max</option></select></div></div>
   <label class="small muted" style="display:block;margin-top:10px">Topic</label><select id="mk_t">${tops.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("")}</select>
-  <label class="small muted" style="display:block;margin-top:10px">Question (maths between $ signs, e.g. $x^2+1$)</label><textarea id="mk_q"></textarea>
-  <label class="small muted" style="display:block;margin-top:10px">Code (optional)</label><textarea id="mk_code" style="font-family:ui-monospace,Menlo,monospace"></textarea>
-  ${[0,1,2,3].map(i=>`<div class="row" style="margin-top:10px"><button class="tick ${i===0?"on":""}" data-act="mkRight" data-i="${i}" aria-label="Right answer">${i===0?"✓":""}</button><input id="mk_o${i}" placeholder="Option ${SHAPES[i]}${i===0?" (ticked = the right answer)":""}"></div>`).join("")}
-  <label class="small muted" style="display:block;margin-top:10px">Explanation (why the answer is right)</label><textarea id="mk_x"></textarea>
+  <label class="small muted" style="display:block;margin-top:10px">Question (maths between $ signs, e.g. $x^2+1$)</label><textarea id="mk_q" enterkeyhint="next" autocapitalize="sentences" autocorrect="on" spellcheck="true"></textarea>
+  <label class="small muted" style="display:block;margin-top:10px">Code (optional)</label><textarea id="mk_code" enterkeyhint="enter" autocapitalize="off" autocorrect="off" spellcheck="false" style="font-family:ui-monospace,Menlo,monospace"></textarea>
+  ${[0,1,2,3].map(i=>`<div class="row" style="margin-top:10px"><button class="tick ${i===0?"on":""}" data-act="mkRight" data-i="${i}" aria-label="Right answer">${i===0?"✓":""}</button><input id="mk_o${i}" enterkeyhint="next" autocapitalize="sentences" autocorrect="on" spellcheck="true" placeholder="Option ${SHAPES[i]}${i===0?" (ticked = the right answer)":""}"></div>`).join("")}
+  <label class="small muted" style="display:block;margin-top:10px">Explanation (why the answer is right)</label><textarea id="mk_x" enterkeyhint="done" autocapitalize="sentences" autocorrect="on" spellcheck="true"></textarea>
   <div class="row" style="margin-top:12px"><button class="btn go" data-act="mkBuild">Preview & make line</button></div></div>
   <div id="mk_out"></div></div>`,"maker");
   $("#mk_s").onchange=e=>{lsSet("mk_s",e.target.value);ACT.maker();};
@@ -989,7 +1006,7 @@ function hostQuestion(i){
   H.qT=setInterval(()=>{
     if(!H||H.phase!=="q")return clearInterval(H.qT);
     const left=H.cur.dur*1000-(Date.now()-H.cur.start),el=$("#tm");
-    if(el){el.querySelector("i").style.width=Math.max(0,left/(H.cur.dur*1000)*100)+"%";el.classList.toggle("low",left<H.cur.dur*250);}
+    if(el)tmSet(el,left,H.cur.dur*1000);
     const sec=$("#hSec");if(sec)sec.textContent=Math.max(0,Math.ceil(left/1000));
     if(left<=-GRACE){clearInterval(H.qT);hostReveal();}
   },200);
@@ -1049,7 +1066,7 @@ function hostRender(){
     const m=qMsg(),q=m.q,mine=H.answers.get(H.hostPid);
     render(`<div class="wrap">${top}
     <div class="row"><span class="chip">Question ${H.i+1}/${H.qs.length}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="muted small">${esc(q.t)}</span><span class="spacer"></span><span class="chip" id="hAns">${H.answers.size} / ${activeCount()} answered</span><span class="big-num" id="hSec" style="font-size:34px;min-width:50px;text-align:right">${Math.ceil(m.left/1000)}</span></div>
-    <div class="timer" id="tm"><i></i></div>
+    <div class="timer" id="tm"><i></i><b></b></div>
     <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
     <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i}" ${HS.play&&!mine?`data-act="hPick" data-i="${i}" data-silent="1"`:"disabled"}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div></div>
     <div class="row"><div class="pchips" id="hPlayers">${playerChips()}</div><span class="spacer"></span><span class="muted" id="hLock">${mine?"🔒 Your answer is in":""}</span><button class="btn" data-act="hReveal">Reveal now</button></div></div>`,"host");
@@ -1087,9 +1104,9 @@ ACT.join=(d)=>{
   const pre=(d&&d.code)||"";
   render(`<div class="wrap">${topBar("Join a game")}
   <div class="card"><label class="small muted">Room code (on the host's screen)</label>
-  <input id="jcode" maxlength="4" autocapitalize="characters" autocomplete="off" style="font-size:32px;font-weight:900;letter-spacing:.3em;text-transform:uppercase;text-align:center" value="${esc(pre)}">
+  <input id="jcode" maxlength="4" enterkeyhint="next" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off" style="font-size:32px;font-weight:900;letter-spacing:.3em;text-transform:uppercase;text-align:center" value="${esc(pre)}">
   <label class="small muted" style="display:block;margin-top:12px">Your nickname</label>
-  <div class="row"><input id="jname" maxlength="22" value="${esc(ME.name)}"><button class="btn" data-act="rnameJ" aria-label="Random name">🎲</button></div>
+  <div class="row"><input id="jname" maxlength="22" enterkeyhint="go" autocapitalize="words" autocorrect="off" spellcheck="false" autocomplete="off" value="${esc(ME.name)}"><button class="btn" data-act="rnameJ" aria-label="Random name">🎲</button></div>
   <div class="small muted" style="margin:12px 0 6px">Badge</div><div class="avs">${BADGES.map(b=>`<button class="av-btn ${b===ME.badge?"sel":""}" data-act="badge" data-b="${b}">${b}</button>`).join("")}</div>
   <button class="btn go block" style="margin-top:16px;font-size:18px;padding:16px" data-act="joinGo">Join</button><p class="small muted center" id="jmsg"></p></div></div>`,"join");
 };
@@ -1176,11 +1193,11 @@ function plRenderQ(){
   const q=PL.q;clearInterval(PL.timer);
   render(`<div class="wrap">${plTop()}
   <div class="row"><span class="chip">Q ${PL.n+1}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="spacer"></span><b id="plSec" style="font-size:22px"></b></div>
-  <div class="timer" id="tm"><i></i></div>
+  <div class="timer" id="tm"><i></i><b></b></div>
   <div class="qbox"><div class="small muted" style="margin-bottom:6px">${esc(q.t)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
   <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i} ${PL.mine!=null?(PL.mine===i?"mine":"dim"):""}" data-act="plPick" data-i="${i}" data-silent="1" ${PL.mine!=null?"disabled":""}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div>
   <div id="plMsg" class="center muted" style="margin-top:12px">${PL.mine!=null?"🔒 Locked in. Waiting for the others…":""}</div></div></div>`,"play");
-  PL.timer=setInterval(()=>{const left=PL.dur*1000-(Date.now()-PL.start),el=$("#tm");if(!el)return clearInterval(PL.timer);el.querySelector("i").style.width=Math.max(0,left/(PL.dur*1000)*100)+"%";el.classList.toggle("low",left<PL.dur*250);const s=$("#plSec");if(s)s.textContent=Math.max(0,Math.ceil(left/1000));if(left<=0){clearInterval(PL.timer);if(PL.mine==null){document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;b.classList.add("dim");});const m=$("#plMsg");if(m)m.textContent="⏱ Time's up";}}},200);
+  tmSet($("#tm"),PL.dur*1000-(Date.now()-PL.start),PL.dur*1000);PL.timer=setInterval(()=>{const left=PL.dur*1000-(Date.now()-PL.start),el=$("#tm");if(!el)return clearInterval(PL.timer);tmSet(el,left,PL.dur*1000);const s=$("#plSec");if(s)s.textContent=Math.max(0,Math.ceil(left/1000));if(left<=0){clearInterval(PL.timer);if(PL.mine==null){document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;b.classList.add("dim");});const m=$("#plMsg");if(m)m.textContent="⏱ Time's up";}}},200);
 }
 ACT.plPick=d=>{
   if(!PL||PL.phase!=="q"||PL.mine!=null)return;
@@ -1199,6 +1216,119 @@ function leaveLive(){
   if(wakeLock){try{wakeLock.release();}catch(e){}wakeLock=null;}
 }
 window.addEventListener("beforeunload",()=>{try{if(H)H.peer.destroy();if(PL&&PL.peer)PL.peer.destroy();}catch(e){}});
+
+
+/* =====================================================================
+   SPRINT (Guy, 16 Nov 2026): as many questions as possible against one clock.
+   Points by level, so harder questions are worth more: level 1 = 1, level 2 = 2, level 3 = 3.
+   A wrong answer costs 3 seconds; Skip costs 2 seconds, so a hard question never traps you.
+   Answers count towards the tracker and spaced repetition like any other rep. Best score per course,
+   subject and length is kept on this device.
+   ===================================================================== */
+const SPRINT_LENS=[60,120,180];
+let SPS=Object.assign({len:60},lsGet("sprint",{}));
+if(!SPRINT_LENS.includes(SPS.len))SPS.len=60;
+let SP=null,SPT=null;
+const SP_PTS={1:1,2:2,3:3},SP_WRONG=3,SP_SKIP=2;
+ACT.sprint=()=>{
+  setWide(false);
+  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="spS" data-s="${s}">${s==="mix"?"🎲 Mixed":esc(SUBJ[s].em+" "+SUBJ[s].name)}</button>`).join("");
+  const lens=SPRINT_LENS.map(l=>`<button class="chip ${SPS.len===l?"on":""}" data-act="spL" data-l="${l}">${l<120?l+" s":l/60+" min"}</button>`).join("");
+  const best=ST.best["sprint|"+SPS.len+"|"+GYM.s];
+  render(`<div class="wrap">${topBar("Sprint")}
+  <div class="card"><b style="font-size:18px">⚡ As many as you can</b><p class="small muted" style="margin:6px 0 0">One clock for the whole sprint. Level 1 questions score 1 point, level 2 score 2, level 3 score 3. A wrong answer costs ${SP_WRONG} seconds; Skip costs ${SP_SKIP}.</p></div>
+  <div class="card"><h3>Subject</h3><div class="pchips">${sChips}</div></div>
+  <div class="card"><h3>Length</h3><div class="pchips">${lens}</div>
+  <div class="small muted" style="margin-top:8px">Your best here: ${best?best+" points":"none yet"}</div></div>
+  <div class="card">${coverRow("spTaught",GYM.taught,"sprint")}</div>
+  <button class="btn go block" data-act="spGo" style="font-size:18px;padding:16px">Start sprint</button>
+  <p class="small muted center" id="spmsg"></p></div>`,"sprint");
+};
+ACT.spS=d=>{GYM.s=d.s;GYM.topic=null;lsSet("gym",GYM);ACT.sprint();};
+ACT.spL=d=>{SPS.len=+d.l;lsSet("sprint",SPS);ACT.sprint();};
+ACT.spTaught=()=>{GYM.taught=!GYM.taught;lsSet("gym",GYM);ACT.sprint();};
+function spPool(){return playable(BANK.filter(q=>GYM.s==="mix"||q.s===GYM.s),GYM.taught);}
+ACT.spGo=()=>{
+  const pool=spPool();
+  if(!pool.length){$("#spmsg").textContent="No questions match those settings yet. Try another subject, or check what you've covered.";return;}
+  SP={len:SPS.len,s:GYM.s,end:Date.now()+SPS.len*1000,pool:shuffle(pool.slice()),k:0,q:null,perm:null,pts:0,right:0,wrong:0,skips:0,res:[],locked:false};
+  spNext();
+  clearInterval(SPT);SPT=setInterval(spTick,200);
+};
+function spTick(){
+  if(!SP)return clearInterval(SPT);
+  const left=SP.end-Date.now();tmSet($("#tm"),left,SP.len*1000);
+  if(left<=0){clearInterval(SPT);spEnd();}
+}
+function spNext(){
+  if(SP.k>=SP.pool.length){SP.pool=shuffle(SP.pool);SP.k=0;}
+  let q=null;for(let tries=0;!q&&tries<SP.pool.length;tries++){q=inst(SP.pool[SP.k++]);if(SP.k>=SP.pool.length){SP.pool=shuffle(SP.pool);SP.k=0;}}
+  if(!q)return spEnd();
+  SP.q=q;SP.perm=shuffle([0,1,2,3]);SP.locked=false;
+  render(`<div class="wrap">
+  <div class="top"><button class="icon-btn" data-act="spQuit" aria-label="Stop">✕</button>
+   <div class="hud"><span class="chip">⚡ ${SP.pts} pts</span><span class="chip">${SP.right} right</span></div>
+   <button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>
+  <div class="timer" id="tm"><i></i><b></b></div>
+  <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">+${SP_PTS[q.lv]} pt${SP_PTS[q.lv]>1?"s":""}</span></div>
+   <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+   <div class="opts">${SP.perm.map((k,i)=>`<button class="opt o${i}" data-act="spPick" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
+   <div class="row" style="margin-top:12px"><span class="spacer"></span><button class="btn" data-act="spSkip">Skip (−${SP_SKIP} s)</button></div></div></div>`,"sprintq");
+  spTick();
+}
+ACT.spPick=d=>{
+  if(!SP||SP.locked)return;SP.locked=true;
+  const q=SP.q,right=SP.perm.indexOf(q.a),di=+d.i,ok=di===right;
+  recordAnswer(q,ok);SP.res.push({q,ok,di,perm:SP.perm});
+  if(ok){SP.right++;SP.pts+=SP_PTS[q.lv];SFX.correct();}else{SP.wrong++;SP.end-=SP_WRONG*1000;SFX.wrong();popText("−"+SP_WRONG+" s");}
+  document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i===right)b.classList.add("right");else if(i===di)b.classList.add("mine");else b.classList.add("dim");});
+  setTimeout(()=>{if(SP&&SP.end>Date.now())spNext();},ok?350:900);
+};
+ACT.spSkip=()=>{if(!SP||SP.locked)return;SP.skips++;SP.end-=SP_SKIP*1000;spNext();};
+ACT.spQuit=()=>{clearInterval(SPT);SP=null;home();};   // a sprint stopped early records no score
+function spEnd(){
+  if(!SP||SP.done)return;SP.done=true;clearInterval(SPT);
+  const key="sprint|"+SP.len+"|"+SP.s,prev=ST.best[key]||0,pb=SP.pts>prev&&SP.pts>0;
+  if(pb)ST.best[key]=SP.pts;
+  addXP(SP.res.filter(r=>r.ok).reduce((a,r)=>a+XP_LV[r.q.lv],0));saveST();
+  if(pb&&prev>0){SFX.fanfare();confetti();}
+  const n=SP.right+SP.wrong,miss=SP.res.filter(r=>!r.ok);
+  render(`<div class="wrap">${topBar("Sprint done","sprint")}
+   <div class="card center"><div class="big-num">${SP.pts}</div><div class="muted">points in ${SP.len<120?SP.len+" s":SP.len/60+" min"}</div>
+   <div class="muted" style="margin-top:6px">${SP.right} right · ${SP.wrong} wrong · ${SP.skips} skipped${n?" · "+Math.round(SP.right/n*100)+"% accuracy":""}</div>
+   ${pb&&prev>0?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">🏆 New best (was ${prev})</div>`:`<div class="small muted" style="margin-top:8px">Best: ${Math.max(prev,SP.pts)} points</div>`}</div>
+   ${miss.length?`<div class="card"><h3>Review your misses</h3><div class="list">${miss.slice(0,12).map(r=>`<div class="topic" style="display:block"><div class="row" style="margin-bottom:6px">${subjTag(r.q.s)}<span class="small muted">${esc(topicOf(r.q).name)}</span></div><div>${tex(r.q.q)}</div><div class="small" style="margin-top:6px">Answer: <b>${tex(r.q.o[r.q.a])}</b></div><div class="small muted" style="margin-top:4px">${tex(r.q.x||"")}</div></div>`).join("")}</div></div>`:""}
+   <div class="row"><button class="btn go" data-act="spGo">Go again</button><button class="btn" data-act="home">Home</button></div></div>`,"sprintend");
+}
+
+/* ---------- phones: typing view and ?debug=1 (FNF_Phone_Games_Guide.md, rules 1-3 and the real-phone check) ---------- */
+/* While a text box has focus and an on-screen keyboard has shrunk the visible area, the page switches to a typing view
+   (header and footer folded away, see the CSS) and scrolls the box's label to the top, so the question being answered
+   and the box are on screen together. Laptops never shrink the visible area, so they never see it.
+   ?kb=<px> pretends a keyboard of that height is up: phone_audit.py uses it, as no emulator shows a real keyboard. */
+const KB_SIM=+(new URLSearchParams(location.search).get("kb")||0);
+function askOf(e){let n=e;if(n.parentElement&&n.parentElement.classList.contains("row"))n=n.parentElement;const p=n.previousElementSibling;return p&&p.tagName==="LABEL"?p:null;}
+function fitPhone(){
+  const vv=window.visualViewport,a=document.activeElement;
+  const box=!!(a&&a.matches&&a.matches("input:not([type=checkbox]),textarea"));
+  const vis=(vv?vv.height:innerHeight)-(box&&KB_SIM?KB_SIM:0);
+  const typing=box&&vis<innerHeight-120;
+  const was=document.body.classList.contains("typing");
+  document.body.classList.toggle("typing",typing);
+  document.documentElement.style.setProperty("--vvh",vis+"px");
+  if(typing&&!was)(askOf(a)||a).scrollIntoView({block:"start"});
+  dbgShow();
+}
+if(window.visualViewport){visualViewport.addEventListener("resize",fitPhone);visualViewport.addEventListener("scroll",fitPhone);}
+document.addEventListener("focusin",fitPhone);document.addEventListener("focusout",()=>setTimeout(fitPhone,50));
+/* ?debug=1: the numbers to read off a real phone with the keyboard up (screenshot it and send it back) */
+const DBG=/[?&]debug=1(?![0-9])/.test(location.search);
+function dbgShow(){
+  if(!DBG)return;let d=$("#dbg");if(!d){d=document.createElement("div");d.id="dbg";document.body.appendChild(d);const p=document.createElement("div");p.id="sai";document.body.appendChild(p);}
+  const vv=window.visualViewport,cs=getComputedStyle($("#sai"));
+  d.textContent=`Rep Max v${VERSION} ${PROFILE||""}\ninner ${innerWidth}x${innerHeight}\nvisual ${vv?Math.round(vv.width)+"x"+Math.round(vv.height)+" top "+Math.round(vv.offsetTop):"n/a"}\nsafe ${["Top","Right","Bottom","Left"].map(k=>parseInt(cs["padding"+k])||0).join(" ")}\ndpr ${devicePixelRatio}  typing ${document.body.classList.contains("typing")?"on":"off"}`;
+}
+if(DBG){window.addEventListener("resize",dbgShow);setInterval(dbgShow,1000);}
 
 /* ---------- start ---------- */
 function route(){
