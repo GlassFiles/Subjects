@@ -3,12 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
-<title>Rep Max · A-level gym</title>
+<title>Rep Max · revision gym</title>
 <meta name="theme-color" content="#0d0f13">
-<meta name="description" content="Rep Max: a revision game for A-level Maths, Further Maths, Chemistry and Computer Science. Solo training, a daily challenge and live quiz nights with friends.">
+<meta name="description" content="A revision gym for A-level and GCSE: timed sprints, a daily challenge and live quiz nights with friends.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Rep Max">
+<meta property="og:title" content="Rep Max · revision gym">
+<meta property="og:description" content="A revision gym for A-level and GCSE: timed sprints, a daily challenge and live quiz nights with friends.">
+<meta property="og:url" content="https://glassfiles.github.io/Subjects/">
+<meta property="og:image" content="https://glassfiles.github.io/Subjects/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The words Rep Max in lime green beside a barbell, with Sprint, Daily challenge and Quiz nights">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://glassfiles.github.io/Subjects/og-image.jpg">
 <link rel="stylesheet" href="lib/katex.min.css" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css'">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="lib/icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rep Max">
@@ -199,7 +212,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.6";
+const VERSION="1.6.1";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -222,6 +235,7 @@ const PROFILES={
 };
 const PROFILE=window.RM.profile;                     // null until a course is chosen
 const PRO=PROFILES[PROFILE]||{label:"",tag:"",quiz:false,subj:{}};
+if(PRO.label)document.title="Rep Max · "+PRO.label;
 if(window.RM.quiz===false)PRO.quiz=false;            // data/<course>/spec.js says no question files exist yet
 const SUBJ=PRO.subj;
 const QSUBJ=Array.isArray(window.RM.quiz)?window.RM.quiz.filter(k=>SUBJ[k]):null;   // subjects with question files (null = all)
