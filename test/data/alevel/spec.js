@@ -358,7 +358,34 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA 7357 specification page",
+    "url": "https://www.aqa.org.uk/subjects/mathematics/a-level/mathematics-7357/specification",
+    "desc": "The official course outline, linking to papers and examiner reports"
+   },
+   {
+    "name": "AQA past papers and mark schemes finder",
+    "url": "https://www.aqa.org.uk/past-papers-and-mark-schemes-finder",
+    "desc": "AQA's finder: choose Mathematics, A-level, 7357 for papers, mark schemes, reports"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Use brackets when you expand, substitute or differentiate. Missing brackets cost marks on chain rule, composite function and integration questions.",
+    "src": "https://examsolutions.s3.eu-west-2.amazonaws.com/exam+papers/maths/2024/AQA-73571-WRE-JUN24.PDF"
+   },
+   {
+    "text": "Keep full calculator values. Round only the final answer.",
+    "src": "https://examsolutions.s3.eu-west-2.amazonaws.com/exam+papers/maths/2024/AQA-73571-WRE-JUN24.PDF"
+   },
+   {
+    "text": "Answer in the form asked: give a domain in terms of x, and include units.",
+    "src": "https://examsolutions.s3.eu-west-2.amazonaws.com/exam+papers/maths/2024/AQA-73571-WRE-JUN24.PDF"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "further": {
   "name": "Further Maths",
@@ -538,7 +565,39 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA 7367 specification page",
+    "url": "https://www.aqa.org.uk/subjects/mathematics/a-level/mathematics-7367/specification",
+    "desc": "Official 7367 specification: content, assessment scheme and formulae"
+   },
+   {
+    "name": "AQA All About Maths: A-level Further Maths",
+    "url": "https://www.aqa.org.uk/all-about-maths/a-level-further-maths",
+    "desc": "AQA hub for Further Maths: specimen and practice papers, formulae poster"
+   },
+   {
+    "name": "AQA 7367 assessment resources",
+    "url": "https://www.aqa.org.uk/subjects/mathematics/a-level/mathematics-7367/assessment-resources",
+    "desc": "AQA's own 7367 page for past papers, mark schemes and examiner reports"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Good methods still lose marks to algebra slips. Check each line before you move on.",
+    "src": "https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-73671-WRE-JUN22.PDF"
+   },
+   {
+    "text": "Argand diagrams and loci: check signs, so circle centres and half-line ends land in the right place.",
+    "src": "https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2022/june/AQA-73671-WRE-JUN22.PDF"
+   },
+   {
+    "text": "When asked for a point, give coordinates, not a position vector.",
+    "src": "https://filestore.aqa.org.uk/sample-papers-and-mark-schemes/2019/june/AQA-73671-WRE-JUN19.PDF"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "chem": {
   "name": "Chemistry",
@@ -815,7 +874,39 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA 7405 practical assessment page",
+    "url": "https://www.aqa.org.uk/subjects/chemistry/a-level/chemistry-7405/specification/practical-assessment",
+    "desc": "The 12 required practicals and practical skills"
+   },
+   {
+    "name": "AQA A-level Chemistry 7405 assessment resources",
+    "url": "https://www.aqa.org.uk/subjects/chemistry/a-level/chemistry-7405/assessment-resources",
+    "desc": "Official 7405 past papers, mark schemes and reports"
+   },
+   {
+    "name": "Chemguide",
+    "url": "https://www.chemguide.co.uk/",
+    "desc": "Free, clear explanations of organic and physical chemistry. Not AQA-specific"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Spot the command word, but read every word of the question too. The rest of the wording shapes what the examiner wants.",
+    "src": "https://www.ocr.org.uk/blog/how-important-are-command-words/"
+   },
+   {
+    "text": "Be precise. Vague words like \"amount\" or \"how much\" can lose the mark, so name the exact thing, such as volume.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "Write clearly in black pen at a readable size. Answers are scanned for marking, so tiny or messy writing is hard to read.",
+    "src": "https://www.aqa.org.uk/files/cRIpdimsSKiybuSFvPrqz4/460a7e8d0c640ae9ee894cd5af598248044152f2.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "cs": {
   "name": "Computer Science",
@@ -1003,7 +1094,29 @@ RM.setSpec({
     ],
     "ref": "2.1-2.3"
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "Isaac Computer Science",
+    "url": "https://isaaccomputerscience.org/",
+    "desc": "Free A-level CS material from Raspberry Pi Foundation and Cambridge, under an open licence"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Tie every answer to the scenario. Examiners note answers that ignore the context.",
+    "src": "https://www.ocr.org.uk/Images/726391-examiners-report-computer-systems.pdf"
+   },
+   {
+    "text": "Use exact terms. For trees, say nodes and branches, not vertices and edges, which are graph words. Examiners also penalise wrong database terms.",
+    "src": "https://www.ocr.org.uk/Images/703604-examiners-report-algorithms-and-programming.pdf"
+   },
+   {
+    "text": "Be specific. Not \"remove the end node\", but which node, and set the parent pointer to null.",
+    "src": "https://www.ocr.org.uk/Images/703604-examiners-report-algorithms-and-programming.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  }
 });
 RM.quiz=["maths", "further", "chem", "cs"];
