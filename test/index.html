@@ -1,0 +1,1398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="robots" content="noindex, nofollow">
+<title>Rep Max · revision gym (test version)</title>
+<meta name="theme-color" content="#0d0f13">
+<meta name="description" content="A revision gym for A-level and GCSE: timed sprints, a daily challenge and live quiz nights with friends.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Rep Max">
+<meta property="og:title" content="Rep Max · revision gym (test version)">
+<meta property="og:description" content="A revision gym for A-level and GCSE: timed sprints, a daily challenge and live quiz nights with friends.">
+<meta property="og:url" content="https://glassfiles.github.io/Subjects/test/">
+<meta property="og:image" content="https://glassfiles.github.io/Subjects/test/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The words Rep Max in lime green beside a barbell, with Sprint, Daily challenge and Quiz nights">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://glassfiles.github.io/Subjects/test/og-image.jpg">
+<link rel="stylesheet" href="../lib/katex.min.css" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css'">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rep Max">
+<style>
+:root{--bg:#0d0f13;--panel:#161a21;--panel2:#1e232c;--line:#2b313d;--text:#f3f5f9;--mute:#9aa3b2;--lime:#c6ff3d;--lime2:#a5e400;--orange:#ff7a2f;--red:#ff4d5e;--green:#2fd27a;
+--maths:#4da3ff;--further:#b27cff;--chem:#33d17a;--cs:#ff9f1c;--t0:#e5484d;--t1:#3e7bff;--t2:#e8a317;--t3:#2a9d5c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+body{min-height:100vh;background:radial-gradient(1200px 600px at 50% -200px,#1b2230 0%,var(--bg) 60%) fixed}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select,textarea{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:70px;resize:vertical}
+a{color:var(--lime)}
+.wrap{max-width:760px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(60px,calc(env(safe-area-inset-bottom) + 24px)) max(16px,env(safe-area-inset-left))}
+/* phone rules (FNF_Phone_Games_Guide.md, 16 Nov 2026): 44 px targets, no double-tap zoom, 16 px text in boxes */
+button,a[href],select,input:not([type=checkbox]){min-height:44px;min-width:44px;touch-action:manipulation}
+input,select,textarea{font-size:max(16px,1em)}
+/* typing view: while a text box has focus and an on-screen keyboard is up, the header and footer fold away and the
+   box's label is scrolled to the top, so the label and the box sit together above the keyboard */
+body.typing .top,body.typing .foot{display:none}
+.top .row{min-width:0;flex-wrap:nowrap}.top [data-act=profile]{display:block;max-width:36vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:30px}   /* 320 px: the nickname shortens rather than pushing the page sideways */
+body.typing .wrap{padding-bottom:var(--fullh,100vh)}
+label,textarea,input{scroll-margin-top:8px}   /* room below, so a box near the end can still be scrolled up to the top */
+#dbg{position:fixed;right:max(6px,env(safe-area-inset-right));top:max(6px,env(safe-area-inset-top));z-index:999;background:rgba(0,0,0,.82);color:#9f9;font:12px/1.35 ui-monospace,Menlo,monospace;padding:6px 8px;border-radius:8px;pointer-events:none;white-space:pre}
+#sai{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);visibility:hidden;pointer-events:none}
+.wide .wrap{max-width:1100px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.logo{font-weight:900;letter-spacing:.06em;font-size:calc(26px*var(--fs,1));line-height:1;display:flex;align-items:center;gap:8px}
+.logo b{color:var(--lime)}
+.logo small{display:block;font-size:calc(11px*var(--fs,1));letter-spacing:.12em;color:var(--mute);font-weight:700;margin-top:3px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:calc(14px*var(--fs,1));font-weight:600}
+.chip.on{background:var(--lime);color:#111;border-color:var(--lime)}
+.icon-btn{width:44px;height:44px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:inline-grid;place-items:center;font-size:calc(18px*var(--fs,1))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+.card h2,.card h3{margin:0 0 8px}
+h1{font-size:calc(26px*var(--fs,1));margin:6px 0 4px;font-weight:900;letter-spacing:.01em}
+h2{font-size:calc(20px*var(--fs,1));font-weight:800}
+h3{font-size:calc(16px*var(--fs,1));font-weight:800}
+.muted{color:var(--mute)}
+.small{font-size:calc(13px*var(--fs,1))}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row>input{flex:1;width:auto;min-width:0}
+.row>.tick+div{flex:1;min-width:0}
+.top>.row{flex-wrap:nowrap}
+.top .chip{max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
+.spacer{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;transition:transform .08s,border-color .15s}
+@media (hover:hover){.big:hover{border-color:#3a4252}}.big:active{transform:scale(.985)}
+.big .em{font-size:calc(30px*var(--fs,1));width:46px;height:46px;display:grid;place-items:center;background:var(--panel2);border-radius:14px;flex:none}
+.big b{display:block;font-size:calc(17px*var(--fs,1))}.big span{color:var(--mute);font-size:calc(13px*var(--fs,1))}
+.big.hero{background:linear-gradient(135deg,#25310c,#161a21 70%);border-color:#3f5414}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:14px;font-weight:800;background:var(--panel2);border:1px solid var(--line)}
+.btn.go{background:var(--lime);color:#111;border-color:var(--lime)}
+@media (hover:hover){.btn.go:hover{background:var(--lime2)}}
+.btn.warn{background:#3a1d22;border-color:#6b2a33;color:#ffb3bb}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.rank{display:flex;gap:14px;align-items:center}
+.rank .badge{font-size:calc(34px*var(--fs,1));width:58px;height:58px;border-radius:18px;background:var(--panel2);display:grid;place-items:center;flex:none;border:1px solid var(--line)}
+.bar{height:10px;background:var(--panel2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--lime2),var(--lime));border-radius:99px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{background:var(--panel2);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:calc(20px*var(--fs,1))}.stat span{font-size:calc(12px*var(--fs,1));color:var(--mute)}
+.subj{display:inline-flex;align-items:center;gap:6px;font-size:calc(12px*var(--fs,1));font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--line)}
+.subj i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.lv{font-size:calc(12px*var(--fs,1));font-weight:800;padding:4px 9px;border-radius:999px;background:#2a2f18;color:var(--lime);border:1px solid #46521a}
+.lv.l3{background:#3a1f12;color:#ffb184;border-color:#6b3518}
+.qbox{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin:12px 0}
+.qtext{font-size:calc(19px*var(--fs,1));line-height:1.45;font-weight:600}
+.wide .qtext{font-size:calc(28px*var(--fs,1))}
+pre.code{background:#0a0c10;border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 0;margin:12px 0 0;overflow-x:auto;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;counter-reset:ln}
+.wide pre.code{font-size:calc(20px*var(--fs,1))}
+pre.code span{display:block;padding-left:44px;position:relative;white-space:pre}
+pre.code span::before{counter-increment:ln;content:counter(ln);position:absolute;left:0;width:32px;text-align:right;color:#5b6475}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{position:relative;display:flex;align-items:center;gap:12px;text-align:left;min-height:62px;padding:12px 14px;border-radius:14px;font-size:calc(17px*var(--fs,1));font-weight:650;color:#fff;border:2px solid transparent;transition:transform .08s,opacity .2s}
+.wide .opt{font-size:calc(24px*var(--fs,1));min-height:90px}
+.opt:active{transform:scale(.98)}
+.opt .sh{font-size:calc(20px*var(--fs,1));opacity:.9;flex:none;width:22px;text-align:center}
+.opt.o0{background:var(--t0)}.opt.o1{background:var(--t1)}.opt.o2{background:var(--t2)}.opt.o3{background:var(--t3)}
+.opt.dim{opacity:.28}.opt.dim.mine{opacity:.78}
+.opt.right{outline:4px solid var(--lime);outline-offset:2px;opacity:1}
+.opt.mine{border-color:#fff}
+.opt .mark{margin-left:auto;font-size:calc(22px*var(--fs,1))}
+.opt .katex{color:#fff}
+.feedback{margin-top:12px;padding:14px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);font-size:calc(16px*var(--fs,1));line-height:1.45}
+.feedback.ok{border-color:#2f6b24;background:#15230f}
+.feedback.no{border-color:#6b2a33;background:#24121a}
+.feedback b{font-size:calc(18px*var(--fs,1))}
+.timer{position:sticky;top:max(4px,env(safe-area-inset-top));z-index:6;height:24px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden;margin:6px 0 8px}
+.timer i{display:block;height:100%;background:var(--lime);width:100%;transition:width .2s linear}
+.timer b{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(14px*var(--fs,1));font-weight:900;color:#fff;text-shadow:0 1px 2px #000}
+@media (prefers-reduced-motion:reduce){.timer i{transition:none}*{animation:none!important;transition:none!important}.opt:active,.big:active,.btn:active{transform:none!important}}
+.timer.low i{background:var(--red)}
+.hud{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.combo{font-weight:900;color:var(--orange)}
+.list{display:flex;flex-direction:column;gap:8px}
+.topic{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.topic .nm{flex:1;min-width:0}
+.topic .nm b{display:block;font-size:calc(14px*var(--fs,1));font-weight:700}
+.topic .nm span{font-size:calc(12px*var(--fs,1));color:var(--mute)}
+.mini{width:80px;height:8px;border-radius:99px;background:#0f1218;overflow:hidden;flex:none}
+.mini i{display:block;height:100%}
+.tick{width:44px;height:44px;margin:-9px;position:relative;isolation:isolate;display:grid;place-items:center;flex:none;font-size:calc(15px*var(--fs,1));font-weight:900}
+.tick::before{content:"";position:absolute;inset:9px;border-radius:8px;border:2px solid #485164;z-index:-1}
+.tick.on{color:#111}.tick.on::before{background:var(--lime);border-color:var(--lime)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:10px 0;overflow:hidden}
+summary{padding:14px 16px;cursor:pointer;font-weight:800;display:flex;align-items:center;gap:10px;list-style:none}
+summary::-webkit-details-marker{display:none}summary{min-height:44px;touch-action:manipulation}summary::before{content:"▸";color:var(--mute)}details[open]>summary::before{content:"▾"}
+details .inner{padding:0 12px 12px}
+.board{display:flex;flex-direction:column;gap:6px}
+.brow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-weight:700}
+.brow.me{border-color:var(--lime)}
+.brow .pos{width:26px;text-align:center;font-weight:900;color:var(--mute)}
+.brow .av{font-size:calc(22px*var(--fs,1))}
+.brow .pts{margin-left:auto;font-variant-numeric:tabular-nums}
+.wide .brow{font-size:calc(22px*var(--fs,1));padding:14px 18px}
+.code-big{font-size:calc(56px*var(--fs,1));font-weight:900;letter-spacing:.18em;color:var(--lime);font-variant-numeric:tabular-nums}
+.pchips{display:flex;flex-wrap:wrap;gap:8px}
+.avs{display:flex;flex-wrap:wrap;gap:6px}
+.av-btn{width:44px;height:44px;border-radius:12px;background:var(--panel2);border:2px solid var(--line);font-size:calc(22px*var(--fs,1))}
+.av-btn.sel{border-color:var(--lime)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#20262f;border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-weight:800;z-index:50;box-shadow:0 10px 30px #0008;max-width:90vw;text-align:center}
+.pop{position:fixed;left:50%;top:16%;transform:translate(-50%,-50%);font-size:calc(44px*var(--fs,1));font-weight:900;color:var(--lime);text-shadow:0 4px 24px #000;pointer-events:none;animation:pop 1s ease-out forwards;z-index:40}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-90%) scale(1)}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+.big-num{font-size:calc(44px*var(--fs,1));font-weight:900;color:var(--lime);line-height:1}
+.grid-emoji{font-size:calc(22px*var(--fs,1));letter-spacing:1px;white-space:nowrap}
+.tag{font-size:calc(11px*var(--fs,1));font-weight:800;padding:2px 7px;border-radius:6px;background:#262c37;color:var(--mute)}
+.tex-raw{font-family:ui-monospace,Menlo,monospace;font-size:.9em;opacity:.9}
+.katex{font-size:1.08em}
+.err{color:#ffb3bb}
+.qr{background:#fff;padding:10px;border-radius:14px;display:inline-block}
+.qr img,.qr canvas{display:block}
+.hostq .qtext{font-size:calc(30px*var(--fs,1))}
+.counts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.counts div{border-radius:10px;padding:8px;text-align:center;font-weight:900;color:#fff}
+.hr{height:1px;background:var(--line);margin:14px 0}
+.kbd{font-family:ui-monospace,Menlo,monospace;background:#0a0c10;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:calc(12px*var(--fs,1));white-space:pre-wrap;word-break:break-word;max-height:260px;overflow:auto}
+.center{text-align:center}
+.status-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--green)}
+.status-dot.off{background:var(--red)}
+.linkb{text-decoration:underline;color:var(--mute);font-size:calc(13px*var(--fs,1));padding:2px 0}
+.keycard{margin-top:10px;padding:12px 14px;border-radius:14px;background:#161d10;border:1px solid #3f5414;font-size:calc(15px*var(--fs,1));line-height:1.45}
+.cswitch{display:flex;gap:0;margin:0 0 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel2)}
+.cswitch button{flex:1;padding:12px 8px;font-size:calc(17px*var(--fs,1));font-weight:800;color:var(--mute);background:transparent;border:0}
+.cswitch button.on{background:var(--lime);color:#111;opacity:1}
+.cname{font-size:calc(12px*var(--fs,1));font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--lime);margin-top:2px}
+.foot{margin-top:28px;color:var(--mute);font-size:calc(12px*var(--fs,1));text-align:center;line-height:1.6}
+.topic:has(>.desc){flex-wrap:wrap}
+.topic>.desc{flex-basis:100%;font-size:calc(13px*var(--fs,1));color:#c9d1dc;line-height:1.4;margin:-4px 0 0;padding-left:42px}
+
+@font-face{font-family:"RM Lexend";src:url(../lib/fonts/rm-lexend.woff2) format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"RM OpenDyslexic";src:url(../lib/fonts/rm-opendyslexic.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"RM OpenDyslexic";src:url(../lib/fonts/rm-opendyslexic-bold.woff2) format("woff2");font-weight:700 900;font-display:swap}
+body.f-lexend{font-family:"RM Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body.f-dys{font-family:"RM OpenDyslexic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body.f-lexend .logo,body.f-dys .logo{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.btn:active,.chip:active,.icon-btn:active,.linkb:active,.big:active,.opt:active,summary:active{filter:brightness(1.3)}
+.footbar{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:10px max(14px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));background:linear-gradient(rgba(13,15,19,0),var(--bg) 35%)}
+.footbar .btn{max-width:560px;margin:0 auto;display:flex;width:100%}
+.footpad{height:96px}
+.feedback[data-act]{cursor:pointer}
+.tapon{display:block;margin-top:8px;font-size:calc(13px*var(--fs,1));color:var(--mute)}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;max-width:360px;width:100%}
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.rankart{background:linear-gradient(90deg,var(--panel) 45%,rgba(20,24,31,.55)),url(../lib/repmax-art.jpg) right center/cover no-repeat}
+</style>
+</head>
+<body><div style="background:#ffd23f;color:#111;font:700 13px/1.3 system-ui,sans-serif;text-align:center;padding:calc(6px + env(safe-area-inset-top)) 10px 6px">TEST VERSION: progress, scores and quiz rooms here are separate from the real Rep Max</div>
+<div id="app"><div class="wrap"><p class="muted">Loading Rep Max…</p></div></div>
+<canvas id="confetti"></canvas>
+<script>
+/* data/<profile>/spec.js calls RM.setSpec, data/<profile>/generators.js calls RM.gen; the questions are in data/<profile>/*.jsonl */
+window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.banks[s]=this.banks[s]||[]).push(...qs);},setSpec(x){this.spec=x;},gen(g){this.gens.push(g);}};
+</script>
+<!--rm-loader-start-->
+<script>
+/* Which course: ?p=alevel or ?p=gcse in the address (and remembered), else the one chosen before on this device.
+   A quiz-night join link opens the host's course (#join-ABCD is A-level, #join-ABCD-gcse is GCSE) without changing the saved choice. No course yet:
+   nothing is loaded and the start screen asks. bundle.py replaces this block with the data inlined. */
+(function(){
+  var OK=["alevel","gcse"],m=location.search.match(/[?&]p=(alevel|gcse)(?![A-Za-z])/),p=m?m[1]:null;
+  if(p){try{localStorage.setItem("rmt_profile",JSON.stringify(p));}catch(e){}}
+  else{try{p=JSON.parse(localStorage.getItem("rmt_profile"));}catch(e){p=null;}}
+  if(OK.indexOf(p)<0)p=null;
+  var j=location.hash.match(/^#join-[A-Za-z]{4}(?:-(gcse|alevel))?$/);
+  if(j)p=j[1]||"alevel";   // a join link opens the host's course (A-level unless it says -gcse) without changing the saved choice
+  window.RM.profile=p;
+  if(p)document.write('<script src="data/'+p+'/spec.js"><\/script><script src="data/'+p+'/generators.js"><\/script>');
+})();
+</script>
+<!--rm-loader-end-->
+<script src="../lib/katex.min.js" defer onload="window.dispatchEvent(new Event('katex-ready'))" onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js';s.onload=function(){window.dispatchEvent(new Event('katex-ready'))};document.head.appendChild(s)"></script>
+<script>
+"use strict";
+/* =====================================================================
+   REP MAX — a revision gym for A-level and GCSE.
+   Course map · Solo gym · Daily challenge · Live quiz night · Question maker (quizzes: A-level so far)
+   Everything runs in the browser. Progress is saved on this device only.
+   Live games travel through public MQTT relays (no accounts): use nicknames.
+   ===================================================================== */
+const VERSION="1.7";
+const LAUNCH="2026-11-14";                 // daily challenge #1
+/* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
+const PROFILES={
+  alevel:{label:"A-level",tag:"A-LEVEL GYM",quiz:true,subj:{
+    maths:  {name:"Maths",short:"Maths",col:"var(--maths)",em:"∑",pre:"ma"},
+    further:{name:"Further Maths",short:"Further",col:"var(--further)",em:"∫",pre:"fm"},
+    chem:   {name:"Chemistry",short:"Chem",col:"var(--chem)",em:"⚗️",pre:"ch"},
+    cs:     {name:"Computer Science",short:"CS",col:"var(--cs)",em:"💻",pre:"cs"}}},
+  gcse:{label:"GCSE",tag:"GCSE",quiz:true,subj:{
+    english_lang:{name:"English Language",short:"Eng Lang",col:"#e6a23c",em:"📖",pre:"gel"},
+    english_lit: {name:"English Literature",short:"Eng Lit",col:"#d97757",em:"🎭",pre:"gli"},
+    maths:       {name:"Maths",short:"Maths",col:"var(--maths)",em:"∑",pre:"gma"},
+    biology:     {name:"Biology",short:"Bio",col:"#33d17a",em:"🧬",pre:"gbi"},
+    chemistry:   {name:"Chemistry",short:"Chem",col:"var(--chem)",em:"⚗️",pre:"gch"},
+    physics:     {name:"Physics",short:"Phys",col:"#4da3ff",em:"⚛️",pre:"gph"},
+    rs:          {name:"Religious Studies",short:"RS",col:"#b27cff",em:"🕊️",pre:"grs"},
+    history:     {name:"History",short:"History",col:"#c9a227",em:"🏰",pre:"ghi"},
+    dt:          {name:"Design and Technology",short:"DT",col:"#ff7a2f",em:"🛠️",pre:"gdt"},
+    business:    {name:"Business",short:"Business",col:"#5bc0be",em:"💼",pre:"gbu"}}}
+};
+const PROFILE=window.RM.profile;                     // null until a course is chosen
+const PRO=PROFILES[PROFILE]||{label:"",tag:"",quiz:false,subj:{}};
+if(PRO.label)document.title="Rep Max · "+PRO.label+" (test version)";
+if(window.RM.quiz===false)PRO.quiz=false;            // data/<course>/spec.js says no question files exist yet
+const SUBJ=PRO.subj;
+const QSUBJ=Array.isArray(window.RM.quiz)?window.RM.quiz.filter(k=>SUBJ[k]):null;   // subjects with question files (null = all)
+const SKEYS=Object.keys(SUBJ);
+const LVNAME={1:"Warm-up",2:"Working set",3:"1-rep max"};
+const XP_LV={1:10,2:20,3:40};
+const RANKS=[[0,"Day One"],[150,"Starter"],[400,"Regular"],[900,"Lifter"],[1800,"Spotter"],[3200,"PB Hunter"],[5200,"Top Set"],[8000,"Plate Loaded"],[12000,"Rep Max"]];
+const SHAPES=["▲","◆","●","■"];
+const BADGES=["⚡","🚀","🧪","💻","🧮","🧠","🎧","🐉","👑","🎯","🛰️","🔭","⚙️","🧲","🪐","♟️","🎲","🌀","🔷","⭐"];
+const NAME_A=["Cobalt","Argon","Scalar","Prime","Binary","Quantum","Cosmic","Rapid","Atomic","Electric","Static","Lateral","Null","Vector","Turbo","Iron"];
+const NAME_B=["Heron","Otter","Falcon","Lynx","Kestrel","Badger","Pike","Raven","Tangent","Matrix","Proton","Pointer","Photon","Isotope","Radian","Buffer"];
+
+/* ---------- small helpers ---------- */
+const $=s=>document.querySelector(s);
+const app=document.getElementById("app");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const LS_PFX=PROFILE==="gcse"?"rmt_gcse_":"rmt_";   // each course keeps its own progress on a shared device
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(LS_PFX+k);return v==null?d:JSON.parse(v);}catch(e){return d;}};
+const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(LS_PFX+k):localStorage.setItem(LS_PFX+k,JSON.stringify(v));}catch(e){}};
+function shuffle(a,rnd=Math.random){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function londonDate(d=new Date()){try{return new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"}).format(d);}catch(e){return d.toISOString().slice(0,10);}}
+function dayDiff(a,b){return Math.round((Date.parse(b+"T12:00:00Z")-Date.parse(a+"T12:00:00Z"))/864e5);}
+function addDays(d,n){const t=new Date(Date.parse(d+"T12:00:00Z")+n*864e5);return t.toISOString().slice(0,10);}
+const fmt=n=>Number(n||0).toLocaleString("en-GB");
+function randName(){return (pick(NAME_A)+" "+pick(NAME_B)).slice(0,22);}
+
+/* ---------- maths rendering: text with $...$ segments ---------- */
+function tex(s){
+  const parts=String(s??"").split(/(\$[^$]+\$)/g);
+  return parts.map(p=>{
+    if(p.length>2&&p[0]==="$"&&p[p.length-1]==="$"){
+      const t=p.slice(1,-1);
+      if(window.katex){try{return katex.renderToString(t,{throwOnError:false,output:"html"});}catch(e){}}
+      return '<span class="tex-raw" data-tex="'+esc(t)+'">'+esc(t)+'</span>';
+    }
+    return esc(p);
+  }).join("");
+}
+window.addEventListener("katex-ready",()=>{document.querySelectorAll(".tex-raw").forEach(el=>{try{el.outerHTML=katex.renderToString(el.dataset.tex,{throwOnError:false,output:"html"});}catch(e){}});});
+function codeHtml(c){if(!c)return"";return '<pre class="code">'+String(c).replace(/\t/g,"    ").split("\n").map(l=>"<span>"+(esc(l)||" ")+"</span>").join("")+"</pre>";}
+
+/* ---------- the question bank ----------
+   Questions live in data/<subject>.jsonl, one JSON object per line, so one bad
+   line is skipped instead of breaking the subject. data/generators.js holds the
+   number generators: each makes a fresh version of a calculation every time. */
+const SPEC=window.RM.spec||{};
+const TOPIC={};            // "subject|id" -> {id,name,year,s,group}
+for(const s of SKEYS){for(const g of ((SPEC[s]||{}).groups||[])){for(const t of g.topics){TOPIC[s+"|"+t.id]={...t,s,group:g.name};}}}
+const BANK=[],BAD=[],BYID={},CARDS={},LOAD_ERR=[];
+function validQ(q){
+  if(!q||typeof q.id!=="string"||!SUBJ[q.s]||![1,2,3].includes(q.lv))return false;
+  if(q.gen)return typeof q.make==="function";
+  return typeof q.q==="string"&&Array.isArray(q.o)&&q.o.length===4&&new Set(q.o).size===4&&Number.isInteger(q.a)&&q.a>=0&&q.a<4;
+}
+function addQ(q,where){if(validQ(q)&&!BYID[q.id]){BANK.push(q);BYID[q.id]=q;}else BAD.push(where);}
+async function readData(name){
+  const el=document.getElementById("rm-data-"+PROFILE+"-"+name);if(el)return el.textContent;
+  const r=await fetch("data/"+PROFILE+"/"+name+".jsonl",{cache:"no-cache"});if(!r.ok)throw new Error("HTTP "+r.status);return r.text();
+}
+function parseLines(name,text){
+  const out=[];
+  String(text).split(/\r?\n/).forEach((line,i)=>{const l=line.trim();if(!l||l.startsWith("//"))return;try{out.push(JSON.parse(l.replace(/,\s*$/,"")));}catch(e){BAD.push(name+".jsonl line "+(i+1));}});
+  return out;
+}
+async function loadAll(){
+  if(!PRO.quiz)return;                                  // course map and tracker only
+  for(const g of (window.RM.gens||[]))addQ({...g,gen:true},"generator "+((g&&g.id)||"?"));
+  await Promise.all(SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(async s=>{try{parseLines(s,await readData(s)).forEach((q,i)=>addQ(q,s+".jsonl "+((q&&q.id)||"item "+(i+1))));}catch(e){LOAD_ERR.push(SUBJ[s].name);}}));
+  try{for(const c of parseLines("cards",await readData("cards")))if(c&&SUBJ[c.s]&&c.t&&c.key)CARDS[c.s+"|"+c.t]=c;}catch(e){}
+  BANK.sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
+  if(BAD.length)console.warn("Rep Max skipped:",BAD);
+}
+const topicOf=q=>TOPIC[q.s+"|"+q.t]||{id:q.t,name:q.t||"General",year:"",s:q.s,group:""};
+function specRef(q){const sp=SPEC[q.s]||{},t=topicOf(q);return ((sp.board||"")+" "+(sp.code||"")+" · "+(/^\d/.test(t.id)?t.id+" ":"")+t.name).trim();}
+/* a generator makes a fresh version each time; a fixed question comes back as it is */
+function inst(q,rnd){
+  if(!q||!q.gen)return q;
+  for(let k=0;k<5;k++){
+    try{const r=q.make(rnd||Math.random);
+      if(r&&typeof r.q==="string"&&Array.isArray(r.o)&&r.o.length===4&&new Set(r.o).size===4&&r.a>=0&&r.a<4)
+        return{q:r.q,code:r.code||"",o:r.o.map(String),a:r.a,x:r.x||"",id:q.id,s:q.s,t:q.t,lv:q.lv,gen:true};
+    }catch(e){}
+  }
+  return null;
+}
+
+/* ---------- saved progress (this device) ---------- */
+const OLD_WORDS=["Swole","Hench","Shredded","Bulking","Savage","Spicy","Sneaky","Chilli","Gainz","Noodle","Dumpling","Ramen","Gyoza","Bao","Katsu","Tuna","Wonton","Sushi","Pho","Spring Roll","Teriyaki","Kimchi","Shake"];
+let ME=lsGet("me",null);
+if(!ME||!ME.name||(ME.auto!==false&&OLD_WORDS.some(w=>String(ME.name).includes(w)))){ME={name:randName(),badge:pick(BADGES),auto:true};lsSet("me",ME);}
+if(!BADGES.includes(ME.badge)){ME.badge=pick(BADGES);lsSet("me",ME);}
+let ST=Object.assign({xp:0,reps:0,done:0,best:{},q:{},daily:{},days:[],streak:0,lastDay:null,live:0},lsGet("stats",{}));
+if(!Array.isArray(ST.days))ST.days=[];
+let TAUGHT=lsGet("taught",{});
+let NOTYET=lsGet("notyet",{});
+let MUTED=lsGet("muted",true);
+let SET=Object.assign({auto:true,size:1,font:"plain"},lsGet("set",{}));
+const REDUCED=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+function applySet(){document.documentElement.style.setProperty("--fs",SET.size||1);document.body.classList.toggle("f-lexend",SET.font==="lexend");document.body.classList.toggle("f-dys",SET.font==="dys");}
+if(document.body)applySet();else addEventListener("DOMContentLoaded",applySet);
+const saveST=()=>lsSet("stats",ST);
+function rankOf(xp){let i=0;for(let k=0;k<RANKS.length;k++)if(xp>=RANKS[k][0])i=k;return{lvl:i+1,at:RANKS[i][0],name:RANKS[i][1],next:RANKS[i+1]||null};}
+function addXP(n){const before=rankOf(ST.xp).lvl;ST.xp+=Math.max(0,Math.round(n));saveST();const after=rankOf(ST.xp);if(after.lvl>before){setTimeout(()=>{toast("Level "+after.lvl+": "+after.name);SFX.fanfare();},600);}}
+function markDay(){const d=londonDate();if(!ST.days.includes(d)){ST.days.push(d);ST.days=ST.days.slice(-120);}ST.lastDay=d;}
+function weekDays(){const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay()+6)%7,mon=addDays(d,-dow);return ST.days.filter(x=>x>=mon&&x<=d).length;}
+function recordAnswer(q,ok){const r=ST.q[q.id]||{n:0,c:0,box:0,last:0};r.n++;if(ok){r.c++;r.box=Math.min(4,r.box+1);}else r.box=0;r.last=Date.now();ST.q[q.id]=r;ST.done++;if(ok)ST.reps++;markDay();saveST();}
+const BOX_DAYS=[0,1,3,7,14];
+const isDue=r=>r&&Date.now()-r.last>=BOX_DAYS[r.box]*864e5;
+const keyOf=q=>q.s+"|"+q.t;
+function taughtOn(){return Object.values(TAUGHT).some(Boolean);}
+function inTaught(q){return !!TAUGHT[keyOf(q)];}
+/* what a quiz may ask: never a topic marked "not done yet"; only covered topics when that is switched on */
+function playable(pool,useCover){let p=pool.filter(q=>!NOTYET[keyOf(q)]);if(useCover&&taughtOn())p=p.filter(inTaught);return p;}
+const topicQs=(s,tid)=>BANK.filter(q=>q.s===s&&q.t===tid);
+function mastery(s,tid){const qs=topicQs(s,tid);if(!qs.length)return null;let m=0,n=0,seen=0;for(const q of qs){const r=ST.q[q.id];if(r){m+=r.box/4;n+=r.n;seen++;}}return{m:seen?m/seen:0,n,seen};}
+function markNotYet(k){const was=!!TAUGHT[k];if(was){delete TAUGHT[k];lsSet("taught",TAUGHT);}NOTYET[k]=true;lsSet("notyet",NOTYET);return was;}
+function cardHtml(c){if(!c)return"";return `<div class="keycard"><div class="small muted">Key idea · AI-drafted: report it if it's wrong</div><div style="margin-top:4px">${tex(c.key)}</div>${c.trap?`<div class="small" style="margin-top:6px"><b>Common trap:</b> ${tex(c.trap)}</div>`:""}${c.ref?`<div class="small muted" style="margin-top:4px">${esc(c.ref)}</div>`:""}</div>`;}
+function reportText(q,perm){perm=perm||[0,1,2,3];return `Rep Max: question ${q.id}${q.gen?" (generated)":""} may be wrong.\n${SUBJ[q.s].name}, ${topicOf(q).name}\nQ: ${q.q}${q.code?"\n"+q.code:""}\nOptions: ${perm.map((k,i)=>SHAPES[i]+" "+q.o[k]).join("   ")}\nMarked right: ${q.o[q.a]}\nWhat I think is wrong: `;}
+
+/* ---------- sound ---------- */
+let actx=null;
+function ac(){if(!actx){try{actx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(actx&&actx.state==="suspended")actx.resume();return actx;}
+function tone(f,dur,type="sine",vol=.2,when=0,slide=null){if(MUTED)return;const c=ac();if(!c)return;const t=c.currentTime+when,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(c.destination);o.start(t);o.stop(t+dur+.05);}
+const SFX={
+  correct(){[523,659,784,1047].forEach((f,i)=>tone(f,.16,"triangle",.17,i*.06));},
+  wrong(){tone(180,.32,"sawtooth",.11,0,110);},
+  tick(){tone(1200,.04,"square",.05);},
+  click(){tone(660,.05,"triangle",.09);},
+  combo(){[784,988,1175,1568].forEach((f,i)=>tone(f,.11,"sine",.13,i*.05));},
+  fanfare(){[[523,0],[659,.15],[784,.3],[1047,.45],[784,.65],[1047,.8]].forEach(([f,w])=>tone(f,.28,"triangle",.18,w));},
+  plate(){tone(140,.25,"square",.12,0,60);tone(2600,.08,"triangle",.05,.02);}
+};
+
+/* ---------- UI bits ---------- */
+let toastT=null;
+function toast(msg,ms=2600){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";document.body.appendChild(el);}el.textContent=msg;el.style.display="block";clearTimeout(toastT);toastT=setTimeout(()=>{el.style.display="none";},ms);}
+function popText(t){const el=document.createElement("div");el.className="pop";el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),1100);}
+function confetti(){if(REDUCED)return;const cv=document.getElementById("confetti"),c=cv.getContext("2d");cv.width=innerWidth;cv.height=innerHeight;const cols=["#c6ff3d","#ff7a2f","#4da3ff","#b27cff","#33d17a","#ffffff"];const P=Array.from({length:140},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:4+Math.random()*5,c:pick(cols),a:Math.random()*6}));let n=0;(function f(){c.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.a+=.1;c.fillStyle=p.c;c.save();c.translate(p.x,p.y);c.rotate(p.a);c.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);c.restore();});if(++n<200)requestAnimationFrame(f);else c.clearRect(0,0,cv.width,cv.height);})();}
+function subjTag(s){const S=SUBJ[s]||{name:s,col:"#888"};return `<span class="subj"><i style="background:${S.col}"></i>${esc(S.name)}</span>`;}
+function lvTag(lv){return `<span class="lv ${lv===3?"l3":""}">${lv===3?"🔥 ":""}${esc(LVNAME[lv]||"")}</span>`;}
+/* timer bar: width, red when low, and the seconds printed (colour is never the only signal) */
+function tmSet(el,left,total){if(!el)return;el.querySelector("i").style.width=Math.max(0,left/total*100)+"%";el.classList.toggle("low",left<total*.25);const b=el.querySelector("b");if(b)b.textContent=Math.max(0,Math.ceil(left/1000))+" s";}
+function topBar(title,back="home"){return `<div class="top"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
+function setWide(on){document.body.classList.toggle("wide",!!on);}
+let VIEW="home";
+function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();}
+let NAV_IN=false,NAV_SKIP=false;
+function navSync(){try{const atHome=VIEW==="home"||VIEW==="chooser";if(!atHome&&!NAV_IN){history.pushState({rm:1},"",location.href);NAV_IN=true;}else if(atHome&&NAV_IN){NAV_IN=false;NAV_SKIP=true;history.back();}}catch(e){}}
+function busyView(){return (VIEW==="run"&&!!RUN)||(VIEW==="sprintq"&&!!SP)||(VIEW==="host"&&typeof H!=="undefined"&&!!H)||VIEW==="play";}
+function askEnd(msg,sub,onYes){if(document.querySelector(".modal"))return;const o=document.createElement("div");o.className="modal";o.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">${esc(msg)}</b>${sub?`<div class="small muted" style="margin-top:6px">${esc(sub)}</div>`:""}<div class="row" style="margin-top:16px;justify-content:flex-end;gap:10px"><button class="btn" data-m="no">Keep going</button><button class="btn warn" data-m="yes">End it</button></div></div>`;document.body.appendChild(o);o.addEventListener("click",e=>{const m=e.target.closest("[data-m]");if(!m&&e.target!==o)return;o.remove();if(m&&m.dataset.m==="yes")onYes();});}
+function endBusy(){if(VIEW==="run"){clearInterval(RT);RUN=null;home();}else if(VIEW==="sprintq"){clearInterval(SPT);SP=null;home();}else ACT.home();}
+function askEndBusy(){const m=VIEW==="sprintq"?["Stop this sprint?","This sprint won't count."]:VIEW==="host"?["Close the room?","Everyone in the room is sent home."]:VIEW==="play"?["Leave the quiz?","You can join again with the code."]:["End this workout?","The questions you've answered so far still count."];askEnd(m[0],m[1],endBusy);}
+window.addEventListener("popstate",()=>{if(NAV_SKIP){NAV_SKIP=false;return;}NAV_IN=false;const m=document.querySelector(".modal");if(m)m.remove();if(busyView()){try{history.pushState({rm:1},"",location.href);NAV_IN=true;}catch(e){}askEndBusy();}else ACT.home();});
+
+/* every [data-act] button calls ACT[name](dataset, element) */
+const ACT={};
+document.addEventListener("touchstart",()=>{},{passive:true});
+const COARSE=!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
+app.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){if(COARSE&&!REDUCED&&navigator.vibrate)try{navigator.vibrate(10);}catch(x){}if(!b.dataset.silent)SFX.click();f(b.dataset,b,e);}});
+app.addEventListener("keydown",e=>{if(e.key!=="Enter")return;const id=e.target&&e.target.id;if(id==="jcode"){e.preventDefault();const n=$("#jname");if(n)n.focus();}else if(id==="jname"){e.preventDefault();ACT.joinGo();}else if(id==="pname"){e.preventDefault();ACT.saveProfile();}});
+ACT.home=()=>{leaveLive();home();};
+ACT.closeRoom=()=>{if(typeof H!=="undefined"&&H&&H.players&&H.players.size)askEnd("Close the room?","Everyone in the room is sent home.",()=>ACT.home());else ACT.home();};
+ACT.mute=(d,b)=>{MUTED=!MUTED;lsSet("muted",MUTED);b.textContent=MUTED?"🔇":"🔊";};
+
+/* =====================================================================
+   HOME
+   ===================================================================== */
+function isStandalone(){return (window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;}
+function home(){
+  setWide(false);
+  if(!PROFILE)return chooser();
+  if(!PRO.quiz)return homeMap();
+  const r=rankOf(ST.xp),pct=r.next?Math.min(100,(ST.xp-r.at)/(r.next[0]-r.at)*100):100;
+  const today=londonDate(),dn=Math.max(1,dayDiff(LAUNCH,today)+1),dd=ST.daily[today];
+  const nFix=s=>BANK.filter(q=>q.s===s&&!q.gen).length,nGen=BANK.filter(q=>q.gen).length;
+  const counts=SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(s=>`${SUBJ[s].short} ${nFix(s)}`).join(" · ")+(QSUBJ&&QSUBJ.length<SKEYS.length?` (other subjects: course map only, questions to come)`:"")+(nGen?` · plus ${nGen} question types with fresh numbers`:"");
+  const acc=ST.done>=5?Math.round(ST.reps/ST.done*100)+"%":"–";
+  const covStale=taughtOn()&&Date.now()-lsGet("covAt",Date.now())>7*864e5;
+  const a2hs=!lsGet("a2hs",false)&&!isStandalone()&&!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
+  render(`<div class="wrap">
+  <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+    <div class="row"><button class="chip" data-act="profile">${esc(ME.badge)} ${esc(ME.name)}</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
+  ${courseSwitch()}
+  ${LOAD_ERR.length?`<div class="card err">Couldn't load the ${esc(LOAD_ERR.join(", "))} questions. Open Rep Max from its web address: it can't read its question files from a file saved on this device.</div>`:""}
+  <div class="card rankart"><div class="rank"><div class="badge" style="font-weight:900;font-size:26px">${r.lvl}</div><div style="flex:1">
+    <div class="row"><b style="font-size:18px">${esc(r.name)}</b><span class="spacer"></span><span class="muted small">${fmt(ST.xp)} XP${r.next?" · next: "+esc(r.next[1])+" at "+fmt(r.next[0]):""}</span></div>
+    <div class="bar" style="margin-top:8px"><i style="width:${pct}%"></i></div></div></div>
+    <div class="stats"><div class="stat"><b>${weekDays()}</b><span>${weekDays()===1?"day":"days"} this week</span></div><div class="stat"><b>${fmt(ST.reps)}</b><span>right answers</span></div><div class="stat"><b>${acc}</b><span>accuracy</span></div></div></div>
+  <div class="list">
+    <button class="big hero" data-act="daily"><span class="em">☀️</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
+    <button class="big" data-act="gym"><span class="em">🏋️</span><span><b>Solo gym</b><span>Quick 5, warm-ups, working sets, 1-rep max and weak spots</span></span></button>
+    <button class="big" data-act="sprint"><span class="em">⚡</span><span><b>Sprint</b><span>As many as you can before the clock runs out. Harder questions score more</span></span></button>
+    <div class="grid2">
+      <button class="big" data-act="hostSetup"><span class="em">📺</span><span><b>Host a quiz night</b><span>On a laptop or TV; friends join on their own devices</span></span></button>
+      <button class="big" data-act="join"><span class="em">📱</span><span><b>Join a game</b><span>Got a 4-letter code?</span></span></button>
+    </div>
+    <button class="big" data-act="tracker"><span class="em">🗺️</span><span><b>Course map</b><span>Every topic, what it means, what you've covered and how strong you are</span></span></button>
+  </div>
+  ${!taughtOn()&&!lsGet("covAsk",false)?`<div class="card"><b>What have you had in class so far?</b><div class="small muted" style="margin-top:4px">Tell Rep Max and it will only ask about those topics.</div><div class="row" style="margin-top:10px"><button class="btn go" data-act="coverage" data-back="home">📍 Set what I've covered</button><button class="btn" data-act="covLater">Later</button></div></div>`:""}
+  ${covStale?`<div class="card"><b>Covered anything new in class?</b><div class="row" style="margin-top:10px"><button class="btn go" data-act="coverage" data-back="home">Update topics</button><button class="btn" data-act="covSame">Same as before</button></div></div>`:""}
+  ${a2hs?`<details class="card small"><summary><b>Keep your progress: add Rep Max to your home screen</b></summary><div style="margin-top:6px">iPhone: Share, then Add to Home Screen. Android: the ⋮ menu, then Add to Home screen. Then open it from there. Devices can clear saved progress for websites you haven't opened for a while, and on an iPhone the home-screen version keeps its own progress. Already played in the browser? Settings has a backup code to bring it across.<div style="margin-top:8px"><button class="btn" data-act="a2hsOk">Got it</button></div></div></details>`:""}
+
+  <div class="foot">Questions: ${counts}${BAD.length?`<br><span class="err">${BAD.length} line${BAD.length===1?"":"s"} skipped: ${esc(BAD.slice(0,4).join("; "))}${BAD.length>4?"…":""}</span>`:""}<br>
+  ${SKEYS.map(s=>esc(SUBJ[s].name+" "+((SPEC[s]||{}).board||"")+" "+((SPEC[s]||{}).code||"")).trim()).join(" · ")}<br>
+  The questions were written and checked by AI, so a few may be wrong: use "Report a problem" under any question.<br>
+  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button> · ${switchLink()} · v${VERSION}</div>
+  </div>`,"home");
+}
+function courseSwitch(){return `<div class="cswitch" role="group" aria-label="Course">${["alevel","gcse"].map(k=>k===PROFILE
+  ?`<button class="on" aria-current="true" disabled>${esc(PROFILES[k].label)}</button>`
+  :`<button data-act="switchCourse" data-p="${k}">${esc(PROFILES[k].label)}</button>`).join("")}</div>`;}
+function switchLink(){const o=PROFILE==="gcse"?"alevel":"gcse";return `<button class="small" style="text-decoration:underline" data-act="switchCourse" data-p="${o}">Switch to ${esc(PROFILES[o].label)}</button>`;}
+function setCourse(p){try{localStorage.setItem("rmt_profile",JSON.stringify(p));}catch(e){}location.replace(location.pathname);}
+ACT.switchCourse=d=>setCourse(d.p);
+ACT.pickCourse=d=>setCourse(d.p);
+/* first visit on this device: which course? */
+function chooser(){
+  render(`<div class="wrap">
+  <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>REVISION</small></div></div></div>
+  <div class="card"><h3 style="margin-top:0">Which are you doing?</h3><p class="small muted" style="margin:0">You can switch later at the bottom of the home screen. Each keeps its own progress on this device.</p></div>
+  <div class="list">
+    <button class="big hero" data-act="pickCourse" data-p="alevel"><span class="em">🎓</span><span><b>A-level</b><span>${esc(Object.values(PROFILES.alevel.subj).map(x=>x.name).join(", "))}. Course map, solo gym, daily challenge and quiz nights.</span></span></button>
+    <button class="big" data-act="pickCourse" data-p="gcse"><span class="em">📚</span><span><b>GCSE</b><span>${esc(Object.values(PROFILES.gcse.subj).map(x=>x.name).join(", "))}. Quizzes, course map and tracker.</span></span></button>
+  </div>
+  <div class="foot">Rep Max v${VERSION}. Progress is saved on this device only.</div></div>`,"chooser");
+}
+/* a course with no questions yet: the course map and tracker */
+function homeMap(){
+  const all=SKEYS.flatMap(s=>((SPEC[s]||{}).groups||[]).flatMap(g=>g.topics.map(t=>s+"|"+t.id)));
+  const done=all.filter(k=>TAUGHT[k]).length;
+  render(`<div class="wrap">
+  <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+    <div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
+  ${courseSwitch()}
+  <div class="card"><b style="font-size:18px">Your ${SKEYS.length} subjects</b><div class="small muted" style="margin-top:4px">${all.length} topics in all · ${done} ticked as covered so far</div>
+    <div class="bar" style="margin-top:8px"><i style="width:${all.length?Math.round(done/all.length*100):0}%"></i></div></div>
+  <div class="list">
+    <button class="big hero" data-act="tracker"><span class="em">🗺️</span><span><b>Course map</b><span>Every topic of every subject, in a line each, and tick what you've had in class</span></span></button>
+    <button class="big" data-act="coverage" data-back="home"><span class="em">📍</span><span><b>What I've covered</b><span>Tick topics subject by subject</span></span></button>
+  </div>
+  <div class="card small muted">Quiz questions for these subjects haven't been written yet. For now this is your map of everything the courses cover.</div>
+  <div class="foot">${SKEYS.map(s=>esc(SUBJ[s].name+" "+((SPEC[s]||{}).board||"")+" "+((SPEC[s]||{}).code||"")).trim()).join(" · ")}<br>
+  The topic lines were written and checked by AI from the exam boards' specifications, so check anything that looks wrong with your teacher.<br>
+  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button> · ${switchLink()} · v${VERSION}</div>
+  </div>`,"home");
+}
+ACT.covSame=()=>{lsSet("covAt",Date.now());home();};
+ACT.covLater=()=>{lsSet("covAsk",true);home();};
+ACT.a2hsOk=()=>{lsSet("a2hs",true);home();};
+
+/* ---------- profile ---------- */
+ACT.profile=()=>{
+  render(`<div class="wrap">${topBar("Nickname")}
+  <div class="card"><label class="small muted">Nickname (shown to friends in quiz nights; no real names needed)</label>
+  <div class="row" style="margin-top:6px"><input id="pname" maxlength="22" enterkeyhint="done" autocapitalize="words" autocorrect="off" spellcheck="false" autocomplete="off" value="${esc(ME.name)}"><button class="btn" data-act="rname" aria-label="Random name">🎲</button></div>
+  <div class="small muted" style="margin:14px 0 6px">Badge</div><div class="avs" id="avs">${BADGES.map(b=>`<button class="av-btn ${b===ME.badge?"sel":""}" data-act="badge" data-b="${b}">${b}</button>`).join("")}</div>
+  <div style="margin-top:16px"><button class="btn go block" data-act="saveProfile">Save</button></div></div></div>`,"profile");
+};
+ACT.rname=()=>{$("#pname").value=randName();};
+ACT.badge=d=>{ME.badge=d.b;document.querySelectorAll(".av-btn").forEach(x=>x.classList.toggle("sel",x.dataset.b===d.b));};
+ACT.saveProfile=()=>{const n=$("#pname").value.trim().slice(0,22);ME.name=n||randName();ME.auto=false;lsSet("me",ME);home();};
+
+/* ---------- settings / backup ---------- */
+ACT.setAuto=d=>{SET.auto=d.v==="1";lsSet("set",SET);ACT.settings();};
+ACT.setSize=d=>{SET.size=+d.v;lsSet("set",SET);applySet();ACT.settings();};
+ACT.setFont=d=>{SET.font=d.v;lsSet("set",SET);applySet();ACT.settings();};
+ACT.settings=()=>{
+  render(`<div class="wrap">${topBar("Settings & backup")}
+  <div class="card"><h3>How it plays</h3><div class="small muted" style="margin-top:6px">Move on by itself after a right answer${REDUCED?" (off while your device asks for less motion)":""}</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.auto!==false)===!!v?"on":""}" data-act="setAuto" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text size</div><div class="seg">${[[1,"Normal"],[1.15,"Large"],[1.3,"Larger"]].map(([v,l])=>`<button class="chip ${(SET.size||1)==v?"on":""}" data-act="setSize" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text style</div><div class="seg">${[["plain","Standard"],["lexend","Lexend (easy read)"],["dys","OpenDyslexic"]].map(([v,l])=>`<button class="chip ${SET.font===v?"on":""}" data-act="setFont" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Some people find these easier to read; try them and keep what suits you.</div></div>
+  <div class="card"><h3>Move your progress to another device</h3><p class="muted small">Copy this code, then paste it into the box on your other device. It adds to what's there rather than replacing it.</p>
+  <div class="kbd" id="bk">${esc(btoa(unescape(encodeURIComponent(JSON.stringify({me:ME,stats:ST,taught:TAUGHT,notyet:NOTYET})))))}</div>
+  <div class="row" style="margin-top:8px"><button class="btn" data-act="copyBk">Copy code</button></div>
+  <div class="hr"></div><label class="small muted" style="display:block">Paste a backup code from your other device</label><textarea id="bkin" placeholder="Paste a backup code here" enterkeyhint="done" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></textarea>
+  <div class="row" style="margin-top:8px"><button class="btn" data-act="loadBk">Add this backup</button><span id="bkmsg" class="small muted"></span></div></div>
+  <div class="card"><h3>Keep it on your home screen</h3><p class="muted small">iPhone: Share, then Add to Home Screen. Android: the ⋮ menu, then Add to Home screen. Devices can clear saved progress for websites you haven't opened for a while; the home-screen version keeps it.</p></div>
+  <div class="card"><h3>Start again</h3><p class="muted small">Wipes your XP, stats and ticks on this device.</p><button class="btn warn" data-act="wipe1">Reset progress</button><span id="wipe2"></span></div>
+  <div class="card small muted">Quiz nights send your nickname and answers through public relay servers (MQTT). Nothing else leaves this device. Rep Max ${VERSION}.</div></div>`,"settings");
+};
+ACT.copyBk=()=>copyText($("#bk").textContent).then(()=>toast("Backup code copied"));
+ACT.loadBk=()=>{try{const o=JSON.parse(decodeURIComponent(escape(atob($("#bkin").value.trim()))));if(!o.stats)throw 0;mergeProgress(o);toast("Backup added");home();}catch(e){$("#bkmsg").textContent="That code didn't work.";}};
+function mergeProgress(o){
+  const s=o.stats||{};
+  for(const [id,r] of Object.entries(s.q||{})){const m=ST.q[id];if(!m||(r.last||0)>(m.last||0))ST.q[id]=r;}
+  ST.xp=Math.max(ST.xp,s.xp||0);ST.reps=Math.max(ST.reps,s.reps||0);ST.done=Math.max(ST.done,s.done||0);ST.live=Math.max(ST.live||0,s.live||0);
+  for(const [k,v] of Object.entries(s.best||{}))ST.best[k]=Math.max(ST.best[k]||0,v);
+  for(const [d,v] of Object.entries(s.daily||{}))if(!ST.daily[d])ST.daily[d]=v;
+  ST.days=[...new Set([...(ST.days||[]),...(s.days||[])])].sort().slice(-120);
+  Object.assign(TAUGHT,o.taught||{});Object.assign(NOTYET,o.notyet||{});
+  for(const k of Object.keys(TAUGHT))if(TAUGHT[k])delete NOTYET[k];   // a tick wins
+  saveST();lsSet("taught",TAUGHT);lsSet("notyet",NOTYET);
+}
+ACT.wipe1=()=>{$("#wipe2").innerHTML=` <button class="btn warn" data-act="wipe2">Yes, wipe it</button>`;};
+ACT.wipe2=()=>{ST={xp:0,reps:0,done:0,best:{},q:{},daily:{},days:[],streak:0,lastDay:null,live:0};TAUGHT={};NOTYET={};saveST();lsSet("taught",TAUGHT);lsSet("notyet",NOTYET);toast("Progress reset");home();};
+function copyText(t){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t).catch(()=>fallbackCopy(t));return Promise.resolve(fallbackCopy(t));}
+function fallbackCopy(t){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");}catch(e){}a.remove();}
+
+/* =====================================================================
+   SOLO GYM
+   ===================================================================== */
+const WORKOUTS={
+  quick:{name:"Quick 5",em:"⏱️",desc:"Levels 1–2 · 5 reps",n:5,lv:[1,2]},
+  warm:{name:"Warm-up",em:"🤸",desc:"Level 1 · 10 reps",n:10,lv:[1]},
+  sets:{name:"Working sets",em:"🏋️",desc:"Levels 1–2 · 10 reps",n:10,lv:[1,2]},
+  max:{name:"1-rep max",em:"🔥",desc:"Hardest only · 5 reps",n:5,lv:[3]},
+  weak:{name:"Weak spots",em:"🎯",desc:"Your misses and reviews due · 10 reps",n:10,lv:[1,2,3]}
+};
+let GYM=Object.assign({s:"mix",w:"sets",clock:false,taught:false,topic:null},lsGet("gym",{}));
+if(GYM.s!=="mix"&&(!SUBJ[GYM.s]||(QSUBJ&&!QSUBJ.includes(GYM.s))))GYM.s="mix";if(GYM.topic&&!TOPIC[GYM.topic])GYM.topic=null;
+if(!WORKOUTS[GYM.w])GYM.w="sets";
+ACT.gym=()=>gymSetup();
+function gymSetup(){
+  setWide(false);
+  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="gS" data-s="${s}">${s==="mix"?"🎲 Mixed":esc(SUBJ[s].em+" "+SUBJ[s].name)}</button>`).join("");
+  const wBtns=Object.entries(WORKOUTS).map(([k,w])=>`<button class="big" data-act="gW" data-w="${k}" style="${GYM.w===k?"border-color:var(--lime)":""}"><span class="em">${w.em}</span><span><b>${w.name}</b><span>${w.desc}</span></span></button>`).join("");
+  const tp=GYM.topic&&TOPIC[GYM.topic];
+  render(`<div class="wrap">${topBar("Solo gym")}
+  <div class="card"><h3>Subject</h3><div class="pchips">${sChips}</div>
+  ${tp?`<div class="row" style="margin-top:12px"><span class="chip on">Topic: ${esc(tp.name)}</span><button class="small" style="text-decoration:underline" data-act="gClearT">clear</button></div>`:""}</div>
+  <div class="grid2">${wBtns}</div>
+  <div class="card"><div class="row"><button class="tick ${GYM.clock?"on":""}" data-act="gClock" aria-label="Beat the clock">${GYM.clock?"✓":""}</button><div><b>Beat the clock</b><div class="small muted">30 s a rep (60 s for 1-rep max), bonus XP for speed</div></div></div>
+  ${coverRow("gTaught",GYM.taught,"gym")}</div>
+  <button class="btn go block" data-act="gStart" style="font-size:18px;padding:16px">Start workout</button>
+  <p class="small muted center" id="gmsg"></p></div>`,"gym");
+}
+ACT.gS=d=>{GYM.s=d.s;if(GYM.topic&&!GYM.topic.startsWith(d.s+"|"))GYM.topic=null;lsSet("gym",GYM);gymSetup();};
+ACT.gW=d=>{GYM.w=d.w;lsSet("gym",GYM);gymSetup();};
+ACT.gClock=()=>{GYM.clock=!GYM.clock;lsSet("gym",GYM);gymSetup();};
+ACT.gTaught=()=>{GYM.taught=!GYM.taught;lsSet("gym",GYM);gymSetup();};
+ACT.gClearT=()=>{GYM.topic=null;lsSet("gym",GYM);gymSetup();};
+ACT.gStart=()=>{
+  const w=WORKOUTS[GYM.w];
+  let pool=BANK.filter(q=>(GYM.s==="mix"||q.s===GYM.s));
+  if(GYM.topic)pool=pool.filter(q=>keyOf(q)===GYM.topic);   // one topic chosen in the tracker: ask it whatever the ticks say
+  else pool=playable(pool,GYM.taught);
+  let qs;
+  if(GYM.topic){
+    const rank=q=>(ST.q[q.id]?2:0)+(q.gen?0:1);
+    qs=shuffle(pool).sort((a,b)=>rank(a)-rank(b)||((ST.q[a.id]||{}).last||0)-((ST.q[b.id]||{}).last||0)).slice(0,w.n);
+    const gens=pool.filter(q=>q.gen);for(let k=0;qs.length<w.n&&gens.length;k++)qs.push(gens[k%gens.length]);
+  }else if(GYM.w==="weak"){
+    const seen=pool.filter(q=>ST.q[q.id]);
+    const weak=seen.filter(q=>ST.q[q.id].box===0||isDue(ST.q[q.id])).sort((a,b)=>ST.q[a.id].box-ST.q[b.id].box||ST.q[a.id].last-ST.q[b.id].last);
+    const fresh=shuffle(pool.filter(q=>!ST.q[q.id]));
+    qs=[...weak,...fresh].slice(0,w.n);
+  }else{
+    let p=pool.filter(q=>w.lv.includes(q.lv));
+    p=shuffle(p).sort((a,b)=>((ST.q[a.id]||{}).last||0)-((ST.q[b.id]||{}).last||0));   // least recently seen first
+    qs=shuffle(p.slice(0,Math.max(w.n,Math.min(p.length,w.n*2)))).slice(0,w.n);
+  }
+  qs=qs.map(q=>inst(q)).filter(Boolean);
+  if(!qs.length){$("#gmsg").textContent="No questions match those settings yet. Try another subject or workout, or check what you've covered.";return;}
+  const label=w.name+" · "+(GYM.topic?TOPIC[GYM.topic].name:GYM.s==="mix"?"Mixed":SUBJ[GYM.s].name);
+  startRun({mode:"gym",qs,label,clock:GYM.clock,key:GYM.w+"|"+(GYM.topic||GYM.s)});
+};
+
+/* =====================================================================
+   THE RUNNER (solo gym + daily challenge)
+   ===================================================================== */
+let RUN=null,RT=null;
+function startRun(o){
+  const rnd=o.seed!=null?mulberry32(o.seed):Math.random;
+  RUN={...o,i:0,res:[],combo:0,best:0,xp:0,score:0,perms:o.qs.map(()=>shuffle([0,1,2,3],rnd)),t0:Date.now()};
+  showQ();
+}
+function qDur(q){return RUN.mode==="daily"?(q.lv===3?75:45):(q.lv===3?60:30);}
+function showQ(){
+  clearInterval(RT);
+  const q=RUN.qs[RUN.i],perm=RUN.perms[RUN.i],tp=topicOf(q);
+  RUN.locked=false;RUN.start=Date.now();
+  const timed=!!RUN.clock;
+  render(`<div class="wrap">
+  <div class="top"><button class="icon-btn" data-act="quitRun" aria-label="Quit">✕</button>
+   <div class="hud"><span class="chip">${RUN.mode==="daily"?"Daily · ":""}Rep ${RUN.i+1}/${RUN.qs.length}</span>${RUN.combo>=2?`<span class="combo">🔥 x${RUN.combo}</span>`:""}</div>
+   <button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>
+  ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
+  <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
+   <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+   <div class="opts">${perm.map((k,i)=>`<button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
+   <div id="fb"></div>
+   ${q.gen?`<div class="small muted" style="margin-top:12px">Fresh numbers every time</div>`:""}</div></div>`,"run");
+  if(timed){
+    const dur=qDur(q)*1000;
+    tmSet($("#tm"),dur,dur);runTimer();
+  }
+}
+function runTimer(){clearInterval(RT);const q=RUN.qs[RUN.i],dur=qDur(q)*1000;RT=setInterval(()=>{if(!RUN){clearInterval(RT);return;}const left=dur-(Date.now()-RUN.start);const el=$("#tm");if(!el){clearInterval(RT);return;}tmSet(el,left,dur);if(left<=0){clearInterval(RT);answer(-1);}},200);}
+ACT.pickOpt=d=>answer(+d.i);
+function answer(di){
+  if(!RUN||RUN.locked)return;RUN.locked=true;clearInterval(RT);
+  const q=RUN.qs[RUN.i],perm=RUN.perms[RUN.i],right=perm.indexOf(q.a),ok=di===right;
+  const secs=(Date.now()-RUN.start)/1000,dur=qDur(q);
+  recordAnswer(q,ok);
+  let xp=0,pts=0;
+  if(ok){RUN.combo++;RUN.best=Math.max(RUN.best,RUN.combo);xp=XP_LV[q.lv];pts=100;if(RUN.clock){const f=Math.max(0,1-secs/dur);xp+=Math.round(xp*.5*f);pts+=Math.round(50*f);}if(RUN.combo>=3)xp+=5;}
+  else RUN.combo=0;
+  RUN.xp+=xp;RUN.score+=pts;
+  RUN.res.push({id:q.id,ok,di,secs,timeout:di<0});
+  document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i===right){b.classList.add("right");b.insertAdjacentHTML("beforeend",'<span class="mark">✓</span>');}else b.classList.add("dim");if(i===di&&!ok){b.classList.add("mine");b.insertAdjacentHTML("beforeend",'<span class="mark">✗</span>');}});
+  if(ok){SFX.correct();if(RUN.combo>=3)SFX.combo();if(!REDUCED)popText("+"+xp+" XP");}else SFX.wrong();
+  const last=RUN.i===RUN.qs.length-1,card=CARDS[keyOf(q)];
+  const head=ok?(RUN.combo>=3?"🔥 Combo x"+RUN.combo:pick(["Clean rep.","Nailed it.","Strong.","Lift complete."])):di<0?"Out of time.":pick(["Not this one.","Missed."]);
+  const auto=ok&&SET.auto!==false&&!REDUCED,iNow=RUN.i;
+  $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}" data-act="nextQ" data-silent="1"><b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div><span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
+   ${card&&!ok?cardHtml(card):""}<div id="cardBox"></div>
+   <div class="row small" style="margin-top:10px;gap:16px">${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
+   <div class="small muted" style="margin-top:8px">${esc(specRef(q))}</div><div class="footpad"></div><div class="footbar"><button class="btn go block" data-act="nextQ">${last?"Finish":"Next rep →"}</button></div>`;
+  if(auto)setTimeout(()=>{if(RUN&&RUN.locked&&RUN.i===iNow&&VIEW==="run"&&!document.querySelector(".modal"))ACT.nextQ();},1100);
+}
+ACT.showCard=d=>{const el=$("#cardBox");if(el)el.innerHTML=el.innerHTML?"":cardHtml(CARDS[d.k]);};
+ACT.notYet=(d,b)=>{const was=markNotYet(d.k),t=TOPIC[d.k];
+  if(RUN&&!RUN.done){const keep=RUN.qs.map((q,i)=>i<=RUN.i||keyOf(q)!==d.k);RUN.qs=RUN.qs.filter((q,i)=>keep[i]);RUN.perms=RUN.perms.filter((p,i)=>keep[i]);}
+  if(b){b.textContent="Undo";b.dataset.act="undoNotYet";b.dataset.was=was?"1":"";}
+  toast(`"${t?t.name:"That topic"}" is out of your quizzes until you tick it in the Course map.`,3600);};
+ACT.undoNotYet=(d,b)=>{delete NOTYET[d.k];lsSet("notyet",NOTYET);if(d.was){TAUGHT[d.k]=true;lsSet("taught",TAUGHT);}if(b){b.textContent="Not done this topic yet";b.dataset.act="notYet";}toast("Undone");};
+ACT.report=d=>{const i=d.i!=null?+d.i:RUN&&RUN.i,q=RUN&&RUN.qs[i];if(!q)return;copyText(reportText(q,RUN.perms[i])).then(()=>toast("Copied. Paste it into a message, or fix the line on GitHub.",3600));};
+ACT.nextQ=()=>{if(!RUN||!RUN.locked)return;RUN.i++;if(RUN.i>=RUN.qs.length)endRun();else showQ();};
+ACT.quitRun=()=>{if(RUN&&RUN.res&&RUN.res.length)askEnd("End this workout?","The questions you've answered so far still count.",()=>{clearInterval(RT);RUN=null;home();});else{clearInterval(RT);RUN=null;home();}};   // nothing is recorded for an unfinished daily challenge
+function endRun(){
+  clearInterval(RT);
+  const right=RUN.res.filter(r=>r.ok).length,n=RUN.qs.length,daily=RUN.mode==="daily";
+  let pb=false;
+  if(RUN.mode==="gym"){
+    const prev=ST.best[RUN.key]||0;const val=right*1000+Math.max(0,999-Math.round(RUN.res.reduce((a,r)=>a+(r.secs||0),0)));
+    if(val>prev&&right>0){ST.best[RUN.key]=val;pb=prev>0;}saveST();
+  }
+  if(daily&&!RUN.practice){
+    const grid=RUN.res.map(r=>r.ok?"🟩":r.timeout?"⬛":"🟥").join("");
+    ST.daily[RUN.date]={right,n,grid,score:RUN.score,clock:!!RUN.clock};saveST();
+    RUN.xp+=20;
+  }
+  addXP(RUN.xp);
+  if(pb||right===n){SFX.fanfare();confetti();}
+  const missed=RUN.res.map((r,i)=>r.ok?null:i).filter(i=>i!=null);
+  render(`<div class="wrap">${topBar(daily?"Daily challenge":"Workout done")}
+   <div class="card center"><div class="big-num">${right}/${n}</div>
+   <div class="muted" style="margin-top:6px">+${fmt(RUN.xp)} XP · best combo ${RUN.best}${daily&&RUN.clock?" · "+fmt(RUN.score)+" pts against the clock":""}</div>
+   ${pb?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">🏆 New PB</div>`:right===n?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">💯 Perfect set</div>`:""}
+   ${daily&&!RUN.practice?`<div class="grid-emoji" style="margin-top:12px">${ST.daily[RUN.date].grid}</div><div class="row" style="justify-content:center;margin-top:12px"><button class="btn go" data-act="shareDaily">Share result</button></div>`:""}
+   </div>
+   ${missed.length?`<div class="card"><h3>Review your misses</h3><div class="list">${missed.map(i=>{const q=RUN.qs[i],c=CARDS[keyOf(q)];return `<div class="topic" style="display:block"><div class="row" style="margin-bottom:6px">${subjTag(q.s)}<span class="small muted">${esc(topicOf(q).name)}</span></div><div>${tex(q.q)}</div>${codeHtml(q.code)}<div style="margin-top:8px"><b style="color:var(--lime)">Answer:</b> ${tex(q.o[q.a])}</div><div class="small muted" style="margin-top:4px">${tex(q.x||"")}</div>${c?`<div class="small" style="margin-top:6px"><b>Key idea:</b> ${tex(c.key)}</div>`:""}<div style="margin-top:6px"><button class="linkb" data-act="report" data-i="${i}">Report a problem</button></div></div>`;}).join("")}</div></div>`:""}
+   <div class="row">${daily?"":`<button class="btn go" data-act="again">Go again</button>`}<button class="btn" data-act="home">Home</button></div></div>`,"end");
+  RUN.done=true;
+}
+ACT.again=()=>{if(RUN&&RUN.mode==="gym")ACT.gStart();};
+
+/* =====================================================================
+   DAILY CHALLENGE — 10 questions from what you've covered. Friends on the
+   same courses who have ticked the same topics get the same 10.
+   ===================================================================== */
+let DCLOCK=lsGet("dclock",false);
+function dailySet(date){
+  const rnd=mulberry32(hashStr("repmax-daily-"+date));
+  let pool=playable(BANK,true);
+  if(!pool.length)pool=playable(BANK,false);   // ticks only in subjects with no questions yet: use every topic
+  const subs=SKEYS.filter(s=>pool.some(q=>q.s===s&&q.lv<=2));
+  const lists=Object.fromEntries(subs.map(s=>[s,shuffle(pool.filter(q=>q.s===s&&q.lv<=2),rnd)]));
+  const chosen=[];let k=0;
+  while(chosen.length<8&&subs.some(s=>lists[s].length)){const s=subs[k++%subs.length];if(lists[s].length)chosen.push(lists[s].shift());}
+  const hard=shuffle(pool.filter(q=>q.lv===3&&!chosen.includes(q)),rnd).slice(0,2);
+  let qs=[...shuffle(chosen,rnd),...hard];
+  if(qs.length<10)qs=qs.concat(shuffle(pool.filter(q=>!qs.includes(q)),rnd).slice(0,10-qs.length));
+  return qs.slice(0,10).map(q=>inst(q,mulberry32(hashStr(date+"|"+q.id)))).filter(Boolean);
+}
+ACT.daily=()=>{
+  setWide(false);
+  const d=londonDate(),dn=Math.max(1,dayDiff(LAUNCH,d)+1),done=ST.daily[d];
+  if(done){
+    render(`<div class="wrap">${topBar("Daily challenge #"+dn)}
+     <div class="card center"><div class="muted">Today</div><div class="big-num" style="margin-top:6px">${done.right}/${done.n||10}</div><div class="grid-emoji" style="margin-top:10px">${done.grid}</div>
+     <div class="row" style="justify-content:center;margin-top:14px"><button class="btn go" data-act="shareDaily">Share result</button><button class="btn" data-act="dailyPractice">Practise today's set</button></div></div>
+     <p class="muted small center">A new set unlocks at midnight (UK time).</p></div>`,"daily");
+    return;
+  }
+  const c=covStats();
+  render(`<div class="wrap">${topBar("Daily challenge #"+dn)}
+   <div class="card"><h2>☀️ Today's set</h2><p>${c.topics?`From the ${c.topics} topics you've covered.`:`From every topic. Set what you've covered to keep it to what you've had in class.`} Friends who have covered the same topics get the same 10.</p>
+   <ul class="muted"><li>No clock, unless you switch it on</li><li>It only counts once you finish; quitting doesn't</li></ul>
+   <div class="row" style="margin:10px 0 14px"><button class="tick ${DCLOCK?"on":""}" data-act="dClock" aria-label="Beat the clock">${DCLOCK?"✓":""}</button><div><b>Beat the clock</b><div class="small muted">45 s a question (75 for the last two), points for speed</div></div></div>
+   <div class="row" style="margin-bottom:14px"><button class="btn" data-act="coverage" data-back="daily">📍 What I've covered</button></div>
+   <button class="btn go block" data-act="dailyGo" style="font-size:18px;padding:16px">Start</button><p class="small muted center" id="dmsg"></p></div></div>`,"daily");
+};
+ACT.dClock=()=>{DCLOCK=!DCLOCK;lsSet("dclock",DCLOCK);ACT.daily();};
+ACT.dailyGo=()=>{const d=londonDate(),qs=dailySet(d);if(!qs.length){$("#dmsg").textContent="No questions match what you've covered yet.";return;}startRun({mode:"daily",qs,date:d,seed:hashStr("perm-"+d),clock:DCLOCK,label:"Daily"});};
+ACT.dailyPractice=()=>{const d=londonDate();startRun({mode:"daily",practice:true,qs:dailySet(d),date:d,seed:hashStr("perm-"+d),clock:false,label:"Daily practice"});};
+ACT.shareDaily=()=>{
+  const d=RUN&&RUN.date||londonDate(),r=ST.daily[d];if(!r)return;
+  const dn=Math.max(1,dayDiff(LAUNCH,d)+1),url=location.origin+location.pathname;
+  const text=`Rep Max Daily #${dn}: ${r.right}/${r.n||10}\n${r.grid}\n${url}`;
+  if(navigator.share){navigator.share({text}).catch(()=>{});}else copyText(text).then(()=>toast("Copied: paste it in the group chat"));
+};
+
+/* =====================================================================
+   SPEC TRACKER
+   ===================================================================== */
+let TRK=lsGet("trk",null);
+ACT.tracker=()=>tracker();
+function tracker(){
+  setWide(false);
+  if(!SUBJ[TRK])TRK=SKEYS[0];
+  const s=TRK,sp=SPEC[s]||{groups:[]};
+  const all=sp.groups.flatMap(g=>g.topics);
+  const ms=all.map(t=>mastery(s,t.id)).filter(Boolean);
+  const overall=ms.length?Math.round(ms.reduce((a,b)=>a+b.m,0)/ms.length*100):0;
+  const col=x=>!x||x.n<3?"#56627a":x.m<.4?"var(--red)":x.m<.75?"var(--orange)":"var(--green)";
+  const tabs=SKEYS.map(k=>`<button class="chip ${k===s?"on":""}" data-act="trkS" data-s="${k}">${esc(SUBJ[k].short)}</button>`).join("");
+  let slot=0;
+  const nDone=all.filter(t=>TAUGHT[s+"|"+t.id]).length;
+  const meta=t=>[/^\d/.test(t.id)?esc(t.id):"",t.year?"Year "+esc(String(t.year).replace("-","–")):"",t.tier==="H"?"Higher only":"",t.option?(t.option===t.name?"Option":"Option: "+esc(t.option)):""].filter(Boolean).join(" · ");
+  render(`<div class="wrap">${topBar("Course map")}
+   <div class="row"><div class="pchips">${tabs}</div><span class="spacer"></span><button class="btn" style="padding:8px 12px" data-act="coverage" data-back="tracker">📍 What I've covered</button></div>
+   <div class="card"><div class="row"><div><b style="font-size:18px">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${esc(sp.board||"")} ${esc(sp.code||"")}</div></div><span class="spacer"></span><div class="center">${PRO.quiz?`<div class="big-num" style="font-size:30px">${overall}%</div><div class="small muted">strength</div>`:`<div class="big-num" style="font-size:30px">${nDone}/${all.length}</div><div class="small muted">covered</div>`}</div></div>
+   <p class="small muted" style="margin:8px 0 0">Tick a topic once you've had it in class${PRO.quiz?"; workouts and quiz nights then stick to your ticks. Bars stay grey until you've answered a topic a few times.":"."}</p>${sp.note?`<details style="margin-top:6px;background:transparent;border:0"><summary class="small" style="padding:6px 0">About this exam</summary><p class="small muted" style="margin:4px 0 0">${esc(sp.note)}</p></details>`:""}</div>
+   ${sp.groups.map(g=>`<details ${g.topics.every(t=>String(t.year)==="13")?"":"open"}><summary>${esc(g.name)}<span class="spacer"></span><span class="small muted">${g.topics.length} topics</span></summary><div class="inner list">${g.topics.map(t=>{
+     const m=mastery(s,t.id),qs=topicQs(s,t.id),nf=qs.filter(q=>!q.gen).length,ng=qs.length-nf,key=s+"|"+t.id,card=CARDS[key],id="slot"+(slot++);
+     return `<div class="topic"><button class="tick ${TAUGHT[key]?"on":""}" data-act="taught" data-k="${esc(key)}" aria-label="Taught">${TAUGHT[key]?"✓":""}</button>
+     <div class="nm"><b>${esc(t.name)}</b><span>${[meta(t),PRO.quiz?nf+" question"+(nf===1?"":"s")+(ng?` + ${ng} generator${ng===1?"":"s"}`:""):"",NOTYET[key]?"not done yet":""].filter(Boolean).join(" · ")}</span>${card?`<div><button class="linkb" data-act="trkCard" data-k="${esc(key)}" data-slot="${id}">Key idea</button></div>`:""}</div>
+     ${PRO.quiz?`<div class="mini"><i style="width:${!m?0:Math.max(4,m.m*100)}%;background:${col(m)}"></i></div>
+     ${qs.length?`<button class="btn" style="padding:8px 10px;font-size:13px" data-act="trainT" data-k="${esc(key)}">Train</button>`:`<span class="tag">soon</span>`}`:""}
+     ${t.desc?`<div class="desc">${esc(t.desc)}</div>`:""}</div><div id="${id}"></div>`;}).join("")}</div></details>`).join("")}
+  </div>`,"tracker");
+}
+ACT.trkS=d=>{TRK=d.s;lsSet("trk",TRK);tracker();};
+ACT.trkCard=d=>{const el=document.getElementById(d.slot);if(el)el.innerHTML=el.innerHTML?"":cardHtml(CARDS[d.k]);};
+ACT.taught=(d,b)=>{TAUGHT[d.k]=!TAUGHT[d.k];if(!TAUGHT[d.k])delete TAUGHT[d.k];else if(NOTYET[d.k]){delete NOTYET[d.k];lsSet("notyet",NOTYET);}covSaved();b.classList.toggle("on",!!TAUGHT[d.k]);b.textContent=TAUGHT[d.k]?"✓":"";covTabs();};
+function covTabs(){if(VIEW!=="coverage")return;document.querySelectorAll("[data-act=covS]").forEach(c=>{const s=c.dataset.s,n=((SPEC[s]||{}).groups||[]).reduce((n,g)=>n+g.topics.filter(t=>TAUGHT[s+"|"+t.id]).length,0);c.textContent=SUBJ[s].short+(n?" · "+n:"");});}
+ACT.trainT=d=>{GYM.topic=d.k;GYM.s=d.k.split("|")[0];GYM.w="sets";lsSet("gym",GYM);gymSetup();};
+
+/* =====================================================================
+   WHAT HAVE YOU COVERED? — Maths and Chemistry: "up to" per part, as they
+   mostly follow the textbook order. Further Maths and CS: tick boxes, as
+   they are often taught out of order. Writes the same ticks as the tracker.
+   ===================================================================== */
+function coveredUpTo(s,g){let last=-1;g.topics.forEach((t,ti)=>{if(TAUGHT[s+"|"+t.id])last=ti;});return last;}
+function covStats(){const keys=Object.keys(TAUGHT).filter(k=>TAUGHT[k]);const qn=playable(BANK,true).length;return{topics:keys.length,qn};}
+function covSummary(){const c=covStats();if(!PRO.quiz)return `${c.topics} topic${c.topics===1?"":"s"} covered`;return c.topics?`${c.topics} topic${c.topics===1?"":"s"} covered · ${c.qn} question${c.qn===1?"":"s"} in play`:"Not set yet, so every topic is in";}
+function coverRow(act,on,back){
+  on=on&&taughtOn();
+  return `<div class="row" style="margin-top:12px"><button class="tick ${on?"on":""}" data-act="${act}" ${taughtOn()?"":"disabled"} aria-label="Only what I've covered">${on?"✓":""}</button>
+  <div style="flex:1;min-width:0"><b>Only what I've covered</b><div class="small muted">${esc(covSummary())}</div></div>
+  <button class="btn" style="padding:8px 12px" data-act="coverage" data-back="${back}">📍 Set</button></div>`;
+}
+ACT.hsTaught=()=>{HS.taught=!HS.taught;lsSet("host",HS);ACT.hostSetup();};
+ACT.coverage=d=>coverage((d&&d.back)||"home");
+function coverage(back){
+  setWide(false);VIEW_BACK=back;
+  const y13=g=>g.topics.every(t=>String(t.year)==="13");
+  const tickList=(s,g)=>`<div class="list" style="margin-top:6px">${g.topics.map(t=>{const k=s+"|"+t.id;return `<div class="topic"><button class="tick ${TAUGHT[k]?"on":""}" data-act="taught" data-k="${esc(k)}" aria-label="Covered">${TAUGHT[k]?"✓":""}</button><div class="nm"><b>${esc(t.name)}</b></div></div>`;}).join("")}</div>`;
+  const upTo=(s,g,gi)=>{const idx=coveredUpTo(s,g);return `<select data-cov="${s}|${gi}"><option value="-1" ${idx<0?"selected":""}>Not started yet</option>${g.topics.map((t,ti)=>`<option value="${ti}" ${idx===ti?"selected":""}>${ti===g.topics.length-1?"All of it, up to: ":"Up to: "}${esc(t.name)}</option>`).join("")}</select>`;};
+  if(!SUBJ[COV_S])COV_S=SKEYS[0];
+  const nT=s=>((SPEC[s]||{}).groups||[]).reduce((n,g)=>n+g.topics.filter(t=>TAUGHT[s+"|"+t.id]).length,0);
+  const tabs=SKEYS.map(k=>`<button class="chip ${k===COV_S?"on":""}" data-act="covS" data-s="${k}">${esc(SUBJ[k].short)}${nT(k)?` · ${nT(k)}`:""}</button>`).join("");
+  const cards=[COV_S].map(s=>{
+    const sp=SPEC[s]||{groups:[]},ticks=(s==="further"||s==="cs"||PROFILE==="gcse");
+    const part=(g,gi)=>`<label class="small muted" style="display:block;margin-top:12px">${esc(g.name)}</label>${ticks?tickList(s,g):upTo(s,g,gi)}`;
+    const now=sp.groups.map((g,gi)=>y13(g)?"":part(g,gi)).join(""),later=sp.groups.map((g,gi)=>y13(g)?part(g,gi):"").join("");
+    return `<div class="card"><div class="row"><b style="font-size:17px">${esc(SUBJ[s].em+" "+SUBJ[s].name)}</b><span class="spacer"></span><span class="small muted">${esc((sp.board||"")+" "+(sp.code||""))}</span></div>
+    ${ticks?`<div class="small muted" style="margin-top:4px">Tick each topic you've had: these are often taught out of order.</div>`:""}${now}
+    ${later?`<details style="margin-top:12px;background:transparent;border:0"><summary class="small" style="padding:6px 0">Year 13 parts</summary>${later}</details>`:""}</div>`;}).join("");
+  render(`<div class="wrap">${topBar("What have you covered?",back)}
+   <p class="muted small" style="margin-top:0">Pick what you've had in class so far. ${PRO.quiz?"Workouts, quiz nights and the daily challenge then only ask about those topics.":"Your course map then shows what's done and what's still to come."}</p>
+   <div class="card" style="position:sticky;top:8px;z-index:5"><div class="row"><b id="covCount"></b><span class="spacer"></span>${Object.keys(TAUGHT).length?`<button class="btn" style="padding:8px 12px" data-act="covClear">Clear all</button>`:""}</div>
+   <div class="pchips" style="margin-top:10px">${tabs}</div></div>
+   ${cards}
+   <button class="btn go block" style="font-size:18px;padding:16px" data-act="${back}">Done</button></div>`,"coverage");
+  document.querySelectorAll("select[data-cov]").forEach(sel=>sel.addEventListener("change",()=>{
+    const [s,gi]=sel.dataset.cov.split("|"),g=SPEC[s].groups[+gi],upto=+sel.value;
+    g.topics.forEach((t,ti)=>{const k=s+"|"+t.id;if(ti<=upto){TAUGHT[k]=true;delete NOTYET[k];}else delete TAUGHT[k];});
+    lsSet("notyet",NOTYET);covSaved();covTabs();
+  }));
+  covCount();
+}
+function covSaved(){lsSet("taught",TAUGHT);lsSet("covAt",Date.now());const on=taughtOn();GYM.taught=on;HS.taught=on;lsSet("gym",GYM);lsSet("host",HS);covCount();}
+function covCount(){const el=$("#covCount");if(el)el.textContent=covSummary();}
+ACT.covClear=(d,b)=>{if(!b||b.dataset.armed!=="1"){if(b){b.dataset.armed="1";b.textContent="Tap again to clear every tick";setTimeout(()=>{if(b.isConnected){b.dataset.armed="";b.textContent="Clear all";}},4000);}return;}TAUGHT={};covSaved();coverage(VIEW_BACK||"home");};
+let COV_S=lsGet("covS",null);   // the subject tab open on the covered screen
+ACT.covS=d=>{COV_S=d.s;lsSet("covS",COV_S);coverage(VIEW_BACK||"home");};
+let VIEW_BACK=null;
+
+/* =====================================================================
+   QUESTION MAKER — builds one line for data/<course>/<subject>.jsonl
+   ===================================================================== */
+function repoUrl(){const m=location.hostname.match(/^([^.]+)\.github\.io$/i);if(!m)return"";const repo=location.pathname.split("/").filter(Boolean)[0]||"";return "https://github.com/"+m[1]+(repo?"/"+repo:"");}
+let MK_RIGHT=0;
+ACT.maker=()=>{
+  setWide(false);
+  let s=lsGet("mk_s",SKEYS[0]);if(!SUBJ[s])s=SKEYS[0];
+  const tops=(SPEC[s]?SPEC[s].groups.flatMap(g=>g.topics):[]);
+  const repo=repoUrl();
+  render(`<div class="wrap">${topBar("Write a question")}
+  <div class="card"><p class="muted small" style="margin-top:0">Fill this in and check the preview. Then open <b>data/${PROFILE}/${esc(s)}.jsonl</b> on GitHub, click the pencil, paste your line on a new line at the end, and commit. One question per line, no commas between lines. ${repo?`<a href="${repo}/tree/main/data/${PROFILE}" target="_blank" rel="noopener">Open the question files</a>.`:""}</p>
+  <div class="grid2"><div><label class="small muted">Subject</label><select id="mk_s">${SKEYS.map(k=>`<option value="${k}" ${k===s?"selected":""}>${esc(SUBJ[k].name)}</option>`).join("")}</select></div>
+  <div><label class="small muted">Level</label><select id="mk_lv"><option value="1">1 · Warm-up</option><option value="2" selected>2 · Working set</option><option value="3">3 · 1-rep max</option></select></div></div>
+  <label class="small muted" style="display:block;margin-top:10px">Topic</label><select id="mk_t">${tops.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("")}</select>
+  <label class="small muted" style="display:block;margin-top:10px">Question (maths between $ signs, e.g. $x^2+1$)</label><textarea id="mk_q" enterkeyhint="next" autocapitalize="sentences" autocorrect="on" spellcheck="true"></textarea>
+  <label class="small muted" style="display:block;margin-top:10px">Code (optional)</label><textarea id="mk_code" enterkeyhint="enter" autocapitalize="off" autocorrect="off" spellcheck="false" style="font-family:ui-monospace,Menlo,monospace"></textarea>
+  ${[0,1,2,3].map(i=>`<div class="row" style="margin-top:10px"><button class="tick ${i===0?"on":""}" data-act="mkRight" data-i="${i}" aria-label="Right answer">${i===0?"✓":""}</button><input id="mk_o${i}" enterkeyhint="next" autocapitalize="sentences" autocorrect="on" spellcheck="true" placeholder="Option ${SHAPES[i]}${i===0?" (ticked = the right answer)":""}"></div>`).join("")}
+  <label class="small muted" style="display:block;margin-top:10px">Explanation (why the answer is right)</label><textarea id="mk_x" enterkeyhint="done" autocapitalize="sentences" autocorrect="on" spellcheck="true"></textarea>
+  <div class="row" style="margin-top:12px"><button class="btn go" data-act="mkBuild">Preview & make line</button></div></div>
+  <div id="mk_out"></div></div>`,"maker");
+  $("#mk_s").onchange=e=>{lsSet("mk_s",e.target.value);ACT.maker();};
+  MK_RIGHT=0;
+};
+ACT.mkRight=d=>{MK_RIGHT=+d.i;document.querySelectorAll("[data-act=mkRight]").forEach(b=>{const on=+b.dataset.i===MK_RIGHT;b.classList.toggle("on",on);b.textContent=on?"✓":"";});};
+ACT.mkBuild=()=>{
+  const s=$("#mk_s").value,o=[0,1,2,3].map(i=>$("#mk_o"+i).value.trim());
+  const pre=(SUBJ[s]&&SUBJ[s].pre)||s.slice(0,3);
+  const q={id:pre+"-u"+Date.now().toString(36).slice(-5),s,t:$("#mk_t").value,lv:+$("#mk_lv").value,q:$("#mk_q").value.trim()};
+  const code=$("#mk_code").value.replace(/\s+$/,"");if(code)q.code=code;
+  q.o=o;q.a=MK_RIGHT;q.x=$("#mk_x").value.trim();
+  const errs=[];if(!q.q)errs.push("Write the question.");if(o.some(x=>!x))errs.push("Fill in all four options.");if(new Set(o).size<4)errs.push("Options must all be different.");if(!q.x)errs.push("Add an explanation.");
+  const line=JSON.stringify(q);
+  $("#mk_out").innerHTML=`<div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(s)}${lvTag(q.lv)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+   <div class="opts">${o.map((x,i)=>`<div class="opt o${i} ${i===q.a?"right":""}"><span class="sh">${SHAPES[i]}</span><span>${tex(x)}</span></div>`).join("")}</div>
+   <div class="feedback">${tex(q.x)}</div></div>
+   ${errs.length?`<p class="err">${errs.map(esc).join(" ")}</p>`:`<div class="card"><h3>Your line for data/${PROFILE}/${s}.jsonl</h3><div class="kbd" id="mk_line">${esc(line)}</div><button class="btn" style="margin-top:8px" data-act="mkCopy">Copy line</button></div>`}`;
+};
+ACT.mkCopy=()=>copyText($("#mk_line").textContent).then(()=>toast("Copied"));
+
+/* =====================================================================
+   LIVE QUIZ NIGHT
+   Relay transport adapted from Nose Knows: messages go through every public
+   MQTT broker that answers and are de-duplicated on arrival. No accounts.
+   The host's screen is in charge: it picks questions, keeps the answer key,
+   times each question and scores. Phones send only their pick.
+   ===================================================================== */
+const PEER_PREFIX="rep-max-v1-";
+const MQTT_SRC=["../lib/mqtt.min.js","https://cdn.jsdelivr.net/npm/mqtt@5.16.1/dist/mqtt.min.js","https://unpkg.com/mqtt@5.16.1/dist/mqtt.min.js"];
+const BROKERS=[{url:"wss://public.cloud.shiftr.io:443/mqtt",username:"public",password:"public"},{url:"wss://broker.emqx.io:8084/mqtt"},{url:"wss://broker.hivemq.com:8884/mqtt"}];
+const RELAY_ROOT="rm-relay-test-v1/";
+const rid=(n=12)=>{const a="abcdefghijklmnopqrstuvwxyz0123456789";let s="";const r=(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(new Uint8Array(n)):null;for(let i=0;i<n;i++)s+=a[(r?r[i]:Math.floor(Math.random()*256))%a.length];return s;};
+class RelayEmitter{constructor(){this._h={};}on(e,f){(this._h[e]=this._h[e]||new Set()).add(f);return this;}off(e,f){if(this._h[e])this._h[e].delete(f);return this;}emit(e,...a){[...(this._h[e]||[])].forEach(f=>{try{f(...a);}catch(x){console.error(x);}});}}
+class RelayConn extends RelayEmitter{
+  constructor(peer,remote,cid){super();this._peer=peer;this.remote=remote;this.cid=cid;this.open=false;this.lastSeen=Date.now();}
+  send(obj){if(!this.open)throw new Error("closed");this._peer._pub(this.remote,{t:"d",cid:this.cid,d:obj});}
+  close(){if(this._dropped)return;try{this._peer._pub(this.remote,{t:"x",cid:this.cid});}catch(e){}this._drop();}
+  _drop(){if(this._dropped)return;this._dropped=true;this.open=false;this._peer.conns.delete(this.cid);clearInterval(this._retry);this.emit("close");}
+}
+class RelayPeer extends RelayEmitter{
+  constructor(id){super();this.claim=typeof id==="string";this.id=this.claim?id:"p-"+rid(14);this.destroyed=false;this.conns=new Map();this.clients=[];this.nonce=rid(10);this._seen=new Set();this._seenQ=[];this._open=false;this._taken=false;setTimeout(()=>this._start(),0);}
+  get disconnected(){return !this.clients.some(c=>c.connected);}
+  _topic(id){return RELAY_ROOT+id;}
+  _start(){
+    let first=true;
+    const failT=setTimeout(()=>{if(first&&!this.destroyed)this.emit("error",{type:"network"});},12000);
+    for(const b of BROKERS){
+      let c;try{c=mqtt.connect(b.url,{clientId:"rm_"+rid(14),clean:true,connectTimeout:8000,reconnectPeriod:3000,keepalive:30,...(b.username?{username:b.username,password:b.password}:{})});}catch(e){continue;}
+      this.clients.push(c);
+      c.on("connect",()=>{c.subscribe(this._topic(this.id),{qos:0},()=>{if(first&&!this.destroyed){first=false;clearTimeout(failT);this._ready();}});});
+      c.on("message",(t,buf)=>{let m;try{m=JSON.parse(buf.toString());}catch(e){return;}this._recv(m);});
+      c.on("error",()=>{});
+    }
+    if(!this.clients.length){clearTimeout(failT);setTimeout(()=>this.emit("error",{type:"network"}));}
+    this._hb=setInterval(()=>this._beat(),5000);
+  }
+  _ready(){
+    if(!this.claim){this._open=true;this.emit("open",this.id);return;}
+    try{this._pub(this.id,{t:"probe",n:this.nonce});}catch(e){}
+    setTimeout(()=>{if(this.destroyed)return;if(this._taken){this.emit("error",{type:"unavailable-id"});this.destroy();return;}this._open=true;this.emit("open",this.id);},1800);
+  }
+  _pub(target,msg){const live=this.clients.filter(c=>c.connected);if(!live.length)throw new Error("offline");msg.from=this.id;msg.mid=rid(12);const s=JSON.stringify(msg),t=this._topic(target);live.forEach(c=>{try{c.publish(t,s,{qos:0});}catch(e){}});}
+  _dup(mid){if(!mid)return false;if(this._seen.has(mid))return true;this._seen.add(mid);this._seenQ.push(mid);if(this._seenQ.length>4000)this._seen.delete(this._seenQ.shift());return false;}
+  _recv(m){
+    if(!m||typeof m!=="object"||this.destroyed||this._dup(m.mid))return;
+    const c=m.cid&&this.conns.get(m.cid);
+    switch(m.t){
+      case "probe":if(m.n===this.nonce)return;if(this.claim&&this._open)try{this._pub(this.id,{t:"taken",n:m.n});}catch(e){}return;
+      case "taken":if(m.n===this.nonce)this._taken=true;return;
+      case "open":{
+        if(!this._open||typeof m.from!=="string"||typeof m.cid!=="string")return;
+        if(c){try{this._pub(m.from,{t:"ack",cid:m.cid});}catch(e){}return;}
+        const conn=new RelayConn(this,m.from,m.cid);this.conns.set(m.cid,conn);this.emit("connection",conn);
+        conn.open=true;try{this._pub(m.from,{t:"ack",cid:m.cid});}catch(e){}setTimeout(()=>conn.emit("open"));return;}
+      case "ack":if(c&&!c.open&&c.remote===m.from){c.open=true;c.lastSeen=Date.now();clearInterval(c._retry);c.emit("open");}return;
+      case "d":if(c&&c.remote===m.from){c.lastSeen=Date.now();if(c.open)c.emit("data",m.d);}else if(this.claim&&m.from)try{this._pub(m.from,{t:"x",cid:m.cid});}catch(e){}return;
+      case "hb":if(c&&c.remote===m.from)c.lastSeen=Date.now();return;
+      case "x":if(c&&c.remote===m.from)c._drop();return;
+    }
+  }
+  _beat(){const now=Date.now();for(const c of [...this.conns.values()]){if(!c.open)continue;if(now-c.lastSeen>17000){c._drop();continue;}try{this._pub(c.remote,{t:"hb",cid:c.cid});}catch(e){}}}
+  connect(target){
+    const cid=rid(14),conn=new RelayConn(this,target,cid);this.conns.set(cid,conn);
+    const ask=()=>{try{this._pub(target,{t:"open",cid});}catch(e){}};
+    ask();conn._retry=setInterval(()=>{if(conn.open||conn._dropped)return clearInterval(conn._retry);ask();},1500);
+    setTimeout(()=>{if(!conn.open&&!conn._dropped){clearInterval(conn._retry);this.conns.delete(cid);conn._dropped=true;conn.emit("fail");}},8000);
+    return conn;
+  }
+  reconnect(){this.clients.forEach(c=>{if(!c.connected)try{c.reconnect();}catch(e){}});}
+  destroy(){if(this.destroyed)return;this.destroyed=true;clearInterval(this._hb);[...this.conns.values()].forEach(c=>c.close());this.clients.forEach(c=>{try{c.end(true);}catch(e){}});}
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+async function loadMqtt(){if(!window.mqtt){for(const s of MQTT_SRC){try{await loadScript(s);if(window.mqtt)break;}catch(e){}}}return !!window.mqtt;}
+function peerOnce(id){
+  return new Promise((res,rej)=>{
+    let p;try{p=new RelayPeer(id);}catch(e){return rej({type:"init"});}
+    const t=setTimeout(()=>{try{p.destroy();}catch(e){}rej({type:"timeout"});},14000);
+    const onErr=e=>{clearTimeout(t);try{p.destroy();}catch(x){}rej({type:e&&e.type||"error"});};
+    p.on("open",()=>{clearTimeout(t);p.off("error",onErr);res(p);});p.on("error",onErr);
+  });
+}
+function genCode(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ";let c="";for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];return c;}
+const myPid=()=>{let p=lsGet("pid",null);if(!p){p="p"+rid(10);lsSet("pid",p);}return p;};
+const GRACE=1500;
+function ptsFor(ms,dur){return 800+Math.round(200*Math.max(0,1-ms/(dur*1000)));}
+let wakeLock=null,WANT_WAKE=false,HID_AT=0;
+document.addEventListener("visibilitychange",()=>{if(document.hidden){HID_AT=Date.now();if(RUN&&RUN.clock&&!RUN.locked)clearInterval(RT);if(SP)clearInterval(SPT);}else{const gap=HID_AT?Date.now()-HID_AT:0;HID_AT=0;if(RUN&&RUN.clock&&!RUN.locked&&VIEW==="run"){RUN.start+=gap;runTimer();}if(SP&&VIEW==="sprintq"){SP.end+=gap;clearInterval(SPT);SPT=setInterval(spTick,200);}if(WANT_WAKE)keepAwake();}});
+async function keepAwake(){WANT_WAKE=true;try{if(navigator.wakeLock)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
+
+/* ---------------- HOST ---------------- */
+let H=null;
+let HS=Object.assign({subs:SKEYS.slice(),lv:"mix",n:10,dur:45,auto:0,taught:false,play:false},lsGet("host",{}));
+HS.subs=(HS.subs||[]).filter(k=>SUBJ[k]&&(!QSUBJ||QSUBJ.includes(k)));if(!HS.subs.length)HS.subs=QSUBJ?QSUBJ.slice():SKEYS.slice();
+if(![30,45,60,90].includes(HS.dur))HS.dur=45;
+ACT.hostSetup=()=>{
+  setWide(false);
+  const sub=SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(s=>`<button class="chip ${HS.subs.includes(s)?"on":""}" data-act="hsSub" data-s="${s}">${esc(SUBJ[s].em+" "+SUBJ[s].short)}</button>`).join("");
+  const seg=(key,vals,lab)=>vals.map(v=>`<button class="chip ${HS[key]===v?"on":""}" data-act="hsSet" data-k="${key}" data-v="${v}">${lab(v)}</button>`).join("");
+  render(`<div class="wrap">${topBar("Host a quiz night")}
+  <div class="card"><h3>Subjects</h3><div class="pchips">${sub}</div>
+   <h3 style="margin-top:14px">Difficulty</h3><div class="pchips">${seg("lv",["mix","easy","max"],v=>({mix:"Mixed",easy:"Levels 1–2",max:"🔥 1-rep max only"})[v])}</div>
+   <h3 style="margin-top:14px">Questions</h3><div class="pchips">${seg("n",[5,10,15,20],v=>v)}</div>
+   <h3 style="margin-top:14px">Time per question</h3><div class="pchips">${seg("dur",[30,45,60,90],v=>v+" s")}</div><div class="small muted" style="margin-top:6px">The hardest questions get double time.</div>
+   <h3 style="margin-top:14px">Next question</h3><div class="pchips">${seg("auto",[0,5,10,15],v=>v?"auto after "+v+" s":"when I tap Next")}</div>
+   <div style="margin-top:6px">${coverRow("hsTaught",HS.taught,"hostSetup")}</div>
+   <div class="row" style="margin-top:12px"><button class="tick ${HS.play?"on":""}" data-act="hsTog" data-k="play" aria-label="I'm playing too">${HS.play?"✓":""}</button><div><b>I'm playing too</b><div class="small muted">Shows answer buttons on this screen as ${esc(ME.badge+" "+ME.name)}</div></div></div></div>
+  <button class="btn go block" data-act="hostOpen" style="font-size:18px;padding:16px">Open the room</button>
+  <p class="small muted center" id="hmsg">Players join on their own devices with a 4-letter code. Nicknames only: names and answers pass through public relays. A right answer scores 800, plus up to 200 for speed.</p></div>`,"hostSetup");
+};
+ACT.hsSub=d=>{const i=HS.subs.indexOf(d.s);if(i>=0){if(HS.subs.length>1)HS.subs.splice(i,1);}else HS.subs.push(d.s);lsSet("host",HS);ACT.hostSetup();};
+ACT.hsSet=d=>{HS[d.k]=isNaN(+d.v)?d.v:+d.v;lsSet("host",HS);ACT.hostSetup();};
+ACT.hsTog=d=>{HS[d.k]=!HS[d.k];lsSet("host",HS);ACT.hostSetup();};
+function hostPool(){
+  let p=playable(BANK.filter(q=>HS.subs.includes(q.s)),HS.taught);
+  if(HS.lv==="easy")p=p.filter(q=>q.lv<=2);else if(HS.lv==="max")p=p.filter(q=>q.lv===3);
+  return p;
+}
+function hostDeal(){return shuffle(hostPool()).slice(0,HS.n*2).map(q=>inst(q)).filter(Boolean).slice(0,HS.n);}
+ACT.hostOpen=async()=>{
+  if(!hostPool().length){$("#hmsg").textContent="No questions match those settings.";return;}
+  $("#hmsg").textContent="Opening a room…";
+  if(!(await loadMqtt())){$("#hmsg").textContent="Couldn't load the connection library. Check the internet connection.";return;}
+  let peer=null,code=null;
+  for(let i=0;i<8&&!peer;i++){code=genCode();try{peer=await peerOnce(PEER_PREFIX+code);}catch(e){if(e.type!=="unavailable-id"){$("#hmsg").textContent="Couldn't open a room ("+e.type+"). The network may block live connections: try another Wi-Fi or a phone hotspot.";return;}}}
+  if(!peer){$("#hmsg").textContent="Couldn't get a free room code. Try again.";return;}
+  H={peer,code,qs:hostDeal(),game:1,conns:new Map(),players:new Map(),phase:"lobby",i:-1,cur:null,answers:new Map(),autoT:null,qT:null,hostPid:"h-"+myPid()};
+  if(HS.play)H.players.set(H.hostPid,{pid:H.hostPid,name:ME.name,badge:ME.badge,score:0,streak:0,host:true,online:true});
+  peer.on("connection",conn=>{
+    conn.on("data",m=>hostRecv(conn,m));
+    conn.on("close",()=>{if(conn._pid&&H&&H.conns.get(conn._pid)===conn){H.conns.delete(conn._pid);const p=H.players.get(conn._pid);if(p)p.online=false;hostRefresh();}});
+  });
+  peer.on("disconnected",()=>{try{peer.reconnect();}catch(e){}});
+  H.syncT=setInterval(()=>{if(!H)return;for(const [pid,c] of H.conns)hsend(c,{...stateFor(pid),sync:1});},3000);   // relays can drop messages: re-send the current state
+  keepAwake();
+  hostRender();
+};
+function hostRecv(conn,m){
+  if(!H||!m||typeof m!=="object")return;
+  if(m.t==="hello"){
+    const pid=String(m.pid||"").replace(/[^A-Za-z0-9_-]/g,"").slice(0,40);if(!pid)return;
+    const name=String(m.name||"Player").replace(/[<>]/g,"").slice(0,22)||"Player",badge=String(m.badge||"⭐").slice(0,8);
+    conn._pid=pid;const old=H.conns.get(pid);if(old&&old!==conn)try{old.close();}catch(e){}
+    H.conns.set(pid,conn);
+    const p=H.players.get(pid);
+    if(p){p.name=name;p.badge=badge;p.online=true;}else H.players.set(pid,{pid,name,badge,score:0,streak:0,online:true});
+    hsend(conn,stateFor(pid));hostRefresh();
+    if(H.phase==="lobby")broadcast(lobbyMsg());
+    return;
+  }
+  if(m.t==="ans")hostTakeAnswer(conn._pid,m.n,m.c);
+}
+function hostTakeAnswer(pid,n,c){
+  if(!H||!pid||H.phase!=="q"||n!==H.i||H.answers.has(pid)||!H.players.has(pid))return;
+  const ms=Date.now()-H.cur.start;if(ms>H.cur.dur*1000+GRACE)return;
+  c=+c;if(!(c>=0&&c<4))return;
+  H.answers.set(pid,{c,ms});
+  const box=$("#hAns");if(box)box.textContent=H.answers.size+" / "+activeCount()+" answered";
+  if(H.answers.size>=activeCount())setTimeout(()=>{if(H&&H.phase==="q"&&H.cur&&n===H.i)hostReveal();},400);
+}
+const activeCount=()=>[...H.players.values()].filter(p=>p.online||p.host).length;
+const send=(c,o)=>{try{c.send(o);}catch(e){}};
+const hsend=(c,o)=>send(c,{...o,g:H?H.game:0});
+function broadcast(o){if(!H)return;for(const c of H.conns.values())hsend(c,o);}
+function playerList(){return [...H.players.values()].map(p=>({pid:p.pid,name:p.name,badge:p.badge,online:!!(p.online||p.host)}));}
+function boardList(){return [...H.players.values()].sort((a,b)=>b.score-a.score).map((p,i)=>({pid:p.pid,name:p.name,badge:p.badge,score:p.score,pos:i+1}));}
+function lobbyMsg(){return{t:"lobby",players:playerList(),code:H.code,subs:HS.subs.map(s=>SUBJ[s].name),n:H.qs.length};}
+function qMsg(){const q=H.cur.q;return{t:"q",n:H.i,total:H.qs.length,dur:H.cur.dur,left:Math.max(0,H.cur.dur*1000-(Date.now()-H.cur.start)),q:{s:q.s,t:topicOf(q).name,lv:q.lv,q:q.q,code:q.code||"",o:H.cur.perm.map(k=>q.o[k])}};}
+function stateFor(pid){
+  if(H.phase==="lobby")return lobbyMsg();
+  if(H.phase==="q"){const m=qMsg();m.mine=H.answers.has(pid)?H.answers.get(pid).c:null;return m;}
+  if(H.phase==="rev")return{...H.lastRev,you:H.lastRev.res[pid]||null};
+  return{t:"end",board:boardList()};
+}
+function hostStart(){if(!H||H.phase!=="lobby"||!H.qs.length)return;hostQuestion(0);}
+function hostQuestion(i){
+  clearTimeout(H.autoT);clearInterval(H.qT);
+  H.i=i;H.phase="q";H.answers=new Map();
+  const q=H.qs[i];H.cur={q,perm:shuffle([0,1,2,3]),start:Date.now(),dur:HS.dur*(q.lv===3?2:1)};
+  broadcast(qMsg());hostRender();SFX.plate();
+  H.qT=setInterval(()=>{
+    if(!H||H.phase!=="q")return clearInterval(H.qT);
+    const left=H.cur.dur*1000-(Date.now()-H.cur.start),el=$("#tm");
+    if(el)tmSet(el,left,H.cur.dur*1000);
+    const sec=$("#hSec");if(sec)sec.textContent=Math.max(0,Math.ceil(left/1000));
+    if(left<=-GRACE){clearInterval(H.qT);hostReveal();}
+  },200);
+}
+function hostReveal(){
+  if(!H||H.phase!=="q")return;clearInterval(H.qT);
+  const q=H.cur.q,right=H.cur.perm.indexOf(q.a),res={},counts=[0,0,0,0];
+  for(const [pid,p] of H.players){
+    const a=H.answers.get(pid);
+    if(a)counts[a.c]++;
+    if(a&&a.c===right){p.streak++;const pts=ptsFor(a.ms,H.cur.dur)+Math.min(150,(p.streak-1)*50);p.score+=pts;res[pid]={ok:true,pts,c:a.c,streak:p.streak};}
+    else{p.streak=0;res[pid]={ok:false,pts:0,c:a?a.c:null};}
+  }
+  const board=boardList();board.forEach(b=>{if(res[b.pid])res[b.pid].pos=b.pos;});
+  H.phase="rev";H.lastRev={t:"rev",n:H.i,total:H.qs.length,a:right,x:q.x||"",counts,res,board:board.slice(0,5),players:board.length,q:{q:q.q,code:q.code||"",o:H.cur.perm.map(k=>q.o[k])}};
+  for(const [pid,c] of H.conns)hsend(c,{...H.lastRev,you:res[pid]||null});
+  if(HS.play){const mine=res[H.hostPid];if(mine)recordAnswer(q,mine.ok);}
+  hostRender();
+  if(HS.auto)H.autoT=setTimeout(()=>{if(H&&H.phase==="rev")hostNext();},HS.auto*1000);
+}
+function hostNext(){if(!H)return;clearTimeout(H.autoT);if(H.i+1<H.qs.length)hostQuestion(H.i+1);else hostEnd();}
+function hostEnd(){
+  clearTimeout(H.autoT);clearInterval(H.qT);H.phase="end";
+  broadcast({t:"end",board:boardList()});
+  if(HS.play){const me=H.players.get(H.hostPid);if(me){addXP(me.score/50);ST.live++;saveST();}}
+  hostRender();SFX.fanfare();confetti();
+}
+ACT.hStart=()=>hostStart();
+ACT.hNext=()=>hostNext();
+ACT.hReveal=()=>hostReveal();
+ACT.hEnd=()=>hostEnd();
+ACT.hRematch=()=>{   // same room, same players, a fresh set of questions
+  if(!H)return;clearTimeout(H.autoT);clearInterval(H.qT);
+  H.game++;H.qs=hostDeal();H.phase="lobby";H.i=-1;H.cur=null;H.lastRev=null;H.answers=new Map();
+  for(const p of H.players.values()){p.score=0;p.streak=0;}
+  broadcast(lobbyMsg());hostRender();
+};
+ACT.hAgain=()=>{leaveLive();ACT.hostSetup();};
+ACT.hPick=d=>{if(!H||H.phase!=="q"||!HS.play)return;if(H.answers.has(H.hostPid))return;hostTakeAnswer(H.hostPid,H.i,+d.i);document.querySelectorAll(".hostq .opt").forEach(b=>{b.disabled=true;});const l=$("#hLock");if(l)l.textContent="🔒 Your answer is in";};
+ACT.hCopy=()=>copyText(joinLink(H.code)).then(()=>toast("Join link copied"));
+function joinLink(code){return location.origin+location.pathname+"#join-"+code+(PROFILE==="gcse"?"-gcse":"");}
+function hostRefresh(){if(!H)return;if(H.phase==="lobby")hostRender();else{const box=$("#hPlayers");if(box)box.innerHTML=playerChips();}}
+function playerChips(){return [...H.players.values()].map(p=>`<span class="chip" style="${p.online||p.host?"":"opacity:.45"}">${esc(p.badge)} ${esc(p.name)}${p.host?" (host)":""}</span>`).join("")||`<span class="muted">Waiting for players…</span>`;}
+function boardHtml(board,meId){return `<div class="board">${board.map(b=>`<div class="brow ${b.pid===meId?"me":""}"><span class="pos">${b.pos<=3&&b.score>0?["🥇","🥈","🥉"][b.pos-1]:b.pos}</span><span class="av">${esc(b.badge)}</span><span>${esc(b.name)}</span><span class="pts">${fmt(b.score)}</span></div>`).join("")}</div>`;}
+function hostRender(){
+  if(!H)return;setWide(true);
+  const top=`<div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>QUIZ NIGHT · ROOM ${H.code}</small></div></div><div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button><button class="btn" data-act="closeRoom">Close room</button></div></div>`;
+  if(H.phase==="lobby"){
+    render(`<div class="wrap">${top}
+    <div class="grid2"><div class="card center"><div class="muted">Join on your device: open Rep Max, tap <b>Join a game</b>, enter</div><div class="code-big" style="margin:10px 0">${H.code}</div><div class="muted small">or scan</div><div id="qr" class="qr" style="margin-top:8px"></div><div style="margin-top:10px"><button class="btn" data-act="hCopy">Copy join link</button></div></div>
+    <div class="card"><h3>Players (<span>${H.players.size}</span>)</h3><div class="pchips" id="hPlayers">${playerChips()}</div>
+    <div class="hr"></div><div class="small muted">${H.game>1?"Round "+H.game+" · ":""}${H.qs.length} questions · ${HS.subs.map(s=>SUBJ[s].short).join(", ")} · ${HS.dur} s each</div>
+    <button class="btn go block" style="margin-top:14px;font-size:20px;padding:16px" data-act="hStart" ${H.players.size&&H.qs.length?"":"disabled"}>Start the quiz</button></div></div></div>`,"host");
+    drawQR(joinLink(H.code));return;
+  }
+  if(H.phase==="q"){
+    const m=qMsg(),q=m.q,mine=H.answers.get(H.hostPid);
+    render(`<div class="wrap">${top}
+    <div class="row"><span class="chip">Question ${H.i+1}/${H.qs.length}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="muted small">${esc(q.t)}</span><span class="spacer"></span><span class="chip" id="hAns">${H.answers.size} / ${activeCount()} answered</span><span class="big-num" id="hSec" style="font-size:34px;min-width:50px;text-align:right">${Math.ceil(m.left/1000)}</span></div>
+    <div class="timer" id="tm"><i></i><b></b></div>
+    <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+    <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i}" ${HS.play&&!mine?`data-act="hPick" data-i="${i}" data-silent="1"`:"disabled"}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div></div>
+    <div class="row"><div class="pchips" id="hPlayers">${playerChips()}</div><span class="spacer"></span><span class="muted" id="hLock">${mine?"🔒 Your answer is in":""}</span><button class="btn" data-act="hReveal">Reveal now</button></div></div>`,"host");
+    return;
+  }
+  if(H.phase==="rev"){
+    const r=H.lastRev,q=H.cur.q;
+    render(`<div class="wrap">${top}
+    <div class="row"><span class="chip">Question ${H.i+1}/${H.qs.length}</span>${subjTag(q.s)}${lvTag(q.lv)}</div>
+    <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+    <div class="opts">${r.q.o.map((o,i)=>`<div class="opt o${i} ${i===r.a?"right":"dim"}"><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span><span class="mark">${r.counts[i]}</span></div>`).join("")}</div>
+    <div class="feedback ok"><b>Why:</b> ${tex(r.x)}</div></div>
+    <div class="grid2"><div class="card"><h3>Leaderboard</h3>${boardHtml(boardList().slice(0,6))}</div>
+    <div class="card center"><p class="muted">${HS.auto?"Next question in a few seconds…":""}</p><button class="btn go block" style="font-size:20px;padding:16px" data-act="hNext">${H.i+1<H.qs.length?"Next question →":"Final results 🏆"}</button>
+    <button class="btn block" style="margin-top:10px" data-act="hEnd">End quiz now</button></div></div></div>`,"host");
+    return;
+  }
+  const b=boardList(),w=b[0]&&b[0].score>0?b[0]:null;
+  render(`<div class="wrap">${top}<div class="card center"><h1>🏆 ${w?esc(w.badge+" "+w.name)+" wins!":"Game over"}</h1><p class="muted">${w?fmt(w.score)+" points":"Nobody scored this time."}</p></div>
+  <div class="card">${boardHtml(b)}</div><div class="row"><button class="btn go" data-act="hRematch">Play again, same room</button><button class="btn" data-act="hAgain">Change settings</button><button class="btn" data-act="home">Home</button></div></div>`,"host");
+}
+let qrLoading=null;
+function drawQR(text){
+  const el=document.getElementById("qr");if(!el)return;
+  const go=()=>{try{el.innerHTML="";new QRCode(el,{text,width:180,height:180,colorDark:"#0d0f13",colorLight:"#ffffff"});}catch(e){el.style.display="none";}};
+  if(window.QRCode)return go();
+  if(!qrLoading)qrLoading=loadScript("../lib/qrcode.min.js").catch(()=>loadScript("https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"));
+  qrLoading.then(go,()=>{el.style.display="none";});
+}
+
+/* ---------------- PLAYER ---------------- */
+let PL=null;
+ACT.join=(d)=>{
+  setWide(false);
+  const pre=(d&&d.code)||"";
+  render(`<div class="wrap">${topBar("Join a game")}
+  <div class="card"><label class="small muted">Room code (on the host's screen)</label>
+  <input id="jcode" maxlength="4" enterkeyhint="next" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off" style="font-size:32px;font-weight:900;letter-spacing:.3em;text-transform:uppercase;text-align:center" value="${esc(pre)}">
+  <label class="small muted" style="display:block;margin-top:12px">Your nickname</label>
+  <div class="row"><input id="jname" maxlength="22" enterkeyhint="go" autocapitalize="words" autocorrect="off" spellcheck="false" autocomplete="off" value="${esc(ME.name)}"><button class="btn" data-act="rnameJ" aria-label="Random name">🎲</button></div>
+  <div class="small muted" style="margin:12px 0 6px">Badge</div><div class="avs">${BADGES.map(b=>`<button class="av-btn ${b===ME.badge?"sel":""}" data-act="badge" data-b="${b}">${b}</button>`).join("")}</div>
+  <button class="btn go block" style="margin-top:16px;font-size:18px;padding:16px" data-act="joinGo">Join</button><p class="small muted center" id="jmsg"></p></div></div>`,"join");
+};
+ACT.rnameJ=()=>{$("#jname").value=randName();};
+ACT.joinGo=async()=>{
+  const code=$("#jcode").value.trim().toUpperCase().replace(/[^A-Z]/g,"");
+  const name=$("#jname").value.trim().slice(0,22)||randName();
+  if(code.length!==4){$("#jmsg").textContent="The code is 4 letters.";return;}
+  if(name!==ME.name)ME.auto=false;
+  ME.name=name;lsSet("me",ME);
+  $("#jmsg").textContent="Connecting…";
+  if(!(await loadMqtt())){$("#jmsg").textContent="Couldn't load the connection library. Check your internet.";return;}
+  leaveLive();
+  PL={code,pid:myPid(),peer:null,conn:null,closed:false,phase:"connecting",q:null,mine:null,start:0,dur:0,timer:null,g:null,revN:-1};
+  try{PL.peer=await peerOnce(null);}catch(e){$("#jmsg").textContent="Couldn't connect. Some Wi-Fi blocks live games: try mobile data.";PL=null;return;}
+  const ok=await plConnect(true);
+  if(!ok){$("#jmsg").textContent="No game found with code "+code+". Check the code and that the host's screen is still open.";leaveLive();return;}
+  keepAwake();
+};
+function plConnect(first){
+  return new Promise(res=>{
+    if(!PL||PL.closed)return res(false);
+    const c=PL.peer.connect(PEER_PREFIX+PL.code);let done=false;
+    c.on("open",()=>{if(done)return;done=true;PL.conn=c;send(c,{t:"hello",pid:PL.pid,name:ME.name,badge:ME.badge});res(true);plStatus(true);});
+    c.on("fail",()=>{if(done)return;done=true;res(false);});
+    c.on("data",m=>plRecv(m));
+    c.on("close",()=>{if(PL&&PL.conn===c){PL.conn=null;plStatus(false);if(!PL.closed)plReconnect();}});
+    if(first)setTimeout(()=>{if(!done){done=true;res(false);}},10000);
+  });
+}
+async function plReconnect(){
+  if(!PL||PL.reconnecting)return;PL.reconnecting=true;
+  for(let i=0;PL&&!PL.closed&&!PL.conn;i++){await sleep(Math.min(5000,1200+i*600));if(!PL||PL.closed)break;try{if(PL.peer.disconnected)PL.peer.reconnect();}catch(e){}await plConnect(false);}
+  if(PL)PL.reconnecting=false;
+}
+function plStatus(on){const el=$("#plDot");if(el)el.classList.toggle("off",!on);const t=$("#plConn");if(t)t.textContent=on?"connected":"reconnecting…";}
+function plTop(){return `<div class="top"><div class="row"><span class="chip">${esc(ME.badge)} ${esc(ME.name)}</span></div><div class="row small muted"><span class="status-dot ${PL&&PL.conn?"":"off"}" id="plDot"></span><span id="plConn">${PL&&PL.conn?"connected":"reconnecting…"}</span><span class="chip">Room ${esc(PL?PL.code:"")}</span><button class="icon-btn" data-act="leaveGame" aria-label="Leave">✕</button></div></div>`;}
+function plRecv(m){
+  if(!PL||!m||typeof m!=="object")return;
+  for(const k of ["n","dur","left","a","players","total","g"])if(m[k]!=null&&!Array.isArray(m[k]))m[k]=Number(m[k])||0;
+  if(m.you){m.you.pts=Number(m.you.pts)||0;m.you.pos=Number(m.you.pos)||0;m.you.streak=Number(m.you.streak)||0;m.you.c=m.you.c==null?null:Number(m.you.c);}
+  if(Array.isArray(m.board))m.board=m.board.map(b=>({...b,pos:Number(b.pos)||0,score:Number(b.score)||0}));
+  if(m.g!=null&&m.g!==PL.g){PL.g=m.g;PL.n=undefined;PL.revN=-1;PL.xpDone=false;PL.mine=null;PL.lobbySig=null;if(PL.phase!=="connecting")PL.phase="new";}   // a new round in the same room
+  if(m.t==="lobby"){
+    const sig=JSON.stringify([m.players,m.subs,m.n]);if(PL.phase==="lobby"&&PL.lobbySig===sig)return;PL.lobbySig=sig;PL.phase="lobby";clearInterval(PL.timer);
+    render(`<div class="wrap">${plTop()}<div class="card center"><div style="font-size:48px">${esc(ME.badge)}</div><h2>You're in!</h2><p class="muted">Waiting for the host to start…</p>${m.subs?`<p class="small muted">Tonight: ${esc(m.subs.join(", "))} · ${m.n} questions</p>`:""}</div><div class="card"><h3>In the room</h3><div class="pchips">${(m.players||[]).map(p=>`<span class="chip" style="${p.online?"":"opacity:.45"}">${esc(p.badge)} ${esc(p.name)}</span>`).join("")}</div></div></div>`,"play");
+    return;
+  }
+  if(m.t==="q"){
+    if(PL.phase==="q"&&PL.n===m.n){if(m.mine==null&&PL.mine!=null&&PL.conn)send(PL.conn,{t:"ans",n:PL.n,c:PL.mine});return;}   // already showing it; re-send a lost answer
+    if((PL.phase==="rev"&&PL.revN>=m.n)||PL.phase==="end")return;
+    PL.phase="q";PL.n=m.n;PL.q=m.q;PL.mine=m.mine;PL.dur=m.dur;PL.start=Date.now()-(m.dur*1000-m.left);
+    plRenderQ();SFX.plate();return;
+  }
+  if(m.t==="rev"){
+    if((PL.phase==="rev"&&PL.revN===m.n)||PL.phase==="end")return;
+    PL.phase="rev";PL.revN=m.n;clearInterval(PL.timer);const y=m.you||{ok:false,pts:0,c:null};
+    if(y.ok){SFX.correct();if((y.streak||0)>=3)SFX.combo();}else SFX.wrong();
+    recordLive(y.ok);
+    const q=m.q||PL.q||{o:["","","",""],q:""};
+    render(`<div class="wrap">${plTop()}
+     <div class="card center" style="border-color:${y.ok?"#2f6b24":"#6b2a33"}"><div style="font-size:52px">${y.ok?"✅":y.c==null?"⏱":"❌"}</div><h2 style="margin:6px 0">${y.ok?"+"+fmt(y.pts)+" points":y.c==null?"No answer":"Not this time"}</h2>
+     ${y.ok&&(y.streak||0)>=2?`<div class="combo">🔥 Streak x${y.streak}</div>`:""}<p class="muted">${y.pos?`You're #${y.pos} of ${m.players}`:""}</p></div>
+     <div class="qbox"><div>${tex(q.q)}</div><div style="margin-top:10px"><b style="color:var(--lime)">Answer:</b> ${tex(q.o[m.a])}</div><div class="small muted" style="margin-top:6px">${tex(m.x)}</div></div>
+     <div class="card"><h3>Top 5</h3>${boardHtml(m.board,PL.pid)}</div></div>`,"play");
+    return;
+  }
+  if(m.t==="closed"){
+    PL.closed=true;clearInterval(PL.timer);
+    render(`<div class="wrap">${topBar("Quiz night")}<div class="card center"><div style="font-size:48px">🏁</div><h2>The host closed the room.</h2><p class="muted">Thanks for playing.</p></div><button class="btn block" data-act="home">Home</button></div>`,"play");
+    return;
+  }
+  if(m.t==="end"){
+    if(PL.phase==="end")return;
+    PL.phase="end";clearInterval(PL.timer);const me=(m.board||[]).find(b=>b.pid===PL.pid);
+    if(me&&!PL.xpDone){PL.xpDone=true;addXP(me.score/50);ST.live++;saveST();}
+    if(me&&me.pos===1&&me.score>0){SFX.fanfare();confetti();}
+    render(`<div class="wrap">${plTop()}<div class="card center"><div style="font-size:52px">${me&&me.score>0&&me.pos<=3?["🥇","🥈","🥉"][me.pos-1]:"🏁"}</div><h2>${me?"You finished #"+me.pos:"Game over"}</h2><p class="muted">${me?fmt(me.score)+" points":""}</p><p class="small muted">Stay here if the host starts another round.</p></div>
+    <div class="card">${boardHtml(m.board||[],PL.pid)}</div><button class="btn block" data-act="home">Home</button></div>`,"play");
+  }
+}
+function recordLive(ok){ST.done++;if(ok)ST.reps++;markDay();saveST();}   // quiz-night questions count as reps
+function plRenderQ(){
+  const q=PL.q;clearInterval(PL.timer);
+  render(`<div class="wrap">${plTop()}
+  <div class="row"><span class="chip">Q ${PL.n+1}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="spacer"></span><b id="plSec" style="font-size:22px"></b></div>
+  <div class="timer" id="tm"><i></i><b></b></div>
+  <div class="qbox"><div class="small muted" style="margin-bottom:6px">${esc(q.t)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+  <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i} ${PL.mine!=null?(PL.mine===i?"mine":"dim"):""}" data-act="plPick" data-i="${i}" data-silent="1" ${PL.mine!=null?"disabled":""}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div>
+  <div id="plMsg" class="center muted" style="margin-top:12px">${PL.mine!=null?"🔒 Locked in. Waiting for the others…":""}</div></div></div>`,"play");
+  tmSet($("#tm"),PL.dur*1000-(Date.now()-PL.start),PL.dur*1000);PL.timer=setInterval(()=>{const left=PL.dur*1000-(Date.now()-PL.start),el=$("#tm");if(!el)return clearInterval(PL.timer);tmSet(el,left,PL.dur*1000);const s=$("#plSec");if(s)s.textContent=Math.max(0,Math.ceil(left/1000));if(left<=0){clearInterval(PL.timer);if(PL.mine==null){document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;b.classList.add("dim");});const m=$("#plMsg");if(m)m.textContent="⏱ Time's up";}}},200);
+}
+ACT.plPick=d=>{
+  if(!PL||PL.phase!=="q"||PL.mine!=null)return;
+  const left=PL.dur*1000-(Date.now()-PL.start);if(left<=0)return;
+  PL.mine=+d.i;SFX.click();
+  const msg={t:"ans",n:PL.n,c:PL.mine};
+  if(PL.conn)send(PL.conn,msg);
+  setTimeout(()=>{if(PL&&PL.conn&&PL.phase==="q"&&PL.n===msg.n)send(PL.conn,msg);},1500);   // once more in case a relay dropped it; the host keeps only the first
+  document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;b.classList.toggle("mine",i===PL.mine);if(i!==PL.mine)b.classList.add("dim");});
+  $("#plMsg").textContent="🔒 Locked in. Waiting for the others…";
+};
+ACT.leaveGame=()=>{leaveLive();home();};
+function leaveLive(){
+  if(PL){PL.closed=true;clearInterval(PL.timer);try{PL.conn&&PL.conn.close();}catch(e){}try{PL.peer&&PL.peer.destroy();}catch(e){}PL=null;}
+  if(H){clearTimeout(H.autoT);clearInterval(H.qT);clearInterval(H.syncT);try{broadcast({t:"closed"});}catch(e){}try{H.peer.destroy();}catch(e){}H=null;}
+  if(wakeLock){try{wakeLock.release();}catch(e){}wakeLock=null;}
+}
+window.addEventListener("beforeunload",()=>{try{if(H)H.peer.destroy();if(PL&&PL.peer)PL.peer.destroy();}catch(e){}});
+
+
+/* =====================================================================
+   SPRINT (16 Nov 2026): as many questions as possible against one clock.
+   Points by level, so harder questions are worth more: level 1 = 1, level 2 = 2, level 3 = 3.
+   A wrong answer costs 3 seconds; Skip costs 2 seconds, so a hard question never traps you.
+   Answers count towards the tracker and spaced repetition like any other rep. Best score per course,
+   subject and length is kept on this device.
+   ===================================================================== */
+const SPRINT_LENS=[60,120,180];
+let SPS=Object.assign({len:60},lsGet("sprint",{}));
+if(!SPRINT_LENS.includes(SPS.len))SPS.len=60;
+let SP=null,SPT=null;
+const SP_PTS={1:1,2:2,3:3},SP_WRONG=3,SP_SKIP=2;
+ACT.sprint=()=>{
+  setWide(false);
+  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="spS" data-s="${s}">${s==="mix"?"🎲 Mixed":esc(SUBJ[s].em+" "+SUBJ[s].name)}</button>`).join("");
+  const lens=SPRINT_LENS.map(l=>`<button class="chip ${SPS.len===l?"on":""}" data-act="spL" data-l="${l}">${l<120?l+" s":l/60+" min"}</button>`).join("");
+  const best=ST.best["sprint|"+SPS.len+"|"+GYM.s];
+  render(`<div class="wrap">${topBar("Sprint")}
+  <div class="card"><b style="font-size:18px">⚡ As many as you can</b><p class="small muted" style="margin:6px 0 0">One clock for the whole sprint. Level 1 questions score 1 point, level 2 score 2, level 3 score 3. A wrong answer costs ${SP_WRONG} seconds; Skip costs ${SP_SKIP}.</p></div>
+  <div class="card"><h3>Subject</h3><div class="pchips">${sChips}</div></div>
+  <div class="card"><h3>Length</h3><div class="pchips">${lens}</div>
+  <div class="small muted" style="margin-top:8px">Your best here: ${best?best+" points":"none yet"}</div></div>
+  <div class="card">${coverRow("spTaught",GYM.taught,"sprint")}</div>
+  <button class="btn go block" data-act="spGo" style="font-size:18px;padding:16px">Start sprint</button>
+  <p class="small muted center" id="spmsg"></p></div>`,"sprint");
+};
+ACT.spS=d=>{GYM.s=d.s;GYM.topic=null;lsSet("gym",GYM);ACT.sprint();};
+ACT.spL=d=>{SPS.len=+d.l;lsSet("sprint",SPS);ACT.sprint();};
+ACT.spTaught=()=>{GYM.taught=!GYM.taught;lsSet("gym",GYM);ACT.sprint();};
+function spPool(){return playable(BANK.filter(q=>GYM.s==="mix"||q.s===GYM.s),GYM.taught);}
+ACT.spGo=()=>{
+  const pool=spPool();
+  if(!pool.length){$("#spmsg").textContent="No questions match those settings yet. Try another subject, or check what you've covered.";return;}
+  SP={len:SPS.len,s:GYM.s,end:Date.now()+SPS.len*1000,pool:shuffle(pool.slice()),k:0,q:null,perm:null,pts:0,right:0,wrong:0,skips:0,res:[],locked:false};
+  spNext();
+  clearInterval(SPT);SPT=setInterval(spTick,200);
+};
+function spTick(){
+  if(!SP)return clearInterval(SPT);
+  const left=SP.end-Date.now();tmSet($("#tm"),left,SP.len*1000);
+  if(left<=0){clearInterval(SPT);spEnd();}
+}
+function spNext(){
+  if(SP.k>=SP.pool.length){SP.pool=shuffle(SP.pool);SP.k=0;}
+  let q=null;for(let tries=0;!q&&tries<SP.pool.length;tries++){q=inst(SP.pool[SP.k++]);if(SP.k>=SP.pool.length){SP.pool=shuffle(SP.pool);SP.k=0;}}
+  if(!q)return spEnd();
+  SP.q=q;SP.perm=shuffle([0,1,2,3]);SP.locked=false;
+  render(`<div class="wrap">
+  <div class="top"><button class="icon-btn" data-act="spQuit" aria-label="Stop">✕</button>
+   <div class="hud"><span class="chip">⚡ ${SP.pts} pts</span><span class="chip">${SP.right} right</span></div>
+   <button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>
+  <div class="timer" id="tm"><i></i><b></b></div>
+  <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">+${SP_PTS[q.lv]} pt${SP_PTS[q.lv]>1?"s":""}</span></div>
+   <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+   <div class="opts">${SP.perm.map((k,i)=>`<button class="opt o${i}" data-act="spPick" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
+   <div class="row" style="margin-top:12px"><span class="spacer"></span><button class="btn" data-act="spSkip">Skip (−${SP_SKIP} s)</button></div></div></div>`,"sprintq");
+  spTick();
+}
+ACT.spPick=d=>{
+  if(!SP||SP.locked)return;SP.locked=true;
+  const q=SP.q,right=SP.perm.indexOf(q.a),di=+d.i,ok=di===right;
+  recordAnswer(q,ok);SP.res.push({q,ok,di,perm:SP.perm});
+  if(ok){SP.right++;SP.pts+=SP_PTS[q.lv];SFX.correct();}else{SP.wrong++;SP.end-=SP_WRONG*1000;SFX.wrong();popText("−"+SP_WRONG+" s");}
+  document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i===right)b.classList.add("right");else if(i===di)b.classList.add("mine");else b.classList.add("dim");});
+  setTimeout(()=>{if(SP&&SP.end>Date.now())spNext();},ok?350:900);
+};
+ACT.spSkip=()=>{if(!SP||SP.locked)return;SP.skips++;SP.end-=SP_SKIP*1000;spNext();};
+ACT.spQuit=()=>{if(SP&&SP.res&&SP.res.length)askEnd("Stop this sprint?","This sprint won't count.",()=>{clearInterval(SPT);SP=null;home();});else{clearInterval(SPT);SP=null;home();}};   // a sprint stopped early records no score
+function spEnd(){
+  if(!SP||SP.done)return;SP.done=true;clearInterval(SPT);
+  const key="sprint|"+SP.len+"|"+SP.s,prev=ST.best[key]||0,pb=SP.pts>prev&&SP.pts>0;
+  if(pb)ST.best[key]=SP.pts;
+  addXP(SP.res.filter(r=>r.ok).reduce((a,r)=>a+XP_LV[r.q.lv],0));saveST();
+  if(pb&&prev>0){SFX.fanfare();confetti();}
+  const n=SP.right+SP.wrong,miss=SP.res.filter(r=>!r.ok);
+  render(`<div class="wrap">${topBar("Sprint done","sprint")}
+   <div class="card center"><div class="big-num">${SP.pts}</div><div class="muted">points in ${SP.len<120?SP.len+" s":SP.len/60+" min"}</div>
+   <div class="muted" style="margin-top:6px">${SP.right} right · ${SP.wrong} wrong · ${SP.skips} skipped${n?" · "+Math.round(SP.right/n*100)+"% accuracy":""}</div>
+   ${pb&&prev>0?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">🏆 New best (was ${prev})</div>`:`<div class="small muted" style="margin-top:8px">Best: ${Math.max(prev,SP.pts)} points</div>`}</div>
+   ${miss.length?`<div class="card"><h3>Review your misses</h3><div class="list">${miss.slice(0,12).map(r=>`<div class="topic" style="display:block"><div class="row" style="margin-bottom:6px">${subjTag(r.q.s)}<span class="small muted">${esc(topicOf(r.q).name)}</span></div><div>${tex(r.q.q)}</div><div class="small" style="margin-top:6px">Answer: <b>${tex(r.q.o[r.q.a])}</b></div><div class="small muted" style="margin-top:4px">${tex(r.q.x||"")}</div></div>`).join("")}</div></div>`:""}
+   <div class="row"><button class="btn go" data-act="spGo">Go again</button><button class="btn" data-act="home">Home</button></div></div>`,"sprintend");
+}
+
+/* ---------- phones: typing view and ?debug=1 (FNF_Phone_Games_Guide.md, rules 1-3 and the real-phone check) ---------- */
+/* While a text box has focus and an on-screen keyboard has shrunk the visible area, the page switches to a typing view
+   (header and footer folded away, see the CSS) and scrolls the box's label to the top, so the question being answered
+   and the box are on screen together. Laptops never shrink the visible area, so they never see it.
+   ?kb=<px> pretends a keyboard of that height is up: phone_audit.py uses it, as no emulator shows a real keyboard. */
+const KB_SIM=+(new URLSearchParams(location.search).get("kb")||0);
+function askOf(e){let n=e;if(n.parentElement&&n.parentElement.classList.contains("row"))n=n.parentElement;const p=n.previousElementSibling;return p&&p.tagName==="LABEL"?p:null;}
+let FULL_H=innerHeight;
+function fitPhone(){
+  const vv=window.visualViewport,a=document.activeElement;
+  const box=!!(a&&a.matches&&a.matches("input:not([type=checkbox]),textarea"));
+  const vis=(vv?vv.height:innerHeight)-(box&&KB_SIM?KB_SIM:0);
+  if(!box)FULL_H=innerHeight;document.documentElement.style.setProperty("--fullh",FULL_H+"px");const typing=box&&vis<FULL_H-120;
+  const was=document.body.classList.contains("typing");
+  document.body.classList.toggle("typing",typing);
+  document.documentElement.style.setProperty("--vvh",vis+"px");
+  if(typing&&!was)(askOf(a)||a).scrollIntoView({block:"start"});
+  dbgShow();
+}
+if(window.visualViewport){visualViewport.addEventListener("resize",fitPhone);visualViewport.addEventListener("scroll",fitPhone);}
+document.addEventListener("focusin",fitPhone);document.addEventListener("focusout",()=>setTimeout(fitPhone,50));
+/* ?debug=1: the numbers to read off a real phone with the keyboard up (screenshot it and send it back) */
+const DBG=/[?&]debug=1(?![0-9])/.test(location.search);
+function dbgShow(){
+  if(!DBG)return;let d=$("#dbg");if(!d){d=document.createElement("div");d.id="dbg";document.body.appendChild(d);const p=document.createElement("div");p.id="sai";document.body.appendChild(p);}
+  const vv=window.visualViewport,cs=getComputedStyle($("#sai"));
+  d.textContent=`Rep Max v${VERSION} ${PROFILE||""}\ninner ${innerWidth}x${innerHeight}\nvisual ${vv?Math.round(vv.width)+"x"+Math.round(vv.height)+" top "+Math.round(vv.offsetTop):"n/a"}\nsafe ${["Top","Right","Bottom","Left"].map(k=>parseInt(cs["padding"+k])||0).join(" ")}\ndpr ${devicePixelRatio}  typing ${document.body.classList.contains("typing")?"on":"off"}`;
+}
+if(DBG){window.addEventListener("resize",dbgShow);setInterval(dbgShow,1000);}
+
+/* ---------- start ---------- */
+function route(){
+  const m=(location.hash||"").match(/^#join-([A-Za-z]{4})(?:-(?:gcse|alevel))?$/);
+  if(m){history.replaceState(null,"",location.pathname+location.search);ACT.join({code:m[1].toUpperCase()});return;}
+  home();
+}
+let READY=false;   // a join link opened while the questions are still loading is handled once they are in
+window.addEventListener("hashchange",()=>{if(READY)route();});
+loadAll().catch(e=>console.error(e)).then(()=>{READY=true;route();});
+</script>
+</body>
+
+</html>
