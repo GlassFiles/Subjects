@@ -1,7 +1,7 @@
 // Rep Max questions: Physics (AQA 8463), GCSE. One question per line, no commas between lines.
 // Fields: id (unique), s (subject), t (topic id from spec.json), lv (1 warm-up, 2 working set, 3 hardest; Higher-only topics are 3),
 // q (question; maths between $ signs, backslashes doubled), code (optional), o (four options), a (index 0-3 of the right one), x (explanation).
-// Written by AI (Sonnet) and checked independently by AI (Opus), 15 Nov 2026; logs in provenance/ted-gcse/questions/.
+// Written by AI (Sonnet) and checked independently by AI (Opus), 15 Nov 2026; logs in the library's provenance folder.
 {"id":"gph-001","s":"physics","t":"4.1.1","lv":2,"q":"A car of mass 800 kg moves at 15 m/s. What is its kinetic energy?","o":["90 000 J","6000 J","180 000 J","12 000 J"],"a":0,"x":"Kinetic energy = ½ × m × v². So ½ × 800 × 15² = ½ × 800 × 225 = 90 000 J. Forgetting to square v, or forgetting the ½, gives the wrong options."}
 {"id":"gph-002","s":"physics","t":"4.1.2","lv":2,"q":"A motor takes in 250 J of electrical energy. It wastes 60 J as thermal and sound energy. What is its efficiency?","o":["24%","32%","76%","132%"],"a":2,"x":"Useful output = 250 − 60 = 190 J. Efficiency = useful output ÷ total input = 190 ÷ 250 = 0.76, which is 76%. 24% is the wasted fraction."}
 {"id":"gph-003","s":"physics","t":"4.1.3","lv":1,"q":"Which of these energy resources is renewable?","o":["Natural gas","Tidal power","Coal","Uranium for nuclear power"],"a":1,"x":"A renewable resource is replaced as fast as it is used. Tides keep coming. Coal, gas and uranium will run out because they cannot be replaced in a human lifetime."}

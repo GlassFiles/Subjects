@@ -1,7 +1,7 @@
 // Rep Max questions: Mathematics (Pearson Edexcel 1MA1), GCSE. One question per line, no commas between lines.
 // Fields: id (unique), s (subject), t (topic id from spec.json), lv (1 warm-up, 2 working set, 3 hardest; Higher-only topics are 3),
 // q (question; maths between $ signs, backslashes doubled), code (optional), o (four options), a (index 0-3 of the right one), x (explanation).
-// Written by AI (Sonnet) and checked independently by AI (Opus), 15 Nov 2026; logs in provenance/ted-gcse/questions/.
+// Written by AI (Sonnet) and checked independently by AI (Opus), 15 Nov 2026; logs in the library's provenance folder.
 {"id":"gma-001","s":"maths","t":"N1-N3","lv":1,"q":"Work out $3 + 4 \\times 2^2 - 5$.","o":["$23$","$14$","$62$","$116$"],"a":1,"x":"Powers first: $2^2=4$. Then multiply: $4\\times4=16$. Then $3+16-5=14$."}
 {"id":"gma-002","s":"maths","t":"N1-N3","lv":2,"q":"Work out $2\\frac{1}{3} + 1\\frac{3}{4}$.","o":["$4\\frac{4}{7}$","$3\\frac{1}{12}$","$4\\frac{1}{7}$","$4\\frac{1}{12}$"],"a":3,"x":"Add whole numbers: 3. Then $\\frac{1}{3}+\\frac{3}{4}=\\frac{4}{12}+\\frac{9}{12}=\\frac{13}{12}=1\\frac{1}{12}$. Total $4\\frac{1}{12}$."}
 {"id":"gma-003","s":"maths","t":"N4-N5","lv":1,"q":"What is the highest common factor (HCF) of 24 and 36?","o":["$6$","$72$","$4$","$12$"],"a":3,"x":"Factors of 24 and 36 shared: 1, 2, 3, 4, 6, 12. The highest is 12. (72 is the LCM.)"}

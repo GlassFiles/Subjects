@@ -801,6 +801,19 @@ RM.setSpec({
      }
     ],
     "ref": "3.3"
+   },
+   {
+    "name": "Practical skills",
+    "ref": "8",
+    "topics": [
+     {
+      "id": "8.rp",
+      "name": "Required practicals and practical skills",
+      "desc": "The twelve required practicals and the practical skills in the written papers: techniques, uncertainty, safety, variables and evaluation.",
+      "ref": "8",
+      "year": "12-13"
+     }
+    ]
    }
   ]
  },

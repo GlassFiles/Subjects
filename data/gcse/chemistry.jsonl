@@ -1,7 +1,7 @@
 // Rep Max questions: Chemistry (AQA 8462), GCSE. One question per line, no commas between lines.
 // Fields: id (unique), s (subject), t (topic id from spec.json), lv (1 warm-up, 2 working set, 3 hardest; Higher-only topics are 3),
 // q (question; maths between $ signs, backslashes doubled), code (optional), o (four options), a (index 0-3 of the right one), x (explanation).
-// Written by AI (Sonnet) and checked independently by AI (Opus), 15 Nov 2026; logs in provenance/ted-gcse/questions/.
+// Written by AI (Sonnet) and checked independently by AI (Opus), 15 Nov 2026; logs in the library's provenance folder.
 {"id":"gch-001","s":"chemistry","t":"4.1.1.1","lv":1,"q":"Which technique is used to get pure water from salt solution?","o":["Filtration","Paper chromatography","Simple distillation","Crystallisation"],"a":2,"x":"Distillation evaporates the water and condenses it, leaving the salt behind. Crystallisation keeps the salt, and filtration only removes insoluble solids."}
 {"id":"gch-002","s":"chemistry","t":"4.1.1.3","lv":1,"q":"A chlorine atom has atomic number 17 and mass number 37. How many neutrons does it have?","o":["17","37","20","54"],"a":2,"x":"Neutrons = mass number − atomic number = 37 − 17 = 20. The atomic number is the number of protons, which is also 17."}
 {"id":"gch-003","s":"chemistry","t":"4.1.1.7","lv":1,"q":"Phosphorus has atomic number 15. What is its electronic structure?","o":["2,8,8,5","2,5,8","2,8,5","2,13"],"a":2,"x":"15 electrons fill the shells in order: 2 in the first, 8 in the second, leaving 5 in the third shell. The structure is 2,8,5."}
