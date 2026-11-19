@@ -27,7 +27,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rep Max">
 <style>
-:root{--bg:#0d0f13;--panel:#161a21;--panel2:#1e232c;--line:#2b313d;--text:#f3f5f9;--mute:#9aa3b2;--lime:#c6ff3d;--lime2:#a5e400;--orange:#ff7a2f;--red:#ff4d5e;--green:#2fd27a;
+:root{--bg:#0d0f13;--panel:#1b212b;--panel2:#29313f;--line:#3b4456;--text:#f3f5f9;--mute:#9aa3b2;--lime:#c6ff3d;--lime2:#a5e400;--orange:#ff7a2f;--red:#ff4d5e;--green:#2fd27a;
 --maths:#4da3ff;--further:#b27cff;--chem:#33d17a;--cs:#ff9f1c;--t0:#e5484d;--t1:#3e7bff;--t2:#e8a317;--t3:#2a9d5c}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
@@ -73,9 +73,9 @@ h3{font-size:calc(16px*var(--fs,1));font-weight:800}
 @media(max-width:560px){.grid2{grid-template-columns:1fr}}
 .big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;transition:transform .08s,border-color .15s}
 @media (hover:hover){.big:hover{border-color:#3a4252}}.big:active{transform:scale(.985)}
-.big .em{font-size:calc(30px*var(--fs,1));width:46px;height:46px;display:grid;place-items:center;background:var(--panel2);border-radius:14px;flex:none}
+.big .em{font-size:calc(30px*var(--fs,1));width:46px;height:46px;display:grid;place-items:center;background:rgba(198,255,61,.10);border:1px solid rgba(198,255,61,.28);border-radius:14px;flex:none}
 .big b{display:block;font-size:calc(17px*var(--fs,1))}.big span{color:var(--mute);font-size:calc(13px*var(--fs,1))}
-.big.hero{background:linear-gradient(135deg,#25310c,#161a21 70%);border-color:#3f5414}
+.big.hero{background:linear-gradient(135deg,#2c3a0e,#1b212b 70%);border-color:#56721b}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:14px;font-weight:800;background:var(--panel2);border:1px solid var(--line)}
 .btn.go{background:var(--lime);color:#111;border-color:var(--lime)}
 @media (hover:hover){.btn.go:hover{background:var(--lime2)}}
@@ -195,6 +195,16 @@ body.f-lexend .logo,body.f-dys .logo{font-family:system-ui,-apple-system,"Segoe 
 .mbox{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;max-width:360px;width:100%}
 .seg{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .rankart{background:linear-gradient(90deg,var(--panel) 45%,rgba(20,24,31,.55)),url(lib/repmax-art.jpg) right center/cover no-repeat}
+.ic{width:26px;height:26px;fill:none;stroke:var(--lime);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic.sm{width:1.05em;height:1.05em;stroke:currentColor;vertical-align:-.16em;margin-right:.35em}
+.big.hero .em{background:var(--lime);border-color:var(--lime)}.big.hero .em .ic{stroke:#111}
+.logo .lg .ic{width:28px;height:28px}
+.btn{background:var(--panel2);border-color:var(--line)}
+a.big{color:inherit;text-decoration:none}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.badges .chip{font-size:calc(12px*var(--fs,1));padding:4px 10px;min-height:32px}
+.why{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12)}
+.mpill{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--lime);color:#111;font-size:calc(11px*var(--fs,1));font-weight:800;vertical-align:2px}
+.tipcard{border-color:rgba(198,255,61,.35)}
 </style>
 </head>
 <body>
@@ -230,7 +240,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.7";
+const VERSION="1.8";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -353,6 +363,38 @@ let ST=Object.assign({xp:0,reps:0,done:0,best:{},q:{},daily:{},days:[],streak:0,
 if(!Array.isArray(ST.days))ST.days=[];
 let TAUGHT=lsGet("taught",{});
 let NOTYET=lsGet("notyet",{});
+const ICP={
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+dumbbell:'<path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/>',
+bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+host:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+join:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4M9.5 9.5 12 12l2.5-2.5M12 6v6"/>',
+map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>',
+pin:'<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',
+cap:'<path d="M2 9 12 4l10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5M22 9v6"/>',
+books:'<path d="M4 19V5a2 2 0 0 1 2-2h12v15H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h12"/><path d="M8 7h6"/>',
+watch:'<circle cx="12" cy="13" r="8"/><path d="M12 13V9M10 2h4M12 2v3M19 6l1.5-1.5"/>',
+warm:'<path d="M3 17c3 0 3-4 6-4s3 4 6 4 3-4 6-4"/><path d="M3 11c3 0 3-4 6-4s3 4 6 4 3-4 6-4"/>',
+flame:'<path d="M12 22c4 0 7-3 7-7 0-5-5-7-5-12-3 2-5 5-5 8-1-1-2-2-2-3-1 2-2 4-2 7 0 4 3 7 7 7z"/>',
+target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+wrench:'<path d="M14.5 6.5a4 4 0 0 1-5 5L4 17l3 3 5.5-5.5a4 4 0 0 1 5-5l-2.5-2.5 2-2z"/>',
+sigma:'<path d="M18 4H6l7 8-7 8h12"/>',
+integral:'<path d="M15 3c-2.5 0-3 2-3 4v10c0 2-.5 4-3 4"/>',
+flask:'<path d="M9 2h6M10 2v7L4 20a1.5 1.5 0 0 0 1.3 2h13.4A1.5 1.5 0 0 0 20 20l-6-11V2"/><path d="M7 15h10"/>',
+code:'<path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+pen:'<path d="M12 19 19 12l3 3-7 7zM18 13l-1.5-7.5L2 2l3.5 14.5L13 18zM2 2l7.6 7.6"/><circle cx="11" cy="11" r="2"/>',
+book:'<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+dna:'<path d="M7 2c0 6 10 8 10 20M17 2c0 6-10 8-10 20M8 6h8M7.5 12h9M8 18h8"/>',
+atom:'<circle cx="12" cy="12" r="1.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>',
+talk:'<path d="M21 11a7 7 0 0 1-7 7H8l-5 3 1.5-4A7 7 0 0 1 3 11a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7z"/>',
+tower:'<path d="M5 21V8h2V5h2v3h2V5h2v3h2V5h2v3h2v13zM10 21v-5a2 2 0 0 1 4 0v5"/>',
+chart:'<path d="M3 3v18h18M7 16v-4M12 16V8M17 16v-7"/>',
+shuffle:'<path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>',
+repeat:'<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
+medal:'<circle cx="12" cy="15" r="6"/><path d="M8.5 10 6 2h4l2 5 2-5h4l-2.5 8"/><path d="m12 12 1 2h2l-1.5 1.5.5 2-2-1-2 1 .5-2L9 14h2z"/>',
+link:'<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'};
+const EMI={"☀️":"sun","🏋️":"dumbbell","⚡":"bolt","📺":"host","📱":"join","🗺️":"map","📍":"pin","🎓":"cap","📚":"books","⏱️":"watch","🤸":"warm","🔥":"flame","🎯":"target","🛠️":"wrench","∑":"sigma","∫":"integral","⚗️":"flask","💻":"code","📖":"pen","🎭":"book","🧬":"dna","⚛️":"atom","🕊️":"talk","🏰":"tower","💼":"chart","🎲":"shuffle","🏆":"cap","🔁":"repeat","🏅":"medal","🔗":"link"};
+function icn(em,small){const n=EMI[em];return n?`<svg class="ic${small?" sm":""}" viewBox="0 0 24 24" aria-hidden="true">${ICP[n]}</svg>`:(small?esc(em)+" ":esc(em));}
 let MUTED=lsGet("muted",true);
 let SET=Object.assign({auto:true,size:1,font:"plain"},lsGet("set",{}));
 const REDUCED=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -363,16 +405,38 @@ function rankOf(xp){let i=0;for(let k=0;k<RANKS.length;k++)if(xp>=RANKS[k][0])i=
 function addXP(n){const before=rankOf(ST.xp).lvl;ST.xp+=Math.max(0,Math.round(n));saveST();const after=rankOf(ST.xp);if(after.lvl>before){setTimeout(()=>{toast("Level "+after.lvl+": "+after.name);SFX.fanfare();},600);}}
 function markDay(){const d=londonDate();if(!ST.days.includes(d)){ST.days.push(d);ST.days=ST.days.slice(-120);}ST.lastDay=d;}
 function weekDays(){const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay()+6)%7,mon=addDays(d,-dow);return ST.days.filter(x=>x>=mon&&x<=d).length;}
-function recordAnswer(q,ok){const r=ST.q[q.id]||{n:0,c:0,box:0,last:0};r.n++;if(ok){r.c++;r.box=Math.min(4,r.box+1);}else r.box=0;r.last=Date.now();ST.q[q.id]=r;ST.done++;if(ok)ST.reps++;markDay();saveST();}
-const BOX_DAYS=[0,1,3,7,14];
-const isDue=r=>r&&Date.now()-r.last>=BOX_DAYS[r.box]*864e5;
+function recordAnswer(q,ok){const r=ST.q[q.id]||{n:0,c:0,box:0,last:0},today=londonDate();r.n++;
+  if(ok){r.c++;r.box=Math.min(5,r.box+1);r.rd=(r.rd||[]).filter(d=>d!==today).concat(today).slice(-2);if(r.wd&&r.wd<today&&!r.fx){r.fx=1;ST.fixed=(ST.fixed||0)+1;}}
+  else{r.box=0;r.wd=today;r.fx=0;}
+  r.due=addDays(today,BOX_DAYS[r.box]||1);r.last=Date.now();ST.q[q.id]=r;ST.done++;if(ok)ST.reps++;
+  ST.dayN=ST.dayN||{};ST.dayN[today]=(ST.dayN[today]||0)+1;const ks=Object.keys(ST.dayN).sort();if(ks.length>120)ks.slice(0,ks.length-120).forEach(k=>delete ST.dayN[k]);
+  if(RUN&&RUN.mode==="review"){ST.revDone=(ST.revDone||0)+1;ST.dayRev=ST.dayRev||{};ST.dayRev[today]=(ST.dayRev[today]||0)+1;}
+  markDay();checkBadges();saveST();}
+/* due today: questions coming back on their ladder; at most 20 a day, the rest wait quietly */
+const REV_CAP=20;
+function dueList(){return playable(BANK.filter(q=>!q.gen&&(!QSUBJ||QSUBJ.includes(q.s))),false).filter(q=>isDue(ST.q[q.id]));}
+function dueLeft(){const done=(ST.dayRev||{})[londonDate()]||0;return Math.max(0,Math.min(dueList().length,REV_CAP-done));}
+/* taught is not known: a question is mastered once right on two different days; a topic when at least 3 of its questions (or all, if fewer) are */
+const qMastered=r=>!!(r&&r.rd&&r.rd.length>=2);
+function topicMastered(s,tid){const qs=topicQs(s,tid).filter(q=>!q.gen);if(!qs.length)return false;return qs.filter(q=>qMastered(ST.q[q.id])).length>=Math.min(3,qs.length);}
+function masteredCount(){let n=0;for(const s of SKEYS){const sp=SPEC[s];if(!sp||!sp.groups)continue;for(const g of sp.groups)for(const t of g.topics)if(topicMastered(s,t.id))n++;}return n;}
+/* no two questions on the same topic in a row (daily challenge, reviews, Sprint) */
+function mixTopics(qs){const out=[],rest=qs.slice();while(rest.length){const last=out[out.length-1];let k=rest.findIndex(q=>!last||keyOf(q)!==keyOf(last));if(k<0)k=0;out.push(rest.splice(k,1)[0]);}return out;}
+/* a forgiving streak: days with a proper set (5 or more answers); one missed day a week is forgiven */
+function weekOf(d){const dow=(new Date(d+"T12:00:00Z").getUTCDay()+6)%7;return addDays(d,-dow);}
+function streak(){const N=ST.dayN||{},good=d=>(N[d]||0)>=5||(!(d in N)&&ST.days.includes(d)&&d<londonDate());const all=[...ST.days,...Object.keys(N)].sort();if(!all.length)return 0;const first=all[0];let d=londonDate(),s=0;const used={};if(!good(d))d=addDays(d,-1);while(d>=first){if(good(d))s++;else{const w=weekOf(d);if(used[w])break;used[w]=1;}d=addDays(d,-1);}return s;}
+/* badges reward mastery and fixing, never time spent */
+const BADGE_DEF=[["fix10","Fixer","Fixed 10 old misses on a later day",()=>(ST.fixed||0)>=10],["rev25","Reviewer","25 reviews done",()=>(ST.revDone||0)>=25],["rev100","Iron habit","100 reviews done",()=>(ST.revDone||0)>=100],["m1","First mastery","Mastered a topic",()=>masteredCount()>=1],["m5","Five down","Mastered 5 topics",()=>masteredCount()>=5],["m15","Course crusher","Mastered 15 topics",()=>masteredCount()>=15],["s7","Week strong","A 7-day streak",()=>streak()>=7],["s30","Month strong","A 30-day streak",()=>streak()>=30],["clean","Clean sheet","10 out of 10 in a daily challenge",()=>Object.values(ST.daily||{}).some(d=>d.right>=10&&(d.n||10)>=10)]];
+function checkBadges(){ST.badges=ST.badges||{};for(const [id,name,desc,f] of BADGE_DEF){try{if(!ST.badges[id]&&f()){ST.badges[id]=londonDate();setTimeout(()=>toast("Badge: "+name+" · "+desc),900);}}catch(e){}}}
+const BOX_DAYS=[0,1,3,10,24,50];
+const isDue=r=>r&&(r.due?r.due<=londonDate():Date.now()-r.last>=BOX_DAYS[Math.min(r.box,5)]*864e5);
 const keyOf=q=>q.s+"|"+q.t;
 function taughtOn(){return Object.values(TAUGHT).some(Boolean);}
 function inTaught(q){return !!TAUGHT[keyOf(q)];}
 /* what a quiz may ask: never a topic marked "not done yet"; only covered topics when that is switched on */
 function playable(pool,useCover){let p=pool.filter(q=>!NOTYET[keyOf(q)]);if(useCover&&taughtOn())p=p.filter(inTaught);return p;}
 const topicQs=(s,tid)=>BANK.filter(q=>q.s===s&&q.t===tid);
-function mastery(s,tid){const qs=topicQs(s,tid);if(!qs.length)return null;let m=0,n=0,seen=0;for(const q of qs){const r=ST.q[q.id];if(r){m+=r.box/4;n+=r.n;seen++;}}return{m:seen?m/seen:0,n,seen};}
+function mastery(s,tid){const qs=topicQs(s,tid);if(!qs.length)return null;let m=0,n=0,seen=0;for(const q of qs){const r=ST.q[q.id];if(r){m+=Math.min(r.box,4)/4;n+=r.n;seen++;}}return{m:seen?m/seen:0,n,seen};}
 function markNotYet(k){const was=!!TAUGHT[k];if(was){delete TAUGHT[k];lsSet("taught",TAUGHT);}NOTYET[k]=true;lsSet("notyet",NOTYET);return was;}
 function cardHtml(c){if(!c)return"";return `<div class="keycard"><div class="small muted">Key idea · AI-drafted: report it if it's wrong</div><div style="margin-top:4px">${tex(c.key)}</div>${c.trap?`<div class="small" style="margin-top:6px"><b>Common trap:</b> ${tex(c.trap)}</div>`:""}${c.ref?`<div class="small muted" style="margin-top:4px">${esc(c.ref)}</div>`:""}</div>`;}
 function reportText(q,perm){perm=perm||[0,1,2,3];return `Rep Max: question ${q.id}${q.gen?" (generated)":""} may be wrong.\n${SUBJ[q.s].name}, ${topicOf(q).name}\nQ: ${q.q}${q.code?"\n"+q.code:""}\nOptions: ${perm.map((k,i)=>SHAPES[i]+" "+q.o[k]).join("   ")}\nMarked right: ${q.o[q.a]}\nWhat I think is wrong: `;}
@@ -419,6 +483,7 @@ const COARSE=!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
 app.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){if(COARSE&&!REDUCED&&navigator.vibrate)try{navigator.vibrate(10);}catch(x){}if(!b.dataset.silent)SFX.click();f(b.dataset,b,e);}});
 app.addEventListener("keydown",e=>{if(e.key!=="Enter")return;const id=e.target&&e.target.id;if(id==="jcode"){e.preventDefault();const n=$("#jname");if(n)n.focus();}else if(id==="jname"){e.preventDefault();ACT.joinGo();}else if(id==="pname"){e.preventDefault();ACT.saveProfile();}});
 ACT.home=()=>{leaveLive();home();};
+ACT.review=()=>{const n=dueLeft();if(!n){toast("Nothing due right now");return;}const qs=mixTopics(shuffle(dueList()).sort((a,b)=>((ST.q[a.id]||{}).due||"")<((ST.q[b.id]||{}).due||"")?-1:1).slice(0,Math.min(10,n))).map(q=>inst(q)).filter(Boolean);startRun({mode:"review",qs,label:"Review",clock:false,key:"review"});};
 ACT.closeRoom=()=>{if(typeof H!=="undefined"&&H&&H.players&&H.players.size)askEnd("Close the room?","Everyone in the room is sent home.",()=>ACT.home());else ACT.home();};
 ACT.mute=(d,b)=>{MUTED=!MUTED;lsSet("muted",MUTED);b.textContent=MUTED?"🔇":"🔊";};
 
@@ -434,36 +499,37 @@ function home(){
   const today=londonDate(),dn=Math.max(1,dayDiff(LAUNCH,today)+1),dd=ST.daily[today];
   const nFix=s=>BANK.filter(q=>q.s===s&&!q.gen).length,nGen=BANK.filter(q=>q.gen).length;
   const counts=SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(s=>`${SUBJ[s].short} ${nFix(s)}`).join(" · ")+(QSUBJ&&QSUBJ.length<SKEYS.length?` (other subjects: course map only, questions to come)`:"")+(nGen?` · plus ${nGen} question types with fresh numbers`:"");
-  const acc=ST.done>=5?Math.round(ST.reps/ST.done*100)+"%":"–";
+  const dueN=dueLeft(),stk=streak(),earned=BADGE_DEF.filter(b=>(ST.badges||{})[b[0]]);
   const covStale=taughtOn()&&Date.now()-lsGet("covAt",Date.now())>7*864e5;
   const a2hs=!lsGet("a2hs",false)&&!isStandalone()&&!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="chip" data-act="profile">${esc(ME.badge)} ${esc(ME.name)}</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${courseSwitch()}
   ${LOAD_ERR.length?`<div class="card err">Couldn't load the ${esc(LOAD_ERR.join(", "))} questions. Open Rep Max from its web address: it can't read its question files from a file saved on this device.</div>`:""}
   <div class="card rankart"><div class="rank"><div class="badge" style="font-weight:900;font-size:26px">${r.lvl}</div><div style="flex:1">
     <div class="row"><b style="font-size:18px">${esc(r.name)}</b><span class="spacer"></span><span class="muted small">${fmt(ST.xp)} XP${r.next?" · next: "+esc(r.next[1])+" at "+fmt(r.next[0]):""}</span></div>
     <div class="bar" style="margin-top:8px"><i style="width:${pct}%"></i></div></div></div>
-    <div class="stats"><div class="stat"><b>${weekDays()}</b><span>${weekDays()===1?"day":"days"} this week</span></div><div class="stat"><b>${fmt(ST.reps)}</b><span>right answers</span></div><div class="stat"><b>${acc}</b><span>accuracy</span></div></div></div>
+    <div class="stats"><div class="stat"><b>${weekDays()}</b><span>${weekDays()===1?"day":"days"} this week</span></div><div class="stat"><b>${fmt(ST.reps)}</b><span>right answers</span></div><div class="stat"><b>${stk}</b><span>day streak</span></div></div>${earned.length?`<div class="badges">${earned.map(b=>`<span class="chip" title="${esc(b[2])}">${icn("🏅",1)}${esc(b[1])}</span>`).join("")}</div>`:""}</div>
   <div class="list">
-    <button class="big hero" data-act="daily"><span class="em">☀️</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
-    <button class="big" data-act="gym"><span class="em">🏋️</span><span><b>Solo gym</b><span>Quick 5, warm-ups, working sets, 1-rep max and weak spots</span></span></button>
-    <button class="big" data-act="sprint"><span class="em">⚡</span><span><b>Sprint</b><span>As many as you can before the clock runs out. Harder questions score more</span></span></button>
+    ${dueN?`<button class="big hero" data-act="review"><span class="em">${icn("🔁")}</span><span><b>Due for review: ${dueN}</b><span>Questions coming back at the right time, so they stick. About ${Math.max(1,Math.round(dueN*0.4))} min</span></span></button>`:""}
+    <button class="big ${dueN?"":"hero"}" data-act="daily"><span class="em">${icn("☀️")}</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
+    <button class="big" data-act="gym"><span class="em">${icn("🏋️")}</span><span><b>Solo gym</b><span>Quick 5, warm-ups, working sets, 1-rep max and weak spots</span></span></button>
+    <button class="big" data-act="sprint"><span class="em">${icn("⚡")}</span><span><b>Sprint</b><span>As many as you can before the clock runs out. Harder questions score more</span></span></button>
     <div class="grid2">
-      <button class="big" data-act="hostSetup"><span class="em">📺</span><span><b>Host a quiz night</b><span>On a laptop or TV; friends join on their own devices</span></span></button>
-      <button class="big" data-act="join"><span class="em">📱</span><span><b>Join a game</b><span>Got a 4-letter code?</span></span></button>
+      <button class="big" data-act="hostSetup"><span class="em">${icn("📺")}</span><span><b>Host a quiz night</b><span>On a laptop or TV; friends join on their own devices</span></span></button>
+      <button class="big" data-act="join"><span class="em">${icn("📱")}</span><span><b>Join a game</b><span>Got a 4-letter code?</span></span></button>
     </div>
-    <button class="big" data-act="tracker"><span class="em">🗺️</span><span><b>Course map</b><span>Every topic, what it means, what you've covered and how strong you are</span></span></button>
+    <button class="big" data-act="tracker"><span class="em">${icn("🗺️")}</span><span><b>Course map</b><span>Every topic, what it means, what you've covered and how strong you are</span></span></button>
   </div>
-  ${!taughtOn()&&!lsGet("covAsk",false)?`<div class="card"><b>What have you had in class so far?</b><div class="small muted" style="margin-top:4px">Tell Rep Max and it will only ask about those topics.</div><div class="row" style="margin-top:10px"><button class="btn go" data-act="coverage" data-back="home">📍 Set what I've covered</button><button class="btn" data-act="covLater">Later</button></div></div>`:""}
+  ${!taughtOn()&&!lsGet("covAsk",false)?`<div class="card"><b>What have you had in class so far?</b><div class="small muted" style="margin-top:4px">Tell Rep Max and it will only ask about those topics.</div><div class="row" style="margin-top:10px"><button class="btn go" data-act="coverage" data-back="home">${icn("📍",1)}Set what I've covered</button><button class="btn" data-act="covLater">Later</button></div></div>`:""}
   ${covStale?`<div class="card"><b>Covered anything new in class?</b><div class="row" style="margin-top:10px"><button class="btn go" data-act="coverage" data-back="home">Update topics</button><button class="btn" data-act="covSame">Same as before</button></div></div>`:""}
   ${a2hs?`<details class="card small"><summary><b>Keep your progress: add Rep Max to your home screen</b></summary><div style="margin-top:6px">iPhone: Share, then Add to Home Screen. Android: the ⋮ menu, then Add to Home screen. Then open it from there. Devices can clear saved progress for websites you haven't opened for a while, and on an iPhone the home-screen version keeps its own progress. Already played in the browser? Settings has a backup code to bring it across.<div style="margin-top:8px"><button class="btn" data-act="a2hsOk">Got it</button></div></div></details>`:""}
 
   <div class="foot">Questions: ${counts}${BAD.length?`<br><span class="err">${BAD.length} line${BAD.length===1?"":"s"} skipped: ${esc(BAD.slice(0,4).join("; "))}${BAD.length>4?"…":""}</span>`:""}<br>
   ${SKEYS.map(s=>esc(SUBJ[s].name+" "+((SPEC[s]||{}).board||"")+" "+((SPEC[s]||{}).code||"")).trim()).join(" · ")}<br>
   The questions were written and checked by AI, so a few may be wrong: use "Report a problem" under any question.<br>
-  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button> · ${switchLink()} · v${VERSION}</div>
+  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="resources">Study links</button> · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button> · ${switchLink()} · v${VERSION}</div>
   </div>`,"home");
 }
 function courseSwitch(){return `<div class="cswitch" role="group" aria-label="Course">${["alevel","gcse"].map(k=>k===PROFILE
@@ -476,11 +542,11 @@ ACT.pickCourse=d=>setCourse(d.p);
 /* first visit on this device: which course? */
 function chooser(){
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>REVISION</small></div></div></div>
+  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>REVISION</small></div></div></div>
   <div class="card"><h3 style="margin-top:0">Which are you doing?</h3><p class="small muted" style="margin:0">You can switch later at the bottom of the home screen. Each keeps its own progress on this device.</p></div>
   <div class="list">
-    <button class="big hero" data-act="pickCourse" data-p="alevel"><span class="em">🎓</span><span><b>A-level</b><span>${esc(Object.values(PROFILES.alevel.subj).map(x=>x.name).join(", "))}. Course map, solo gym, daily challenge and quiz nights.</span></span></button>
-    <button class="big" data-act="pickCourse" data-p="gcse"><span class="em">📚</span><span><b>GCSE</b><span>${esc(Object.values(PROFILES.gcse.subj).map(x=>x.name).join(", "))}. Quizzes, course map and tracker.</span></span></button>
+    <button class="big hero" data-act="pickCourse" data-p="alevel"><span class="em">${icn("🎓")}</span><span><b>A-level</b><span>${esc(Object.values(PROFILES.alevel.subj).map(x=>x.name).join(", "))}. Course map, solo gym, daily challenge and quiz nights.</span></span></button>
+    <button class="big" data-act="pickCourse" data-p="gcse"><span class="em">${icn("📚")}</span><span><b>GCSE</b><span>${esc(Object.values(PROFILES.gcse.subj).map(x=>x.name).join(", "))}. Quizzes, course map and tracker.</span></span></button>
   </div>
   <div class="foot">Rep Max v${VERSION}. Progress is saved on this device only.</div></div>`,"chooser");
 }
@@ -489,19 +555,19 @@ function homeMap(){
   const all=SKEYS.flatMap(s=>((SPEC[s]||{}).groups||[]).flatMap(g=>g.topics.map(t=>s+"|"+t.id)));
   const done=all.filter(k=>TAUGHT[k]).length;
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${courseSwitch()}
   <div class="card"><b style="font-size:18px">Your ${SKEYS.length} subjects</b><div class="small muted" style="margin-top:4px">${all.length} topics in all · ${done} ticked as covered so far</div>
     <div class="bar" style="margin-top:8px"><i style="width:${all.length?Math.round(done/all.length*100):0}%"></i></div></div>
   <div class="list">
-    <button class="big hero" data-act="tracker"><span class="em">🗺️</span><span><b>Course map</b><span>Every topic of every subject, in a line each, and tick what you've had in class</span></span></button>
-    <button class="big" data-act="coverage" data-back="home"><span class="em">📍</span><span><b>What I've covered</b><span>Tick topics subject by subject</span></span></button>
+    <button class="big hero" data-act="tracker"><span class="em">${icn("🗺️")}</span><span><b>Course map</b><span>Every topic of every subject, in a line each, and tick what you've had in class</span></span></button>
+    <button class="big" data-act="coverage" data-back="home"><span class="em">${icn("📍")}</span><span><b>What I've covered</b><span>Tick topics subject by subject</span></span></button>
   </div>
   <div class="card small muted">Quiz questions for these subjects haven't been written yet. For now this is your map of everything the courses cover.</div>
   <div class="foot">${SKEYS.map(s=>esc(SUBJ[s].name+" "+((SPEC[s]||{}).board||"")+" "+((SPEC[s]||{}).code||"")).trim()).join(" · ")}<br>
   The topic lines were written and checked by AI from the exam boards' specifications, so check anything that looks wrong with your teacher.<br>
-  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button> · ${switchLink()} · v${VERSION}</div>
+  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="resources">Study links</button> · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button> · ${switchLink()} · v${VERSION}</div>
   </div>`,"home");
 }
 ACT.covSame=()=>{lsSet("covAt",Date.now());home();};
@@ -524,6 +590,10 @@ ACT.saveProfile=()=>{const n=$("#pname").value.trim().slice(0,22);ME.name=n||ran
 ACT.setAuto=d=>{SET.auto=d.v==="1";lsSet("set",SET);ACT.settings();};
 ACT.setSize=d=>{SET.size=+d.v;lsSet("set",SET);applySet();ACT.settings();};
 ACT.setFont=d=>{SET.font=d.v;lsSet("set",SET);applySet();ACT.settings();};
+ACT.resources=()=>{setWide(false);const subs=SKEYS.filter(s=>((SPEC[s]||{}).links||[]).length);
+  render(`<div class="wrap">${topBar("Study links")}<p class="small muted" style="margin-top:0">Free pages from the exam boards and other trusted sites. They open outside Rep Max; nothing here needs an account or costs money.</p>
+  ${subs.length?subs.map(s=>`<div class="card"><h3>${icn(SUBJ[s].em,1)}${esc(SUBJ[s].name)}</h3><div class="list">${SPEC[s].links.map(l=>`<a class="big" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="em">${icn("🔗")}</span><span><b>${esc(l.name)}</b><span>${esc(l.desc||"")}</span></span></a>`).join("")}</div></div>`).join(""):`<div class="card small muted">No links checked for this course yet.</div>`}
+  <div class="small muted center">${subs.length&&SPEC[subs[0]].links_checked?`Links checked ${esc(SPEC[subs[0]].links_checked)}. `:""}If one stops working, tell whoever sent you Rep Max.</div></div>`,"resources");};
 ACT.settings=()=>{
   render(`<div class="wrap">${topBar("Settings & backup")}
   <div class="card"><h3>How it plays</h3><div class="small muted" style="margin-top:6px">Move on by itself after a right answer${REDUCED?" (off while your device asks for less motion)":""}</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.auto!==false)===!!v?"on":""}" data-act="setAuto" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text size</div><div class="seg">${[[1,"Normal"],[1.15,"Large"],[1.3,"Larger"]].map(([v,l])=>`<button class="chip ${(SET.size||1)==v?"on":""}" data-act="setSize" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text style</div><div class="seg">${[["plain","Standard"],["lexend","Lexend (easy read)"],["dys","OpenDyslexic"]].map(([v,l])=>`<button class="chip ${SET.font===v?"on":""}" data-act="setFont" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Some people find these easier to read; try them and keep what suits you.</div></div>
@@ -570,8 +640,8 @@ if(!WORKOUTS[GYM.w])GYM.w="sets";
 ACT.gym=()=>gymSetup();
 function gymSetup(){
   setWide(false);
-  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="gS" data-s="${s}">${s==="mix"?"🎲 Mixed":esc(SUBJ[s].em+" "+SUBJ[s].name)}</button>`).join("");
-  const wBtns=Object.entries(WORKOUTS).map(([k,w])=>`<button class="big" data-act="gW" data-w="${k}" style="${GYM.w===k?"border-color:var(--lime)":""}"><span class="em">${w.em}</span><span><b>${w.name}</b><span>${w.desc}</span></span></button>`).join("");
+  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="gS" data-s="${s}">${s==="mix"?icn("🎲",1)+"Mixed":icn(SUBJ[s].em,1)+esc(SUBJ[s].name)}</button>`).join("");
+  const wBtns=Object.entries(WORKOUTS).map(([k,w])=>`<button class="big" data-act="gW" data-w="${k}" style="${GYM.w===k?"border-color:var(--lime)":""}"><span class="em">${icn(w.em)}</span><span><b>${w.name}</b><span>${w.desc}</span></span></button>`).join("");
   const tp=GYM.topic&&TOPIC[GYM.topic];
   render(`<div class="wrap">${topBar("Solo gym")}
   <div class="card"><h3>Subject</h3><div class="pchips">${sChips}</div>
@@ -659,8 +729,9 @@ function answer(di){
   if(ok){SFX.correct();if(RUN.combo>=3)SFX.combo();if(!REDUCED)popText("+"+xp+" XP");}else SFX.wrong();
   const last=RUN.i===RUN.qs.length-1,card=CARDS[keyOf(q)];
   const head=ok?(RUN.combo>=3?"🔥 Combo x"+RUN.combo:pick(["Clean rep.","Nailed it.","Strong.","Lift complete."])):di<0?"Out of time.":pick(["Not this one.","Missed."]);
-  const auto=ok&&SET.auto!==false&&!REDUCED,iNow=RUN.i;
-  $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}" data-act="nextQ" data-silent="1"><b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div><span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
+  const auto=ok&&SET.auto!==false&&!REDUCED,iNow=RUN.i,why=!ok&&di>=0&&q.w?q.w[perm[di]]:"";
+  let twin=false;if(!ok&&(RUN.mode==="gym"||RUN.mode==="review")&&(RUN.twins||0)<2){const cand=BANK.filter(x=>keyOf(x)===keyOf(q)&&x.id!==q.id&&!RUN.qs.some(y=>y.id===x.id));const tw=inst(cand.length?cand[Math.floor(Math.random()*cand.length)]:q);if(tw){const at=Math.min(RUN.qs.length,RUN.i+3);RUN.qs.splice(at,0,tw);RUN.perms.splice(at,0,shuffle([0,1,2,3]));RUN.twins=(RUN.twins||0)+1;twin=true;}}
+  $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}" data-act="nextQ" data-silent="1"><b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div>${why?`<div class="why"><b>Why not your answer:</b> ${tex(why)}</div>`:""}${twin?`<div class="small muted" style="margin-top:6px">A similar question comes back in a moment.</div>`:""}<span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
    ${card&&!ok?cardHtml(card):""}<div id="cardBox"></div>
    <div class="row small" style="margin-top:10px;gap:16px">${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
    <div class="small muted" style="margin-top:8px">${esc(specRef(q))}</div><div class="footpad"></div><div class="footbar"><button class="btn go block" data-act="nextQ">${last?"Finish":"Next rep →"}</button></div>`;
@@ -691,12 +762,15 @@ function endRun(){
   addXP(RUN.xp);
   if(pb||right===n){SFX.fanfare();confetti();}
   const missed=RUN.res.map((r,i)=>r.ok?null:i).filter(i=>i!=null);
+  const subjCount={};RUN.qs.forEach(q=>subjCount[q.s]=(subjCount[q.s]||0)+1);const tipS=Object.keys(subjCount).sort((a,b)=>subjCount[b]-subjCount[a])[0];
+  const tips=((SPEC[tipS]||{}).tips)||[],tip=tips.length?tips[(dayDiff(LAUNCH,londonDate())+RUN.qs.length)%tips.length]:null;
   render(`<div class="wrap">${topBar(daily?"Daily challenge":"Workout done")}
    <div class="card center"><div class="big-num">${right}/${n}</div>
    <div class="muted" style="margin-top:6px">+${fmt(RUN.xp)} XP · best combo ${RUN.best}${daily&&RUN.clock?" · "+fmt(RUN.score)+" pts against the clock":""}</div>
    ${pb?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">🏆 New PB</div>`:right===n?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">💯 Perfect set</div>`:""}
    ${daily&&!RUN.practice?`<div class="grid-emoji" style="margin-top:12px">${ST.daily[RUN.date].grid}</div><div class="row" style="justify-content:center;margin-top:12px"><button class="btn go" data-act="shareDaily">Share result</button></div>`:""}
    </div>
+   ${tip?`<div class="card tipcard"><div class="small muted">Exam tip · ${icn(SUBJ[tipS].em,1)}${esc(SUBJ[tipS].name)}</div><div style="margin-top:6px;font-weight:650">${esc(tip.text)}</div>${tip.src?`<a class="small muted" style="display:inline-block;margin-top:6px" href="${esc(tip.src)}" target="_blank" rel="noopener">Source (opens an outside site)</a>`:""}</div>`:""}
    ${missed.length?`<div class="card"><h3>Review your misses</h3><div class="list">${missed.map(i=>{const q=RUN.qs[i],c=CARDS[keyOf(q)];return `<div class="topic" style="display:block"><div class="row" style="margin-bottom:6px">${subjTag(q.s)}<span class="small muted">${esc(topicOf(q).name)}</span></div><div>${tex(q.q)}</div>${codeHtml(q.code)}<div style="margin-top:8px"><b style="color:var(--lime)">Answer:</b> ${tex(q.o[q.a])}</div><div class="small muted" style="margin-top:4px">${tex(q.x||"")}</div>${c?`<div class="small" style="margin-top:6px"><b>Key idea:</b> ${tex(c.key)}</div>`:""}<div style="margin-top:6px"><button class="linkb" data-act="report" data-i="${i}">Report a problem</button></div></div>`;}).join("")}</div></div>`:""}
    <div class="row">${daily?"":`<button class="btn go" data-act="again">Go again</button>`}<button class="btn" data-act="home">Home</button></div></div>`,"end");
   RUN.done=true;
@@ -719,7 +793,7 @@ function dailySet(date){
   const hard=shuffle(pool.filter(q=>q.lv===3&&!chosen.includes(q)),rnd).slice(0,2);
   let qs=[...shuffle(chosen,rnd),...hard];
   if(qs.length<10)qs=qs.concat(shuffle(pool.filter(q=>!qs.includes(q)),rnd).slice(0,10-qs.length));
-  return qs.slice(0,10).map(q=>inst(q,mulberry32(hashStr(date+"|"+q.id)))).filter(Boolean);
+  return mixTopics(qs.slice(0,10)).map(q=>inst(q,mulberry32(hashStr(date+"|"+q.id)))).filter(Boolean);
 }
 ACT.daily=()=>{
   setWide(false);
@@ -736,7 +810,7 @@ ACT.daily=()=>{
    <div class="card"><h2>☀️ Today's set</h2><p>${c.topics?`From the ${c.topics} topics you've covered.`:`From every topic. Set what you've covered to keep it to what you've had in class.`} Friends who have covered the same topics get the same 10.</p>
    <ul class="muted"><li>No clock, unless you switch it on</li><li>It only counts once you finish; quitting doesn't</li></ul>
    <div class="row" style="margin:10px 0 14px"><button class="tick ${DCLOCK?"on":""}" data-act="dClock" aria-label="Beat the clock">${DCLOCK?"✓":""}</button><div><b>Beat the clock</b><div class="small muted">45 s a question (75 for the last two), points for speed</div></div></div>
-   <div class="row" style="margin-bottom:14px"><button class="btn" data-act="coverage" data-back="daily">📍 What I've covered</button></div>
+   <div class="row" style="margin-bottom:14px"><button class="btn" data-act="coverage" data-back="daily">${icn("📍",1)}What I've covered</button></div>
    <button class="btn go block" data-act="dailyGo" style="font-size:18px;padding:16px">Start</button><p class="small muted center" id="dmsg"></p></div></div>`,"daily");
 };
 ACT.dClock=()=>{DCLOCK=!DCLOCK;lsSet("dclock",DCLOCK);ACT.daily();};
@@ -767,13 +841,13 @@ function tracker(){
   const nDone=all.filter(t=>TAUGHT[s+"|"+t.id]).length;
   const meta=t=>[/^\d/.test(t.id)?esc(t.id):"",t.year?"Year "+esc(String(t.year).replace("-","–")):"",t.tier==="H"?"Higher only":"",t.option?(t.option===t.name?"Option":"Option: "+esc(t.option)):""].filter(Boolean).join(" · ");
   render(`<div class="wrap">${topBar("Course map")}
-   <div class="row"><div class="pchips">${tabs}</div><span class="spacer"></span><button class="btn" style="padding:8px 12px" data-act="coverage" data-back="tracker">📍 What I've covered</button></div>
+   <div class="row"><div class="pchips">${tabs}</div><span class="spacer"></span><button class="btn" style="padding:8px 12px" data-act="coverage" data-back="tracker">${icn("📍",1)}What I've covered</button></div>
    <div class="card"><div class="row"><div><b style="font-size:18px">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${esc(sp.board||"")} ${esc(sp.code||"")}</div></div><span class="spacer"></span><div class="center">${PRO.quiz?`<div class="big-num" style="font-size:30px">${overall}%</div><div class="small muted">strength</div>`:`<div class="big-num" style="font-size:30px">${nDone}/${all.length}</div><div class="small muted">covered</div>`}</div></div>
    <p class="small muted" style="margin:8px 0 0">Tick a topic once you've had it in class${PRO.quiz?"; workouts and quiz nights then stick to your ticks. Bars stay grey until you've answered a topic a few times.":"."}</p>${sp.note?`<details style="margin-top:6px;background:transparent;border:0"><summary class="small" style="padding:6px 0">About this exam</summary><p class="small muted" style="margin:4px 0 0">${esc(sp.note)}</p></details>`:""}</div>
    ${sp.groups.map(g=>`<details ${g.topics.every(t=>String(t.year)==="13")?"":"open"}><summary>${esc(g.name)}<span class="spacer"></span><span class="small muted">${g.topics.length} topics</span></summary><div class="inner list">${g.topics.map(t=>{
      const m=mastery(s,t.id),qs=topicQs(s,t.id),nf=qs.filter(q=>!q.gen).length,ng=qs.length-nf,key=s+"|"+t.id,card=CARDS[key],id="slot"+(slot++);
      return `<div class="topic"><button class="tick ${TAUGHT[key]?"on":""}" data-act="taught" data-k="${esc(key)}" aria-label="Taught">${TAUGHT[key]?"✓":""}</button>
-     <div class="nm"><b>${esc(t.name)}</b><span>${[meta(t),PRO.quiz?nf+" question"+(nf===1?"":"s")+(ng?` + ${ng} generator${ng===1?"":"s"}`:""):"",NOTYET[key]?"not done yet":""].filter(Boolean).join(" · ")}</span>${card?`<div><button class="linkb" data-act="trkCard" data-k="${esc(key)}" data-slot="${id}">Key idea</button></div>`:""}</div>
+     <div class="nm"><b>${esc(t.name)}</b>${PRO.quiz&&topicMastered(s,t.id)?` <span class="mpill">Mastered</span>`:""}<span>${[meta(t),PRO.quiz?nf+" question"+(nf===1?"":"s")+(ng?` + ${ng} generator${ng===1?"":"s"}`:""):"",NOTYET[key]?"not done yet":""].filter(Boolean).join(" · ")}</span>${card?`<div><button class="linkb" data-act="trkCard" data-k="${esc(key)}" data-slot="${id}">Key idea</button></div>`:""}</div>
      ${PRO.quiz?`<div class="mini"><i style="width:${!m?0:Math.max(4,m.m*100)}%;background:${col(m)}"></i></div>
      ${qs.length?`<button class="btn" style="padding:8px 10px;font-size:13px" data-act="trainT" data-k="${esc(key)}">Train</button>`:`<span class="tag">soon</span>`}`:""}
      ${t.desc?`<div class="desc">${esc(t.desc)}</div>`:""}</div><div id="${id}"></div>`;}).join("")}</div></details>`).join("")}
@@ -813,7 +887,7 @@ function coverage(back){
     const sp=SPEC[s]||{groups:[]},ticks=(s==="further"||s==="cs"||PROFILE==="gcse");
     const part=(g,gi)=>`<label class="small muted" style="display:block;margin-top:12px">${esc(g.name)}</label>${ticks?tickList(s,g):upTo(s,g,gi)}`;
     const now=sp.groups.map((g,gi)=>y13(g)?"":part(g,gi)).join(""),later=sp.groups.map((g,gi)=>y13(g)?part(g,gi):"").join("");
-    return `<div class="card"><div class="row"><b style="font-size:17px">${esc(SUBJ[s].em+" "+SUBJ[s].name)}</b><span class="spacer"></span><span class="small muted">${esc((sp.board||"")+" "+(sp.code||""))}</span></div>
+    return `<div class="card"><div class="row"><b style="font-size:17px">${icn(SUBJ[s].em,1)+esc(SUBJ[s].name)}</b><span class="spacer"></span><span class="small muted">${esc((sp.board||"")+" "+(sp.code||""))}</span></div>
     ${ticks?`<div class="small muted" style="margin-top:4px">Tick each topic you've had: these are often taught out of order.</div>`:""}${now}
     ${later?`<details style="margin-top:12px;background:transparent;border:0"><summary class="small" style="padding:6px 0">Year 13 parts</summary>${later}</details>`:""}</div>`;}).join("");
   render(`<div class="wrap">${topBar("What have you covered?",back)}
@@ -972,11 +1046,11 @@ HS.subs=(HS.subs||[]).filter(k=>SUBJ[k]&&(!QSUBJ||QSUBJ.includes(k)));if(!HS.sub
 if(![30,45,60,90].includes(HS.dur))HS.dur=45;
 ACT.hostSetup=()=>{
   setWide(false);
-  const sub=SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(s=>`<button class="chip ${HS.subs.includes(s)?"on":""}" data-act="hsSub" data-s="${s}">${esc(SUBJ[s].em+" "+SUBJ[s].short)}</button>`).join("");
+  const sub=SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(s=>`<button class="chip ${HS.subs.includes(s)?"on":""}" data-act="hsSub" data-s="${s}">${icn(SUBJ[s].em,1)+esc(SUBJ[s].short)}</button>`).join("");
   const seg=(key,vals,lab)=>vals.map(v=>`<button class="chip ${HS[key]===v?"on":""}" data-act="hsSet" data-k="${key}" data-v="${v}">${lab(v)}</button>`).join("");
   render(`<div class="wrap">${topBar("Host a quiz night")}
   <div class="card"><h3>Subjects</h3><div class="pchips">${sub}</div>
-   <h3 style="margin-top:14px">Difficulty</h3><div class="pchips">${seg("lv",["mix","easy","max"],v=>({mix:"Mixed",easy:"Levels 1–2",max:"🔥 1-rep max only"})[v])}</div>
+   <h3 style="margin-top:14px">Difficulty</h3><div class="pchips">${seg("lv",["mix","easy","max"],v=>({mix:"Mixed",easy:"Levels 1–2",max:icn("🔥",1)+"1-rep max only"})[v])}</div>
    <h3 style="margin-top:14px">Questions</h3><div class="pchips">${seg("n",[5,10,15,20],v=>v)}</div>
    <h3 style="margin-top:14px">Time per question</h3><div class="pchips">${seg("dur",[30,45,60,90],v=>v+" s")}</div><div class="small muted" style="margin-top:6px">The hardest questions get double time.</div>
    <h3 style="margin-top:14px">Next question</h3><div class="pchips">${seg("auto",[0,5,10,15],v=>v?"auto after "+v+" s":"when I tap Next")}</div>
@@ -1105,7 +1179,7 @@ function playerChips(){return [...H.players.values()].map(p=>`<span class="chip"
 function boardHtml(board,meId){return `<div class="board">${board.map(b=>`<div class="brow ${b.pid===meId?"me":""}"><span class="pos">${b.pos<=3&&b.score>0?["🥇","🥈","🥉"][b.pos-1]:b.pos}</span><span class="av">${esc(b.badge)}</span><span>${esc(b.name)}</span><span class="pts">${fmt(b.score)}</span></div>`).join("")}</div>`;}
 function hostRender(){
   if(!H)return;setWide(true);
-  const top=`<div class="top"><div class="logo"><span>🏋️</span><div>REP <b>MAX</b><small>QUIZ NIGHT · ROOM ${H.code}</small></div></div><div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button><button class="btn" data-act="closeRoom">Close room</button></div></div>`;
+  const top=`<div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>QUIZ NIGHT · ROOM ${H.code}</small></div></div><div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button><button class="btn" data-act="closeRoom">Close room</button></div></div>`;
   if(H.phase==="lobby"){
     render(`<div class="wrap">${top}
     <div class="grid2"><div class="card center"><div class="muted">Join on your device: open Rep Max, tap <b>Join a game</b>, enter</div><div class="code-big" style="margin:10px 0">${H.code}</div><div class="muted small">or scan</div><div id="qr" class="qr" style="margin-top:8px"></div><div style="margin-top:10px"><button class="btn" data-act="hCopy">Copy join link</button></div></div>
@@ -1284,11 +1358,11 @@ let SP=null,SPT=null;
 const SP_PTS={1:1,2:2,3:3},SP_WRONG=3,SP_SKIP=2;
 ACT.sprint=()=>{
   setWide(false);
-  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="spS" data-s="${s}">${s==="mix"?"🎲 Mixed":esc(SUBJ[s].em+" "+SUBJ[s].name)}</button>`).join("");
+  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="spS" data-s="${s}">${s==="mix"?icn("🎲",1)+"Mixed":icn(SUBJ[s].em,1)+esc(SUBJ[s].name)}</button>`).join("");
   const lens=SPRINT_LENS.map(l=>`<button class="chip ${SPS.len===l?"on":""}" data-act="spL" data-l="${l}">${l<120?l+" s":l/60+" min"}</button>`).join("");
   const best=ST.best["sprint|"+SPS.len+"|"+GYM.s];
   render(`<div class="wrap">${topBar("Sprint")}
-  <div class="card"><b style="font-size:18px">⚡ As many as you can</b><p class="small muted" style="margin:6px 0 0">One clock for the whole sprint. Level 1 questions score 1 point, level 2 score 2, level 3 score 3. A wrong answer costs ${SP_WRONG} seconds; Skip costs ${SP_SKIP}.</p></div>
+  <div class="card"><b style="font-size:18px">⚡ As many as you can</b><p class="small muted" style="margin:6px 0 0">One clock for the whole sprint. Level 1 questions score 1 point, level 2 score 2, level 3 score 3. A wrong answer costs ${SP_WRONG} seconds; Skip costs ${SP_SKIP}. Sprint uses questions you have already got right, topped up with warm-ups, so it is fast recall, not new learning.</p></div>
   <div class="card"><h3>Subject</h3><div class="pchips">${sChips}</div></div>
   <div class="card"><h3>Length</h3><div class="pchips">${lens}</div>
   <div class="small muted" style="margin-top:8px">Your best here: ${best?best+" points":"none yet"}</div></div>
@@ -1299,7 +1373,7 @@ ACT.sprint=()=>{
 ACT.spS=d=>{GYM.s=d.s;GYM.topic=null;lsSet("gym",GYM);ACT.sprint();};
 ACT.spL=d=>{SPS.len=+d.l;lsSet("sprint",SPS);ACT.sprint();};
 ACT.spTaught=()=>{GYM.taught=!GYM.taught;lsSet("gym",GYM);ACT.sprint();};
-function spPool(){return playable(BANK.filter(q=>GYM.s==="mix"||q.s===GYM.s),GYM.taught);}
+function spPool(){const all=playable(BANK.filter(q=>GYM.s==="mix"||q.s===GYM.s),GYM.taught);const known=all.filter(q=>((ST.q[q.id]||{}).c||0)>=1);if(known.length>=20)return known;const warm=all.filter(q=>q.lv===1&&!known.includes(q));return known.concat(warm.length?warm:all.filter(q=>!known.includes(q)));}
 ACT.spGo=()=>{
   const pool=spPool();
   if(!pool.length){$("#spmsg").textContent="No questions match those settings yet. Try another subject, or check what you've covered.";return;}
@@ -1314,6 +1388,7 @@ function spTick(){
 }
 function spNext(){
   if(SP.k>=SP.pool.length){SP.pool=shuffle(SP.pool);SP.k=0;}
+  if(SP.q){const pk=keyOf(SP.q);for(let j=SP.k;j<Math.min(SP.pool.length,SP.k+8);j++){if(keyOf(SP.pool[j])!==pk){[SP.pool[SP.k],SP.pool[j]]=[SP.pool[j],SP.pool[SP.k]];break;}}}
   let q=null;for(let tries=0;!q&&tries<SP.pool.length;tries++){q=inst(SP.pool[SP.k++]);if(SP.k>=SP.pool.length){SP.pool=shuffle(SP.pool);SP.k=0;}}
   if(!q)return spEnd();
   SP.q=q;SP.perm=shuffle([0,1,2,3]);SP.locked=false;

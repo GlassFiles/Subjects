@@ -114,7 +114,34 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA GCSE English Language 8700",
+    "url": "https://www.aqa.org.uk/subjects/english/gcse/english-8700",
+    "desc": "Official AQA 8700 page: specification, resources and key dates"
+   },
+   {
+    "name": "AQA past papers and mark schemes finder",
+    "url": "https://www.aqa.org.uk/past-papers-and-mark-schemes-finder",
+    "desc": "Official AQA papers and mark schemes, free once public (about a year after the exam)"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Paper 1 Q1: list four short, simple facts from the lines given. Examiners liked concise answers in 2025, so don't overcomplicate it.",
+    "src": "https://www.aqa.org.uk/files/fHDU1dLPgDwvQhfFoLGn6C/e9cafff5d9495f91d505e3bb0d0cbd47a0917a75.pdf"
+   },
+   {
+    "text": "If a question gives you line numbers, stay inside them.",
+    "src": "https://www.aqa.org.uk/files/fHDU1dLPgDwvQhfFoLGn6C/e9cafff5d9495f91d505e3bb0d0cbd47a0917a75.pdf"
+   },
+   {
+    "text": "Paper 1 Q4 was a weak spot in 2025, often because answers strayed outside the given lines. Practise it and stay inside the lines.",
+    "src": "https://www.aqa.org.uk/files/9e69096b-0fd6-43fd-a5c0-a2167be7bac0/fa964843d4b97a4a0f65829f9c38a6bdb21cb4a7.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "english_lit": {
   "name": "English Literature",
@@ -390,7 +417,39 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA GCSE English Literature (8702)",
+    "url": "https://www.aqa.org.uk/subjects/english/gcse/english-8702",
+    "desc": "AQA's official 8702 page: specification, sample papers, mark schemes, exam reports"
+   },
+   {
+    "name": "AQA past papers and mark schemes finder",
+    "url": "https://www.aqa.org.uk/past-papers-and-mark-schemes-finder",
+    "desc": "Official AQA past papers and mark schemes; choose English Literature 8702"
+   },
+   {
+    "name": "Oak National Academy: KS4 English (AQA)",
+    "url": "https://www.thenational.academy/teachers/programmes/english-secondary-aqa/units?keystages=ks4",
+    "desc": "Free Oak KS4 English (AQA) lessons; credit Oak, do not imply Oak endorses Rep Max"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Paper 1: spend equal time on Shakespeare and the novel. Don't over-write the first and rush the second, and leave a few minutes to proofread.",
+    "src": "https://files.revisely.com/documents/papers/gcse/english-literature/aqa/24124-june-2025-er-paper-1-shakespeare-and-the-19th-century-novel.pdf"
+   },
+   {
+    "text": "State a clear argument early, and come back to it all the way through.",
+    "src": "https://files.revisely.com/documents/papers/gcse/english-literature/aqa/24124-june-2025-er-paper-1-shakespeare-and-the-19th-century-novel.pdf"
+   },
+   {
+    "text": "Write about how and why characters change, tied to the writer's choices.",
+    "src": "https://files.revisely.com/documents/papers/gcse/english-literature/aqa/24124-june-2025-er-paper-1-shakespeare-and-the-19th-century-novel.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "maths": {
   "name": "Mathematics",
@@ -711,7 +770,23 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [],
+  "tips": [
+   {
+    "text": "Cross out work you do not want marked. Two different methods can cost you marks.",
+    "src": "https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-pef-20250821.pdf"
+   },
+   {
+    "text": "Reverse percentages: the reduced amount is not 100%. Do not take 30% of it and add it on.",
+    "src": "https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-1f-pef-20240822.pdf"
+   },
+   {
+    "text": "1.25 hours is 1 hour 15 minutes, not 1 hour 25. Convert decimal hours with care.",
+    "src": "https://qualifications.pearson.com/content/dam/pdf/GCSE/Mathematics/2015/Exam-materials/1ma1-2f-pef-20250821.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "biology": {
   "name": "Biology",
@@ -1090,7 +1165,34 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA GCSE Biology (8461)",
+    "url": "https://www.aqa.org.uk/subjects/biology/gcse/biology-8461",
+    "desc": "AQA GCSE Biology 8461: specification, assessment resources and key dates"
+   },
+   {
+    "name": "AQA past papers and mark schemes finder",
+    "url": "https://www.aqa.org.uk/past-papers-and-mark-schemes-finder",
+    "desc": "Find AQA past papers and mark schemes: choose Biology (8461) in the filter"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Respiration releases energy. Do not say it produces energy.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "When measuring a gas, write \"volume\", not \"amount\" or \"how much\". Examiners marked those answers as too vague.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "Check unit conversions. 1 m is 1,000 mm, not 100. This was a common magnification error.",
+    "src": "https://www.aqa.org.uk/files/cRIpdimsSKiybuSFvPrqz4/460a7e8d0c640ae9ee894cd5af598248044152f2.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "chemistry": {
   "name": "Chemistry",
@@ -1491,7 +1593,34 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA GCSE Chemistry 8462",
+    "url": "https://www.aqa.org.uk/subjects/chemistry/gcse/chemistry-8462",
+    "desc": "Official AQA page for GCSE Chemistry 8462: specification, assessment resources, key dates"
+   },
+   {
+    "name": "AQA past papers and mark schemes",
+    "url": "https://www.aqa.org.uk/past-papers-and-mark-schemes-finder",
+    "desc": "AQA's official finder for past papers and mark schemes; filter to Chemistry 8462"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Spot the command word, but read every word of the question too. The rest of the wording shapes what the examiner wants.",
+    "src": "https://www.ocr.org.uk/blog/how-important-are-command-words/"
+   },
+   {
+    "text": "Be precise. Vague words like \"amount\" or \"how much\" can lose the mark, so name the exact thing, such as volume.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "Write clearly in black pen at a readable size. Answers are scanned for marking, so tiny or messy writing is hard to read.",
+    "src": "https://www.aqa.org.uk/files/cRIpdimsSKiybuSFvPrqz4/460a7e8d0c640ae9ee894cd5af598248044152f2.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "physics": {
   "name": "Physics",
@@ -1835,7 +1964,34 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA GCSE Physics 8463",
+    "url": "https://www.aqa.org.uk/subjects/physics/gcse/physics-8463",
+    "desc": "Official AQA GCSE Physics 8463 page: specification, exam dates, assessment resources"
+   },
+   {
+    "name": "AQA past papers and mark schemes finder",
+    "url": "https://www.aqa.org.uk/past-papers-and-mark-schemes-finder",
+    "desc": "Official AQA finder: choose Physics 8463 to get past papers and mark schemes"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Spot the command word, but read every word of the question too. The rest of the wording shapes what the examiner wants.",
+    "src": "https://www.ocr.org.uk/blog/how-important-are-command-words/"
+   },
+   {
+    "text": "Be precise. Vague words like \"amount\" or \"how much\" can lose the mark, so name the exact thing, such as volume.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "Write clearly in black pen at a readable size. Answers are scanned for marking, so tiny or messy writing is hard to read.",
+    "src": "https://www.aqa.org.uk/files/cRIpdimsSKiybuSFvPrqz4/460a7e8d0c640ae9ee894cd5af598248044152f2.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "rs": {
   "name": "Religious Studies",
@@ -1957,7 +2113,39 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA GCSE Religious Studies A (8062)",
+    "url": "https://www.aqa.org.uk/subjects/religious-studies/gcse/religious-studies-8062/specification",
+    "desc": "Official AQA 8062 specification, with links to teaching and assessment resources"
+   },
+   {
+    "name": "AQA past papers",
+    "url": "https://www.aqa.org.uk/pastpapers",
+    "desc": "Paper 1 Christianity is 8062/13 and Islam is 8062/15"
+   },
+   {
+    "name": "Oak National Academy: KS4 RE (AQA)",
+    "url": "https://www.thenational.academy/teachers/programmes/religious-education-secondary-aqa/units?keystages=ks4",
+    "desc": "Free Oak KS4 AQA RE units: Christianity, Islam, Buddhism, five themes"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Spot the command word, but read every word of the question too. The rest of the wording shapes what the examiner wants.",
+    "src": "https://www.ocr.org.uk/blog/how-important-are-command-words/"
+   },
+   {
+    "text": "Be precise. Vague words like \"amount\" or \"how much\" can lose the mark, so name the exact thing, such as volume.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "Write clearly in black pen at a readable size. Answers are scanned for marking, so tiny or messy writing is hard to read.",
+    "src": "https://www.aqa.org.uk/files/cRIpdimsSKiybuSFvPrqz4/460a7e8d0c640ae9ee894cd5af598248044152f2.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "history": {
   "name": "History",
@@ -2133,7 +2321,23 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [],
+  "tips": [
+   {
+    "text": "Spot the command word, but read every word of the question too. The rest of the wording shapes what the examiner wants.",
+    "src": "https://www.ocr.org.uk/blog/how-important-are-command-words/"
+   },
+   {
+    "text": "Be precise. Vague words like \"amount\" or \"how much\" can lose the mark, so name the exact thing, such as volume.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "Write clearly in black pen at a readable size. Answers are scanned for marking, so tiny or messy writing is hard to read.",
+    "src": "https://www.aqa.org.uk/files/cRIpdimsSKiybuSFvPrqz4/460a7e8d0c640ae9ee894cd5af598248044152f2.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "dt": {
   "name": "Design and Technology",
@@ -2411,7 +2615,39 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [
+   {
+    "name": "AQA 8552 page",
+    "url": "https://www.aqa.org.uk/subjects/design-and-technology/gcse/design-and-technology-8552",
+    "desc": "The specification, papers and NEA guidance"
+   },
+   {
+    "name": "AQA past papers finder",
+    "url": "https://www.aqa.org.uk/past-papers-and-mark-schemes-finder",
+    "desc": "Official AQA past papers and mark schemes; pick D&T 8552 in the filters"
+   },
+   {
+    "name": "Oak National Academy: KS4 Design and technology",
+    "url": "https://www.thenational.academy/teachers/programmes/design-technology-secondary/units?keystages=ks4",
+    "desc": "Free KS4 D&T lessons; general, not AQA-specific, so check against 8552"
+   }
+  ],
+  "tips": [
+   {
+    "text": "Spot the command word, but read every word of the question too. The rest of the wording shapes what the examiner wants.",
+    "src": "https://www.ocr.org.uk/blog/how-important-are-command-words/"
+   },
+   {
+    "text": "Be precise. Vague words like \"amount\" or \"how much\" can lose the mark, so name the exact thing, such as volume.",
+    "src": "https://www.aqa.org.uk/files/2vT3LmcUzNO62qpl9Irktl/46116ac691d43d67fbc6a7ed334827b66a097efe.pdf"
+   },
+   {
+    "text": "Write clearly in black pen at a readable size. Answers are scanned for marking, so tiny or messy writing is hard to read.",
+    "src": "https://www.aqa.org.uk/files/cRIpdimsSKiybuSFvPrqz4/460a7e8d0c640ae9ee894cd5af598248044152f2.pdf"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  },
  "business": {
   "name": "Business",
@@ -2713,7 +2949,23 @@ RM.setSpec({
      }
     ]
    }
-  ]
+  ],
+  "links": [],
+  "tips": [
+   {
+    "text": "Each paper always has four 2-mark Calculate questions, so 16 marks across both papers. Practise them.",
+    "src": "https://qualifications.pearson.com/en/news-policy/subject-updates/business/gcse-business-assessment-support.html"
+   },
+   {
+    "text": "Learn the formulae in Appendix 3 of the specification.",
+    "src": "https://qualifications.pearson.com/en/news-policy/subject-updates/business/gcse-business-assessment-support.html"
+   },
+   {
+    "text": "Read graphs, charts and tables carefully to pick out the right figure.",
+    "src": "https://qualifications.pearson.com/en/news-policy/subject-updates/business/gcse-business-assessment-support.html"
+   }
+  ],
+  "links_checked": "19 Nov 2026"
  }
 });
 RM.quiz=["english_lang", "english_lit", "maths", "biology", "chemistry", "physics", "rs", "history", "dt", "business"];
