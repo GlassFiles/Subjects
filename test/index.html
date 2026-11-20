@@ -235,10 +235,28 @@ a.big{color:inherit;text-decoration:none}
 .mdot{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#0d0f13}
 .md2{background:var(--lime);box-shadow:0 0 8px rgba(198,255,61,.6)}.md1{background:#2a2412;border:3px solid #e8a317}.md0{background:var(--panel2);border:2px solid var(--line)}.md-1{border:2px dashed #2a303b}
 .mgo{flex:none;font-weight:800;font-size:calc(13px*var(--fs,1));color:var(--lime)}
+/* v1.9.1 art: a picture behind the screens, banners on the title bars */
+@font-face{font-family:"RM Display";src:url(../lib/fonts/rm-display.woff2) format("woff2");font-weight:400 900;font-display:swap}
+#app{position:relative;z-index:1}
+#bgart{position:fixed;inset:0;z-index:0;background:#0d0f13 center top/cover no-repeat;opacity:0;transition:opacity .6s}
+#bgart.on{opacity:1}
+#bgart::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,15,19,.3) 0%,rgba(13,15,19,.5) 40%,rgba(13,15,19,.78) 100%)}
+.card,.big,.msec{background-color:rgba(27,33,43,.86)}
+.card{background:rgba(27,33,43,.86)}
+.card.mapcard{background:rgba(13,15,19,.4);border-color:rgba(59,68,86,.6)}
+.ttop{position:relative;border:1px solid #2b3445;border-radius:18px;padding:12px 12px 12px 14px;min-height:84px;background:linear-gradient(90deg,rgba(10,12,16,.92) 0%,rgba(10,12,16,.6) 50%,rgba(10,12,16,.12) 100%),url(../lib/bg/header.jpg) right center/cover no-repeat,#12161d;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.ttop.tbar{min-height:66px;padding:8px 10px}
+.ttop .logo>div{font-family:"RM Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:400;letter-spacing:.04em;font-size:calc(27px*var(--fs,1))}
+.ttop .logo b{font-weight:400;text-shadow:0 0 12px rgba(198,255,61,.6)}
+.ttop .logo small{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.14em;margin-top:5px}
+.tbar h2{font-family:"RM Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:400;letter-spacing:.02em;text-shadow:0 1px 10px rgba(0,0,0,.7)}
+body.f-dys .tbar h2{font-family:"RM OpenDyslexic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:700}
+.ttop .icon-btn{background:rgba(13,15,19,.62)}
+@media (prefers-reduced-motion:reduce){#bgart{transition:none}}
 </style>
 </head>
 <body><div style="background:#ffd23f;color:#111;font:700 13px/1.3 system-ui,sans-serif;text-align:center;padding:calc(6px + env(safe-area-inset-top)) 10px 6px">TEST VERSION: progress, scores and quiz rooms here are separate from the real Rep Max</div>
-<div id="app"><div class="wrap"><p class="muted">Loading Rep Max…</p></div></div>
+<div id="bgart" aria-hidden="true"></div><div id="app"><div class="wrap"><p class="muted">Loading Rep Max…</p></div></div>
 <canvas id="confetti"></canvas>
 <script>
 /* data/<profile>/spec.js calls RM.setSpec, data/<profile>/generators.js calls RM.gen; the questions are in data/<profile>/*.jsonl */
@@ -270,7 +288,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.9";
+const VERSION="1.9.1";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -494,10 +512,17 @@ function subjTag(s){const S=SUBJ[s]||{name:s,col:"#888"};return `<span class="su
 function lvTag(lv){return `<span class="lv ${lv===3?"l3":""}">${lv===3?"🔥 ":""}${esc(LVNAME[lv]||"")}</span>`;}
 /* timer bar: width, red when low, and the seconds printed (colour is never the only signal) */
 function tmSet(el,left,total){if(!el)return;el.querySelector("i").style.width=Math.max(0,left/total*100)+"%";el.classList.toggle("low",left<total*.25);const b=el.querySelector("b");if(b)b.textContent=Math.max(0,Math.ceil(left/1000))+" s";}
-function topBar(title,back="home"){return `<div class="top"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
+function topBar(title,back="home"){return `<div class="top ttop tbar"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
 function setWide(on){document.body.classList.toggle("wide",!!on);}
 let VIEW="home";
-function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();}
+function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();bgSync();}
+const BG_OF={chem:"chemistry"};   // the A-level and GCSE Chemistry share a picture, as do the two Maths
+let BGK=null;
+function bgSync(){const el=document.getElementById("bgart");if(!el)return;
+  const k=busyView()?"":(VIEW==="map"||VIEW==="sec")&&MAPS?"s_"+(BG_OF[MAPS]||MAPS):"gym";
+  if(k===BGK)return;BGK=k;el.classList.remove("on");if(k)bgLoad(el,k,k);}
+function bgLoad(el,k,f){const img=new Image();img.onload=()=>{if(BGK!==k)return;el.style.backgroundImage="url(../lib/bg/"+f+".jpg)";el.classList.add("on");};
+  img.onerror=()=>{if(BGK===k&&f!=="gym")bgLoad(el,k,"gym");};img.src="../lib/bg/"+f+".jpg";}
 let NAV_IN=false,NAV_SKIP=false;
 function navSync(){try{const atHome=VIEW==="home"||VIEW==="chooser";if(!atHome&&!NAV_IN){history.pushState({rm:1},"",location.href);NAV_IN=true;}else if(atHome&&NAV_IN){NAV_IN=false;NAV_SKIP=true;history.back();}}catch(e){}}
 function busyView(){return (VIEW==="run"&&!!RUN)||(VIEW==="sprintq"&&!!SP)||(VIEW==="host"&&typeof H!=="undefined"&&!!H)||VIEW==="play";}
@@ -533,7 +558,7 @@ function home(){
   const covStale=taughtOn()&&Date.now()-lsGet("covAt",Date.now())>7*864e5;
   const a2hs=!lsGet("a2hs",false)&&!isStandalone()&&!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+  <div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="chip" data-act="profile">${esc(ME.badge)} ${esc(ME.name)}</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${courseSwitch()}
   ${LOAD_ERR.length?`<div class="card err">Couldn't load the ${esc(LOAD_ERR.join(", "))} questions. Open Rep Max from its web address: it can't read its question files from a file saved on this device.</div>`:""}
@@ -613,7 +638,7 @@ function mapView(s){setWide(false);if(!SUBJ[s])s=MAPS&&SUBJ[MAPS]?MAPS:SKEYS[0];
   const dueS=Math.min(dueList().filter(q=>q.s===s).length,dueLeft()),named=P.length<=8;
   render(`<div class="wrap">${topBar("Your map")}${mdefs()}
   <div class="pchips">${tabs}</div>
-  <div class="card"><b style="font-size:calc(18px*var(--fs,1))">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${nm} of ${f.length} topics mastered · ${ns} started · ${P.length} section${P.length===1?"":"s"}</div>
+  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${nm} of ${f.length} topics mastered · ${ns} started · ${P.length} section${P.length===1?"":"s"}</div>
    <div class="bar sbar2" style="margin-top:8px"><i style="width:${(nm/tot*100).toFixed(1)}%"></i><i class="am" style="width:${(ns/tot*100).toFixed(1)}%"></i></div>
    ${ringSvg(s,P,true)}${mkey()}</div>
   <div class="list">
@@ -655,7 +680,7 @@ function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g
     svg=`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
   const can=X.some(x=>x.st>=0);
   render(`<div class="wrap">${topBar(esc(SUBJ[s].name),"map")}${mdefs()}
-  <div class="card"><b style="font-size:calc(18px*var(--fs,1))">${esc(g.name)}</b><div class="small muted">${m} of ${n} topics mastered · tap a topic to practise it</div>${svg}${mkey()}</div>
+  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(g.name)}</b><div class="small muted">${m} of ${n} topics mastered · tap a topic to practise it</div>${svg}${mkey()}</div>
   ${can?`<button class="big hero" data-act="mapGo" data-s="${s}" data-g="${gi}"><span class="em">${icn("🏋️")}</span><span><b>Practise this section</b><span>Up to 10 questions across its topics, the weakest first</span></span></button>`:""}
   ${radial?`<h3 style="margin:18px 0 8px">Topics</h3><div class="list">${X.map(x=>`<button class="msec" data-act="mapT" data-k="${esc(s+"|"+x.t.id)}"><span class="mdot md${x.st}">${x.st===2?"✓":""}</span><span class="mname">${esc(x.t.name)}<small>${mstate(x)}${x.due?" · review due":""}</small></span>${x.st>=0?`<span class="mgo">Practise</span>`:""}</button>`).join("")}</div>`:""}
   </div>`,"sec");try{mfit();}catch(e){}}
@@ -684,7 +709,7 @@ ACT.pickCourse=d=>setCourse(d.p);
 /* first visit on this device: which course? */
 function chooser(){
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>REVISION</small></div></div></div>
+  <div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>REVISION</small></div></div></div>
   <div class="card"><h3 style="margin-top:0">Which are you doing?</h3><p class="small muted" style="margin:0">You can switch later at the bottom of the home screen. Each keeps its own progress on this device.</p></div>
   <div class="list">
     <button class="big hero" data-act="pickCourse" data-p="alevel"><span class="em">${icn("🎓")}</span><span><b>A-level</b><span>${esc(Object.values(PROFILES.alevel.subj).map(x=>x.name).join(", "))}. Course map, solo gym, daily challenge and quiz nights.</span></span></button>
@@ -697,7 +722,7 @@ function homeMap(){
   const all=SKEYS.flatMap(s=>((SPEC[s]||{}).groups||[]).flatMap(g=>g.topics.map(t=>s+"|"+t.id)));
   const done=all.filter(k=>TAUGHT[k]).length;
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+  <div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${courseSwitch()}
   <div class="card"><b style="font-size:18px">Your ${SKEYS.length} subjects</b><div class="small muted" style="margin-top:4px">${all.length} topics in all · ${done} ticked as covered so far</div>
@@ -1321,7 +1346,7 @@ function playerChips(){return [...H.players.values()].map(p=>`<span class="chip"
 function boardHtml(board,meId){return `<div class="board">${board.map(b=>`<div class="brow ${b.pid===meId?"me":""}"><span class="pos">${b.pos<=3&&b.score>0?["🥇","🥈","🥉"][b.pos-1]:b.pos}</span><span class="av">${esc(b.badge)}</span><span>${esc(b.name)}</span><span class="pts">${fmt(b.score)}</span></div>`).join("")}</div>`;}
 function hostRender(){
   if(!H)return;setWide(true);
-  const top=`<div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>QUIZ NIGHT · ROOM ${H.code}</small></div></div><div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button><button class="btn" data-act="closeRoom">Close room</button></div></div>`;
+  const top=`<div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>QUIZ NIGHT · ROOM ${H.code}</small></div></div><div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button><button class="btn" data-act="closeRoom">Close room</button></div></div>`;
   if(H.phase==="lobby"){
     render(`<div class="wrap">${top}
     <div class="grid2"><div class="card center"><div class="muted">Join on your device: open Rep Max, tap <b>Join a game</b>, enter</div><div class="code-big" style="margin:10px 0">${H.code}</div><div class="muted small">or scan</div><div id="qr" class="qr" style="margin-top:8px"></div><div style="margin-top:10px"><button class="btn" data-act="hCopy">Copy join link</button></div></div>
