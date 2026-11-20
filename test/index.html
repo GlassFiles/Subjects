@@ -642,7 +642,7 @@ const mstate=x=>x.st===2?"Mastered":x.st===1?`Started · ${Math.round(x.f*100)}%
 function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g)return mapView(s);MAPS=s;
   const ix=tIndex(),X=g.topics.map(t=>({t,...tState(ix,s,t)})),n=X.length,m=X.filter(x=>x.st===2).length,radial=n<=8;let o="",svg;
   if(radial){const W=390,H=340,cx=195,cy=170,R=88;
-    X.forEach((x,i)=>{const a=i*360/n,[nx,ny]=mpol(cx,cy,R,a),[lx,ly]=mpol(cx,cy,R+31,a),k=s+"|"+x.t.id,right=lx>=cx-2,mid=Math.abs(lx-cx)<20,ls=mwrap(x.t.name,12,4);
+    X.forEach((x,i)=>{const a=i*360/n,[nx,ny]=mpol(cx,cy,R,a),[lx,ly]=mpol(cx,cy,R+36,a),k=s+"|"+x.t.id,right=lx>=cx-2,mid=Math.abs(lx-cx)<20,ls=mwrap(x.t.name,12,4);
       o+=`<g class="mzg" data-act="mapT" data-k="${esc(k)}" role="button" aria-label="${esc(x.t.name)}: ${mstate(x)}"><line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" class="msp${x.st}"${x.st===2?' filter="url(#mglow)"':""}/>${mnode(nx,ny,x)}`+
         ls.map((l,j)=>`<text x="${(lx+(mid?0:right?5:-5)).toFixed(1)}" y="${(ly+4+(j-(ls.length-1)/2)*13+(mid?(ly<cy?-12:12):0)).toFixed(1)}" text-anchor="${mid?"middle":right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("")+`</g>`;});
     o+=`<circle cx="${cx}" cy="${cy}" r="44" class="mzc2"/>`+mwrap(secShort(g.name),11,3).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*15).toFixed(1)}" text-anchor="middle" class="mzh">${esc(l)}</text>`).join("");
