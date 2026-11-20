@@ -240,7 +240,7 @@ a.big{color:inherit;text-decoration:none}
 #app{position:relative;z-index:1}
 #bgart{position:fixed;inset:0;z-index:0;background:#0d0f13 center top/cover no-repeat;opacity:0;transition:opacity .6s}
 #bgart.on{opacity:1}
-#bgart::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,15,19,.3) 0%,rgba(13,15,19,.5) 40%,rgba(13,15,19,.78) 100%)}
+#bgart::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,15,19,.4) 0%,rgba(13,15,19,.55) 45%,rgba(13,15,19,.66) 100%)}
 .card,.big,.msec{background-color:rgba(27,33,43,.86)}
 .card{background:rgba(27,33,43,.86)}
 .card.mapcard{background:rgba(13,15,19,.4);border-color:rgba(59,68,86,.6)}
@@ -600,12 +600,13 @@ function subjStates(ix,s){return ((SPEC[s]||{}).groups||[]).map(g=>g.topics.map(
 function mpol(cx,cy,r,a){a=(a-90)*Math.PI/180;return [+(cx+r*Math.cos(a)).toFixed(1),+(cy+r*Math.sin(a)).toFixed(1)];}
 function marc(cx,cy,r0,r1,a0,a1){if(a1-a0>=359.9)a1=a0+359.8;const L=a1-a0>180?1:0,[x0,y0]=mpol(cx,cy,r1,a0),[x1,y1]=mpol(cx,cy,r1,a1),[x2,y2]=mpol(cx,cy,r0,a1),[x3,y3]=mpol(cx,cy,r0,a0);return `M${x0} ${y0}A${r1} ${r1} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${r0} ${r0} 0 ${L} 0 ${x3} ${y3}Z`;}
 function mwrap(t,n,max){const L=[];let c="";for(const x of String(t).split(" ")){if((c+" "+x).trim().length>n&&c){L.push(c);c=x;}else c=(c+" "+x).trim();}L.push(c);if(L.length>max){L.length=max;L[max-1]+="…";}return L;}
+function secLabels(s){const gs=(SPEC[s]||{}).groups||[],a=gs.map(g=>secShort(g.name));return a.map((x,i)=>a.indexOf(x)!==a.lastIndexOf(x)?String(gs[i].name).split(": ")[0]:x);}
 function secShort(n){n=String(n).replace(/\s*\([^)]*\)/g,"");const c=n.indexOf(": ");if(c>0)n=/^Paper \d/.test(n)?n.slice(0,c):n.slice(c+2);if(n.length>24&&n.indexOf(",")>0)n=n.slice(0,n.indexOf(","));return n;}
 const mdefs=()=>`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="mglow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>`;
 const mkey=()=>`<div class="mkey"><span><i style="background:#323b4b"></i>Not started</span><span><i style="background:#e8a317"></i>Started</span><span><i style="background:var(--lime);box-shadow:0 0 6px var(--lime)"></i>Mastered</span><span><i style="background:#ff7a2f;border-radius:2px;height:5px"></i>Review due</span></div><div class="small muted center">Each piece fills up as that topic gets stronger.</div>`;
 /* the ring: inner ring a piece per section, lit from the middle by its share mastered; outer ring a piece per topic, filled as
    the topic gets stronger and glowing once mastered; an orange mark outside a topic with questions due for review */
-function ringSvg(s,P,big){const W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?84:44,ci=big?.33:.42,i0=big?.36:.45,i1=big?.6:.62,o0=big?.63:.66,all=P.flat(),tot=all.length||1,gap=big?.6:.9;let a=0,out="";
+function ringSvg(s,P,big){const SL=big?secLabels(s):[],W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?84:44,ci=big?.33:.42,i0=big?.36:.45,i1=big?.6:.62,o0=big?.63:.66,all=P.flat(),tot=all.length||1,gap=big?.6:.9;let a=0,out="";
   P.forEach((g,gi)=>{const span=360*g.length/tot,a0=a,mm=g.filter(x=>x.st===2).length/(g.length||1),gr=SPEC[s].groups[gi];
     let p=`<path class="mz0" d="${marc(cx,cy,R*i0,R*i1,a0+gap,a0+span-gap)}"/>`;
     if(mm>0)p+=`<path class="mz2" d="${marc(cx,cy,R*i0,R*i0+R*(i1-i0)*mm,a0+gap,a0+span-gap)}"/>`;
@@ -614,7 +615,7 @@ function ringSvg(s,P,big){const W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?
       if(x.f>0)p+=`<path class="mz${x.st}"${x.st===2?' filter="url(#mglow)"':""} d="${marc(cx,cy,R*o0,R*o0+R*(1-o0)*x.f,b0+gg,b1-gg)}"/>`;
       if(x.due)p+=`<path class="mzd" d="${marc(cx,cy,R*1.04,R*1.1,b0+gg,b1-gg)}"/>`;});
     if(big){const mid=a0+span/2;
-      if(P.length<=8){const [x1,y1]=mpol(cx,cy,R*1.14,mid),[x2,y2]=mpol(cx,cy,R*1.3,mid),right=x2>=cx-2,ls=mwrap(secShort(gr.name),11,3);
+      if(P.length<=8){const [x1,y1]=mpol(cx,cy,R*1.14,mid),[x2,y2]=mpol(cx,cy,R*1.3,mid),right=x2>=cx-2,ls=mwrap(SL[gi],11,3);
         p+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="mzl"/>`+ls.map((l,i)=>`<text x="${(x2+(right?4:-4)).toFixed(1)}" y="${(y2+4+(i-(ls.length-1)/2)*12).toFixed(1)}" text-anchor="${right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("");}
       else{const [x2,y2]=mpol(cx,cy,R*1.26,mid);p+=`<circle cx="${x2}" cy="${y2}" r="10" class="mzn"/><text x="${x2}" y="${(y2+4).toFixed(1)}" text-anchor="middle" class="mzt mzb">${gi+1}</text>`;}
       out+=`<g class="mzg" data-act="mapSec" data-s="${s}" data-g="${gi}" role="button" aria-label="${esc(gr.name)}">${p}</g>`;}
@@ -670,7 +671,7 @@ function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g
     X.forEach((x,i)=>{const a=i*360/n,[nx,ny]=mpol(cx,cy,R,a),[lx,ly]=mpol(cx,cy,R+36,a),k=s+"|"+x.t.id,right=lx>=cx-2,mid=Math.abs(lx-cx)<20,ls=mwrap(x.t.name,12,4);
       o+=`<g class="mzg" data-act="mapT" data-k="${esc(k)}" role="button" aria-label="${esc(x.t.name)}: ${mstate(x)}"><line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" class="msp${x.st}"${x.st===2?' filter="url(#mglow)"':""}/>${mnode(nx,ny,x)}`+
         ls.map((l,j)=>`<text x="${(lx+(mid?0:right?5:-5)).toFixed(1)}" y="${(ly+4+(j-(ls.length-1)/2)*13+(mid?(ly<cy?-12:12):0)).toFixed(1)}" text-anchor="${mid?"middle":right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("")+`</g>`;});
-    o+=`<circle cx="${cx}" cy="${cy}" r="44" class="mzc2"/>`+mwrap(secShort(g.name),11,3).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*15).toFixed(1)}" text-anchor="middle" class="mzh">${esc(l)}</text>`).join("");
+    o+=`<circle cx="${cx}" cy="${cy}" r="44" class="mzc2"/>`+mwrap(secLabels(s)[gi],11,3).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*15).toFixed(1)}" text-anchor="middle" class="mzh">${esc(l)}</text>`).join("");
     svg=`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
   else{const W=390,rh=52,H=n*rh+16,sx=30,sy=H/2,nx=104;
     X.forEach((x,i)=>{const y=8+rh/2+i*rh,k=s+"|"+x.t.id,ls=mwrap(x.t.name,30,2);
