@@ -253,6 +253,13 @@ a.big{color:inherit;text-decoration:none}
 body.f-dys .tbar h2{font-family:"RM OpenDyslexic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:700}
 .ttop .icon-btn{background:rgba(13,15,19,.62)}
 @media (prefers-reduced-motion:reduce){#bgart{transition:none}}
+/* v1.10 */
+.orow{display:flex;gap:6px;align-items:stretch}.orow .opt{flex:1;min-width:0}
+.gq{flex:none;width:46px;border-radius:14px;border:2px solid var(--line);background:rgba(27,33,43,.9);color:var(--mute);font-size:calc(20px*var(--fs,1));font-weight:900;transition:transform .08s,border-color .15s}
+.gq:active{transform:scale(.94);border-color:var(--lime);color:var(--lime)}.gq:disabled{opacity:.35}
+.opts.hide{display:none}
+.mz3{fill:#f4ffd0}.msp3{stroke:#f4ffd0;stroke-width:4}.mlock{fill:none;stroke:#0d0f13;stroke-width:2.4;stroke-linecap:round}.mlockb{fill:#0d0f13}
+.md3{background:#f4ffd0;box-shadow:0 0 10px rgba(244,255,208,.8);font-size:13px}
 </style>
 </head>
 <body><div style="background:#ffd23f;color:#111;font:700 13px/1.3 system-ui,sans-serif;text-align:center;padding:calc(6px + env(safe-area-inset-top)) 10px 6px">TEST VERSION: progress, scores and quiz rooms here are separate from the real Rep Max</div>
@@ -288,7 +295,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.9.1";
+const VERSION="1.10";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -336,7 +343,8 @@ const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(LS_PFX+k):localStorage.s
 function shuffle(a,rnd=Math.random){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-function londonDate(d=new Date()){try{return new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"}).format(d);}catch(e){return d.toISOString().slice(0,10);}}
+function londonDate(d=new Date()){d=new Date(d.getTime()-4*3600e3);   /* v1.10: the day turns over at 4 am */
+  try{return new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"}).format(d);}catch(e){return d.toISOString().slice(0,10);}}
 function dayDiff(a,b){return Math.round((Date.parse(b+"T12:00:00Z")-Date.parse(a+"T12:00:00Z"))/864e5);}
 function addDays(d,n){const t=new Date(Date.parse(d+"T12:00:00Z")+n*864e5);return t.toISOString().slice(0,10);}
 const fmt=n=>Number(n||0).toLocaleString("en-GB");
@@ -453,10 +461,12 @@ function rankOf(xp){let i=0;for(let k=0;k<RANKS.length;k++)if(xp>=RANKS[k][0])i=
 function addXP(n){const before=rankOf(ST.xp).lvl;ST.xp+=Math.max(0,Math.round(n));saveST();const after=rankOf(ST.xp);if(after.lvl>before){setTimeout(()=>{toast("Level "+after.lvl+": "+after.name);SFX.fanfare();},600);}}
 function markDay(){const d=londonDate();if(!ST.days.includes(d)){ST.days.push(d);ST.days=ST.days.slice(-120);}ST.lastDay=d;}
 function weekDays(){const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay()+6)%7,mon=addDays(d,-dow);return ST.days.filter(x=>x>=mon&&x<=d).length;}
-function recordAnswer(q,ok){const r=ST.q[q.id]||{n:0,c:0,box:0,last:0},today=londonDate();r.n++;
-  if(ok){r.c++;r.box=Math.min(5,r.box+1);r.rd=(r.rd||[]).filter(d=>d!==today).concat(today).slice(-2);if(r.wd&&r.wd<today&&!r.fx){r.fx=1;ST.fixed=(ST.fixed||0)+1;}}
-  else{r.box=0;r.wd=today;r.fx=0;}
-  r.due=addDays(today,BOX_DAYS[r.box]||1);r.last=Date.now();ST.q[q.id]=r;ST.done++;if(ok)ST.reps++;
+function recordAnswer(q,ok,o){o=o||{};const r=ST.q[q.id]||{n:0,c:0,box:0,last:0},today=londonDate();r.n++;
+  if(ok&&o.guess){r.c++;r.g=(r.g||0)+1;r.box=Math.max(1,Math.min(r.box,2));}   // a guess that comes off: no step up, no mastery day
+  else if(ok){r.c++;const prev=r.rd&&r.rd.length?r.rd[r.rd.length-1]:null;if(prev&&prev<today&&dayDiff(prev,today)>=21)r.sec=1;   // still right after three weeks: secure
+    r.box=Math.min(5,r.box+1);r.rd=(r.rd||[]).filter(d=>d!==today).concat(today).slice(-2);if(r.wd&&r.wd<today&&!r.fx){r.fx=1;ST.fixed=(ST.fixed||0)+1;}}
+  else{r.box=0;r.wd=today;r.fx=0;if(o.sure){r.cw=(r.cw||0)+1;ST.cw=(ST.cw||0)+1;}}
+  r.due=addDays(today,ok&&o.guess?1:!ok&&o.sure?1:(BOX_DAYS[r.box]||1));r.last=Date.now();ST.q[q.id]=r;ST.done++;if(ok)ST.reps++;
   ST.dayN=ST.dayN||{};ST.dayN[today]=(ST.dayN[today]||0)+1;const ks=Object.keys(ST.dayN).sort();if(ks.length>120)ks.slice(0,ks.length-120).forEach(k=>delete ST.dayN[k]);
   if(RUN&&RUN.mode==="review"){ST.revDone=(ST.revDone||0)+1;ST.dayRev=ST.dayRev||{};ST.dayRev[today]=(ST.dayRev[today]||0)+1;}
   markDay();checkBadges();saveST();}
@@ -466,6 +476,10 @@ function dueList(){return playable(BANK.filter(q=>!q.gen&&(!QSUBJ||QSUBJ.include
 function dueLeft(){const done=(ST.dayRev||{})[londonDate()]||0;return Math.max(0,Math.min(dueList().length,REV_CAP-done));}
 /* taught is not known: a question is mastered once right on two different days; a topic when at least 3 of its questions (or all, if fewer) are */
 const qMastered=r=>!!(r&&r.rd&&r.rd.length>=2);
+/* v1.10 secure: still right after a gap of three weeks or more; it never goes backwards */
+const qSecure=r=>!!(r&&r.sec);
+function topicSecure(s,tid){const qs=topicQs(s,tid).filter(q=>!q.gen);if(!qs.length)return false;return qs.filter(q=>qSecure(ST.q[q.id])).length>=Math.min(3,qs.length);}
+function secureCount(){let n=0;for(const s of SKEYS){const sp=SPEC[s];if(!sp||!sp.groups)continue;for(const g of sp.groups)for(const t of g.topics)if(topicSecure(s,t.id))n++;}return n;}
 function topicMastered(s,tid){const qs=topicQs(s,tid).filter(q=>!q.gen);if(!qs.length)return false;return qs.filter(q=>qMastered(ST.q[q.id])).length>=Math.min(3,qs.length);}
 function masteredCount(){let n=0;for(const s of SKEYS){const sp=SPEC[s];if(!sp||!sp.groups)continue;for(const g of sp.groups)for(const t of g.topics)if(topicMastered(s,t.id))n++;}return n;}
 /* no two questions on the same topic in a row (daily challenge, reviews, Sprint) */
@@ -474,7 +488,7 @@ function mixTopics(qs){const out=[],rest=qs.slice();while(rest.length){const las
 function weekOf(d){const dow=(new Date(d+"T12:00:00Z").getUTCDay()+6)%7;return addDays(d,-dow);}
 function streak(){const N=ST.dayN||{},good=d=>(N[d]||0)>=5||(!(d in N)&&ST.days.includes(d)&&d<londonDate());const all=[...ST.days,...Object.keys(N)].sort();if(!all.length)return 0;const first=all[0];let d=londonDate(),s=0;const used={};if(!good(d))d=addDays(d,-1);while(d>=first){if(good(d))s++;else{const w=weekOf(d);if(used[w])break;used[w]=1;}d=addDays(d,-1);}return s;}
 /* badges reward mastery and fixing, never time spent */
-const BADGE_DEF=[["fix10","Fixer","Fixed 10 old misses on a later day",()=>(ST.fixed||0)>=10],["rev25","Reviewer","25 reviews done",()=>(ST.revDone||0)>=25],["rev100","Iron habit","100 reviews done",()=>(ST.revDone||0)>=100],["m1","First mastery","Mastered a topic",()=>masteredCount()>=1],["m5","Five down","Mastered 5 topics",()=>masteredCount()>=5],["m15","Course crusher","Mastered 15 topics",()=>masteredCount()>=15],["s7","Week strong","A 7-day streak",()=>streak()>=7],["s30","Month strong","A 30-day streak",()=>streak()>=30],["clean","Clean sheet","10 out of 10 in a daily challenge",()=>Object.values(ST.daily||{}).some(d=>d.right>=10&&(d.n||10)>=10)]];
+const BADGE_DEF=[["fix10","Fixer","Fixed 10 old misses on a later day",()=>(ST.fixed||0)>=10],["rev25","Reviewer","25 reviews done",()=>(ST.revDone||0)>=25],["rev100","Iron habit","100 reviews done",()=>(ST.revDone||0)>=100],["m1","First mastery","Mastered a topic",()=>masteredCount()>=1],["m5","Five down","Mastered 5 topics",()=>masteredCount()>=5],["m15","Course crusher","Mastered 15 topics",()=>masteredCount()>=15],["sec1","Locked in","A topic secure: still right after three weeks",()=>secureCount()>=1],["sec5","Vault","5 topics secure",()=>secureCount()>=5],["sec15","Fort Knox","15 topics secure",()=>secureCount()>=15],["s7","Week strong","A 7-day streak",()=>streak()>=7],["s30","Month strong","A 30-day streak",()=>streak()>=30],["clean","Clean sheet","10 out of 10 in a daily challenge",()=>Object.values(ST.daily||{}).some(d=>d.right>=10&&(d.n||10)>=10)]];
 function checkBadges(){ST.badges=ST.badges||{};for(const [id,name,desc,f] of BADGE_DEF){try{if(!ST.badges[id]&&f()){ST.badges[id]=londonDate();setTimeout(()=>toast("Badge: "+name+" · "+desc),900);}}catch(e){}}}
 const BOX_DAYS=[0,1,3,10,24,50];
 const isDue=r=>r&&(r.due?r.due<=londonDate():Date.now()-r.last>=BOX_DAYS[Math.min(r.box,5)]*864e5);
@@ -482,7 +496,9 @@ const keyOf=q=>q.s+"|"+q.t;
 function taughtOn(){return Object.values(TAUGHT).some(Boolean);}
 function inTaught(q){return !!TAUGHT[keyOf(q)];}
 /* what a quiz may ask: never a topic marked "not done yet"; only covered topics when that is switched on */
-function playable(pool,useCover){let p=pool.filter(q=>!NOTYET[keyOf(q)]);if(useCover&&taughtOn())p=p.filter(inTaught);return p;}
+function qSig(q){const t=JSON.stringify([q.q,q.o,q.a]);let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return h;}
+function flagged(q){const f=(ST.flags||{})[q.id];if(!f)return false;if(f.sig!==qSig(q)){delete ST.flags[q.id];saveST();return false;}return true;}
+function playable(pool,useCover){let p=pool.filter(q=>!NOTYET[keyOf(q)]&&!flagged(q));if(useCover&&taughtOn())p=p.filter(inTaught);return p;}
 const topicQs=(s,tid)=>BANK.filter(q=>q.s===s&&q.t===tid);
 function mastery(s,tid){const qs=topicQs(s,tid);if(!qs.length)return null;let m=0,n=0,seen=0;for(const q of qs){const r=ST.q[q.id];if(r){m+=Math.min(r.box,4)/4;n+=r.n;seen++;}}return{m:seen?m/seen:0,n,seen};}
 function markNotYet(k){const was=!!TAUGHT[k];if(was){delete TAUGHT[k];lsSet("taught",TAUGHT);}NOTYET[k]=true;lsSet("notyet",NOTYET);return was;}
@@ -519,7 +535,7 @@ function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,
 const BG_OF={chem:"chemistry"};   // the A-level and GCSE Chemistry share a picture, as do the two Maths
 let BGK=null;
 function bgSync(){const el=document.getElementById("bgart");if(!el)return;
-  const k=busyView()?"":(VIEW==="map"||VIEW==="sec")&&MAPS?"s_"+(BG_OF[MAPS]||MAPS):"gym";
+  const k=busyView()||SET.bg===false?"":(VIEW==="map"||VIEW==="sec")&&MAPS?"s_"+(BG_OF[MAPS]||MAPS):"gym";
   if(k===BGK)return;BGK=k;el.classList.remove("on");if(k)bgLoad(el,k,k);}
 function bgLoad(el,k,f){const img=new Image();img.onload=()=>{if(BGK!==k)return;el.style.backgroundImage="url(../lib/bg/"+f+".jpg)";el.classList.add("on");};
   img.onerror=()=>{if(BGK===k&&f!=="gym")bgLoad(el,k,"gym");};img.src="../lib/bg/"+f+".jpg";}
@@ -565,11 +581,12 @@ function home(){
   <div class="card rankart"><div class="rank"><div class="badge" style="font-weight:900;font-size:26px">${r.lvl}</div><div style="flex:1">
     <div class="row"><b style="font-size:18px">${esc(r.name)}</b><span class="spacer"></span><span class="muted small">${fmt(ST.xp)} XP${r.next?" · next: "+esc(r.next[1])+" at "+fmt(r.next[0]):""}</span></div>
     <div class="bar" style="margin-top:8px"><i style="width:${pct}%"></i></div></div></div>
-    <div class="stats"><div class="stat"><b>${weekDays()}</b><span>${weekDays()===1?"day":"days"} this week</span></div><div class="stat"><b>${fmt(ST.reps)}</b><span>right answers</span></div><div class="stat"><b>${stk}</b><span>day streak</span></div></div>${earned.length?`<div class="badges">${earned.map(b=>`<span class="chip" title="${esc(b[2])}">${icn("🏅",1)}${esc(b[1])}</span>`).join("")}</div>`:""}</div>
+    <div class="stats"><div class="stat"><b>${weekDays()}</b><span>${weekDays()===1?"day":"days"} this week</span></div><div class="stat"><b>${fmt(ST.reps)}</b><span>right answers</span></div><div class="stat"><b>${secureCount()}</b><span>🔒 secure</span></div></div>${earned.length?`<div class="badges">${earned.map(b=>`<span class="chip" title="${esc(b[2])}">${icn("🏅",1)}${esc(b[1])}</span>`).join("")}</div>`:""}</div>
   ${mapStrip()}
+  <div class="row small" style="margin:-4px 0 10px;justify-content:flex-end"><button class="linkb" data-act="shareWeek">Share my week</button></div>
   <div class="list">
-    ${dueN?`<button class="big hero" data-act="review"><span class="em">${icn("🔁")}</span><span><b>Due for review: ${dueN}</b><span>Questions coming back at the right time, so they stick. About ${Math.max(1,Math.round(dueN*0.4))} min</span></span></button>`:""}
-    <button class="big ${dueN?"":"hero"}" data-act="daily"><span class="em">${icn("☀️")}</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
+    ${dueN?`<button class="big hero" data-act="review"><span class="em">${icn("🔁")}</span><span><b>Today: ${dueN} due for review</b><span>Questions coming back at the right time, so they stick. About ${Math.max(1,Math.round(dueN*0.4))} min</span></span></button>`:todayGap()}
+    <button class="big" data-act="daily"><span class="em">${icn("☀️")}</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
     <button class="big" data-act="gym"><span class="em">${icn("🏋️")}</span><span><b>Solo gym</b><span>Quick 5, warm-ups, working sets, 1-rep max and weak spots</span></span></button>
     <button class="big" data-act="sprint"><span class="em">${icn("⚡")}</span><span><b>Sprint</b><span>As many as you can before the clock runs out. Harder questions score more</span></span></button>
     <div class="grid2">
@@ -595,7 +612,8 @@ function tIndex(){const ix={};for(const q of BANK)(ix[q.s+"|"+q.t]=ix[q.s+"|"+q.
 function tState(ix,s,t){const qs=ix[s+"|"+t.id]||[];if(!qs.length)return{st:-1,f:0,due:false};
   const nf=qs.filter(q=>!q.gen);let seen=0,m=0;for(const q of qs){const r=ST.q[q.id];if(r){seen++;m+=Math.min(r.box,4)/4;}}
   const mast=nf.length>0&&nf.filter(q=>qMastered(ST.q[q.id])).length>=Math.min(3,nf.length);
-  const st=mast?2:seen?1:0;return{st,f:st===2?1:st===1?Math.max(.25,Math.min(.85,m/seen)):0,due:nf.some(q=>isDue(ST.q[q.id]))};}
+  const sec=mast&&nf.filter(q=>qSecure(ST.q[q.id])).length>=Math.min(3,nf.length);
+  const st=sec?3:mast?2:seen?1:0;return{st,f:st>=2?1:st===1?Math.max(.25,Math.min(.85,m/seen)):0,due:nf.some(q=>isDue(ST.q[q.id]))};}
 function subjStates(ix,s){return ((SPEC[s]||{}).groups||[]).map(g=>g.topics.map(t=>({t,...tState(ix,s,t)})));}
 function mpol(cx,cy,r,a){a=(a-90)*Math.PI/180;return [+(cx+r*Math.cos(a)).toFixed(1),+(cy+r*Math.sin(a)).toFixed(1)];}
 function marc(cx,cy,r0,r1,a0,a1){if(a1-a0>=359.9)a1=a0+359.8;const L=a1-a0>180?1:0,[x0,y0]=mpol(cx,cy,r1,a0),[x1,y1]=mpol(cx,cy,r1,a1),[x2,y2]=mpol(cx,cy,r0,a1),[x3,y3]=mpol(cx,cy,r0,a0);return `M${x0} ${y0}A${r1} ${r1} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${r0} ${r0} 0 ${L} 0 ${x3} ${y3}Z`;}
@@ -603,16 +621,16 @@ function mwrap(t,n,max){const L=[];let c="";for(const x of String(t).split(" "))
 function secLabels(s){const gs=(SPEC[s]||{}).groups||[],a=gs.map(g=>secShort(g.name));return a.map((x,i)=>a.indexOf(x)!==a.lastIndexOf(x)?String(gs[i].name).split(": ")[0]:x);}
 function secShort(n){n=String(n).replace(/\s*\([^)]*\)/g,"");const c=n.indexOf(": ");if(c>0)n=/^Paper \d/.test(n)?n.slice(0,c):n.slice(c+2);if(n.length>24&&n.indexOf(",")>0)n=n.slice(0,n.indexOf(","));return n;}
 const mdefs=()=>`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="mglow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>`;
-const mkey=()=>`<div class="mkey"><span><i style="background:#323b4b"></i>Not started</span><span><i style="background:#e8a317"></i>Started</span><span><i style="background:var(--lime);box-shadow:0 0 6px var(--lime)"></i>Mastered</span><span><i style="background:#ff7a2f;border-radius:2px;height:5px"></i>Review due</span></div><div class="small muted center">Each piece fills up as that topic gets stronger.</div>`;
+const mkey=()=>`<div class="mkey"><span><i style="background:#323b4b"></i>Not started</span><span><i style="background:#e8a317"></i>Started</span><span><i style="background:var(--lime);box-shadow:0 0 6px var(--lime)"></i>Mastered</span><span><i style="background:#f4ffd0;box-shadow:0 0 8px #fff"></i>Secure 🔒</span><span><i style="background:#ff7a2f;border-radius:2px;height:5px"></i>Review due</span></div><div class="small muted center">Each piece fills up as that topic gets stronger. Mastered: right on two different days. Secure: still right three weeks later.</div>`;
 /* the ring: inner ring a piece per section, lit from the middle by its share mastered; outer ring a piece per topic, filled as
    the topic gets stronger and glowing once mastered; an orange mark outside a topic with questions due for review */
 function ringSvg(s,P,big){const SL=big?secLabels(s):[],W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?84:44,ci=big?.33:.42,i0=big?.36:.45,i1=big?.6:.62,o0=big?.63:.66,all=P.flat(),tot=all.length||1,gap=big?.6:.9;let a=0,out="";
-  P.forEach((g,gi)=>{const span=360*g.length/tot,a0=a,mm=g.filter(x=>x.st===2).length/(g.length||1),gr=SPEC[s].groups[gi];
+  P.forEach((g,gi)=>{const span=360*g.length/tot,a0=a,mm=g.filter(x=>x.st>=2).length/(g.length||1),gr=SPEC[s].groups[gi];
     let p=`<path class="mz0" d="${marc(cx,cy,R*i0,R*i1,a0+gap,a0+span-gap)}"/>`;
     if(mm>0)p+=`<path class="mz2" d="${marc(cx,cy,R*i0,R*i0+R*(i1-i0)*mm,a0+gap,a0+span-gap)}"/>`;
     g.forEach((x,ti)=>{const b0=a0+span*ti/g.length,b1=a0+span*(ti+1)/g.length,gg=Math.min(gap,(b1-b0)/4);
       p+=`<path class="${x.st<0?"mzx":"mz0"}" d="${marc(cx,cy,R*o0,R,b0+gg,b1-gg)}"/>`;
-      if(x.f>0)p+=`<path class="mz${x.st}"${x.st===2?' filter="url(#mglow)"':""} d="${marc(cx,cy,R*o0,R*o0+R*(1-o0)*x.f,b0+gg,b1-gg)}"/>`;
+      if(x.f>0)p+=`<path class="mz${x.st}"${x.st>=2?' filter="url(#mglow)"':""} d="${marc(cx,cy,R*o0,R*o0+R*(1-o0)*x.f,b0+gg,b1-gg)}"/>`;
       if(x.due)p+=`<path class="mzd" d="${marc(cx,cy,R*1.04,R*1.1,b0+gg,b1-gg)}"/>`;});
     if(big){const mid=a0+span/2;
       if(P.length<=8){const [x1,y1]=mpol(cx,cy,R*1.14,mid),[x2,y2]=mpol(cx,cy,R*1.3,mid),right=x2>=cx-2,ls=mwrap(SL[gi],11,3);
@@ -621,11 +639,11 @@ function ringSvg(s,P,big){const SL=big?secLabels(s):[],W=big?360:100,H=big?266:1
       out+=`<g class="mzg" data-act="mapSec" data-s="${s}" data-g="${gi}" role="button" aria-label="${esc(gr.name)}">${p}</g>`;}
     else out+=p;
     a+=span;});
-  const pct=Math.round(100*all.filter(x=>x.st===2).length/tot);
+  const pct=Math.round(100*all.filter(x=>x.st>=2).length/tot);
   out+=`<circle cx="${cx}" cy="${cy}" r="${R*ci}" class="mzc"/><text x="${cx}" y="${cy+(big?7:6)}" text-anchor="middle" class="mzp" style="font-size:${big?21:16}px">${pct}%</text>`;
   return `<svg viewBox="0 0 ${W} ${H}" class="${big?"mapbig":"mapmini"}"${big?"":' aria-hidden="true"'}>${out}</svg>`;}
 function mapStrip(){const ix=tIndex();let mt=0,tot=0;
-  const cells=SKEYS.map(s=>{const P=subjStates(ix,s),f=P.flat(),m=f.filter(x=>x.st===2).length;mt+=m;tot+=f.length;
+  const cells=SKEYS.map(s=>{const P=subjStates(ix,s),f=P.flat(),m=f.filter(x=>x.st>=2).length;mt+=m;tot+=f.length;
     return `<button class="mcell" data-act="map" data-s="${s}" aria-label="${esc(SUBJ[s].name)} map: ${m} of ${f.length} topics mastered">${ringSvg(s,P,false)}<span>${esc(SUBJ[s].short)}</span><small>${m}/${f.length}</small></button>`;}).join("");
   return `${mdefs()}<div class="card" id="mapstrip"><div class="row"><b style="font-size:calc(17px*var(--fs,1))">${icn("🗺️",1)}Your map</b><span class="spacer"></span><span class="small muted">${mt} of ${tot} mastered</span></div>
   <div class="mgrid" style="grid-template-columns:repeat(${Math.min(5,SKEYS.length)},minmax(0,1fr))">${cells}</div>
@@ -633,13 +651,13 @@ function mapStrip(){const ix=tIndex();let mt=0,tot=0;
 /* the topics that count for "biggest gap": not marked "not done yet", and only the ticked ones when ticks are in use */
 const mapCounts=(s,t)=>{const k=s+"|"+t.id;return !NOTYET[k]&&(!taughtOn()||!!TAUGHT[k]);};
 function mapView(s){setWide(false);if(!SUBJ[s])s=MAPS&&SUBJ[MAPS]?MAPS:SKEYS[0];MAPS=s;lsSet("mapS",s);
-  const ix=tIndex(),P=subjStates(ix,s),sp=SPEC[s]||{groups:[]},f=P.flat(),nm=f.filter(x=>x.st===2).length,ns=f.filter(x=>x.st===1).length,tot=f.length||1;
+  const ix=tIndex(),P=subjStates(ix,s),sp=SPEC[s]||{groups:[]},f=P.flat(),nm=f.filter(x=>x.st>=2).length,nsec=f.filter(x=>x.st===3).length,ns=f.filter(x=>x.st===1).length,tot=f.length||1;
   const tabs=SKEYS.map(k=>`<button class="chip ${k===s?"on":""}" data-act="map" data-s="${k}">${esc(SUBJ[k].short)}</button>`).join("");
-  let gap=-1,gv=9;P.forEach((g,gi)=>{const av=g.filter(x=>x.st>=0&&mapCounts(s,x.t));if(!av.length)return;const v=av.reduce((a,x)=>a+(x.st===2?1:x.st===1?.4:0),0)/av.length;if(v<1&&v<gv){gv=v;gap=gi;}});
+  const gap=gapOf(s,P)[0];
   const dueS=Math.min(dueList().filter(q=>q.s===s).length,dueLeft()),named=P.length<=8;
   render(`<div class="wrap">${topBar("Your map")}${mdefs()}
   <div class="pchips">${tabs}</div>
-  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${nm} of ${f.length} topics mastered · ${ns} started · ${P.length} section${P.length===1?"":"s"}</div>
+  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${nm} of ${f.length} topics mastered · ${nsec} secure 🔒 · ${ns} started · ${P.length} section${P.length===1?"":"s"}</div>
    <div class="bar sbar2" style="margin-top:8px"><i style="width:${(nm/tot*100).toFixed(1)}%"></i><i class="am" style="width:${(ns/tot*100).toFixed(1)}%"></i></div>
    ${ringSvg(s,P,true)}${mkey()}</div>
   <div class="list">
@@ -647,12 +665,13 @@ function mapView(s){setWide(false);if(!SUBJ[s])s=MAPS&&SUBJ[MAPS]?MAPS:SKEYS[0];
    ${dueS?`<button class="big" data-act="mapRev" data-s="${s}"><span class="em">${icn("🔁")}</span><span><b>${dueS} due for review in ${esc(SUBJ[s].name)}</b><span>Back at the right time, so they stick</span></span></button>`:""}
   </div>
   <h3 style="margin:18px 0 8px">Sections</h3>
-  <div class="list">${P.map((g,gi)=>{const m=g.filter(x=>x.st===2).length,st=g.filter(x=>x.st===1).length,n=g.length||1;
-    return `<button class="msec" data-act="mapSec" data-s="${s}" data-g="${gi}">${named?"":`<span class="mnum">${gi+1}</span>`}<span class="mname">${esc(sp.groups[gi].name)}<small>${m} of ${g.length} mastered${st?` · ${st} started`:""}${g.some(x=>x.due)?" · review due":""}</small></span><span class="sbar"><i style="width:${(m/n*100).toFixed(1)}%;background:var(--lime)"></i><i style="width:${(st/n*100).toFixed(1)}%;background:#e8a317"></i></span></button>`;}).join("")}</div>
+  <div class="list">${P.map((g,gi)=>{const m=g.filter(x=>x.st>=2).length,st=g.filter(x=>x.st===1).length,n=g.length||1;
+    return `<button class="msec" data-act="mapSec" data-s="${s}" data-g="${gi}">${named?"":`<span class="mnum">${gi+1}</span>`}<span class="mname">${esc(sp.groups[gi].name)}<small>${m} of ${g.length} mastered${g.some(x=>x.st===3)?` · ${g.filter(x=>x.st===3).length} 🔒`:""}${st?` · ${st} started`:""}${g.some(x=>x.due)?" · review due":""}</small></span><span class="sbar"><i style="width:${(m/n*100).toFixed(1)}%;background:var(--lime)"></i><i style="width:${(st/n*100).toFixed(1)}%;background:#e8a317"></i></span></button>`;}).join("")}</div>
   <p class="center" style="margin-top:16px"><button class="linkb" data-act="mapList" data-s="${s}">Course map: every topic in a list, and tick what you've had in class</button></p>
   </div>`,"map");try{mfit();}catch(e){}}
 function mnode(x,y,X){const r=17,c=2*Math.PI*r;let o=`<circle cx="${x}" cy="${y}" r="24" fill="transparent"/>`;
-  if(X.st===2)o+=`<circle cx="${x}" cy="${y}" r="${r}" class="mz2" filter="url(#mglow)"/><path d="M${x-6.5} ${y+.5}l4.5 4.5 8.5-9" class="mtick"/>`;
+  if(X.st===3)o+=`<circle cx="${x}" cy="${y}" r="${r}" class="mz3" filter="url(#mglow)"/><path d="M${x-4} ${y-1.5}v-3.2a4 4 0 0 1 8 0v3.2" class="mlock"/><rect x="${x-6.5}" y="${y-2}" width="13" height="10" rx="2" class="mlockb"/>`;
+  else if(X.st===2)o+=`<circle cx="${x}" cy="${y}" r="${r}" class="mz2" filter="url(#mglow)"/><path d="M${x-6.5} ${y+.5}l4.5 4.5 8.5-9" class="mtick"/>`;
   else if(X.st===1)o+=`<circle cx="${x}" cy="${y}" r="${r}" class="mn1"/><circle cx="${x}" cy="${y}" r="${r}" class="marc" stroke-dasharray="${(c*X.f).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${x} ${y})"/>`;
   else o+=`<circle cx="${x}" cy="${y}" r="${r}" class="${X.st<0?"mnx":"mn0"}"/>`;
   if(X.due)o+=`<circle cx="${x}" cy="${y}" r="${r+8}" class="mdue"/>`;
@@ -664,12 +683,12 @@ function mfit(){document.querySelectorAll("svg.mapbig").forEach(sv=>{const vb=sv
   for(const t of ts)t.style.fontSize=(fs*k).toFixed(2)+"px";
   x0=1e9;x1=-1e9;for(const t of ts){const b=t.getBBox();x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+b.width);}
   const d=x0<2?2-x0:x1>vb.width-2?vb.width-2-x1:0;if(d)for(const t of ts)t.setAttribute("x",(parseFloat(t.getAttribute("x"))+d).toFixed(1));});});}
-const mstate=x=>x.st===2?"Mastered":x.st===1?`Started · ${Math.round(x.f*100)}% strong`:x.st===0?"Not started":"Questions coming";
+const mstate=x=>x.st===3?"Secure 🔒 still right after three weeks":x.st===2?"Mastered":x.st===1?`Started · ${Math.round(x.f*100)}% strong`:x.st===0?"Not started":"Questions coming";
 function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g)return mapView(s);MAPS=s;
-  const ix=tIndex(),X=g.topics.map(t=>({t,...tState(ix,s,t)})),n=X.length,m=X.filter(x=>x.st===2).length,radial=n<=8;let o="",svg;
+  const ix=tIndex(),X=g.topics.map(t=>({t,...tState(ix,s,t)})),n=X.length,m=X.filter(x=>x.st>=2).length,radial=n<=8;let o="",svg;const msec=X.filter(x=>x.st===3).length;
   if(radial){const W=390,H=340,cx=195,cy=170,R=88;
     X.forEach((x,i)=>{const a=i*360/n,[nx,ny]=mpol(cx,cy,R,a),[lx,ly]=mpol(cx,cy,R+36,a),k=s+"|"+x.t.id,right=lx>=cx-2,mid=Math.abs(lx-cx)<20,ls=mwrap(x.t.name,12,4);
-      o+=`<g class="mzg" data-act="mapT" data-k="${esc(k)}" role="button" aria-label="${esc(x.t.name)}: ${mstate(x)}"><line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" class="msp${x.st}"${x.st===2?' filter="url(#mglow)"':""}/>${mnode(nx,ny,x)}`+
+      o+=`<g class="mzg" data-act="mapT" data-k="${esc(k)}" role="button" aria-label="${esc(x.t.name)}: ${mstate(x)}"><line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" class="msp${x.st}"${x.st>=2?' filter="url(#mglow)"':""}/>${mnode(nx,ny,x)}`+
         ls.map((l,j)=>`<text x="${(lx+(mid?0:right?5:-5)).toFixed(1)}" y="${(ly+4+(j-(ls.length-1)/2)*13+(mid?(ly<cy?-12:12):0)).toFixed(1)}" text-anchor="${mid?"middle":right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("")+`</g>`;});
     o+=`<circle cx="${cx}" cy="${cy}" r="44" class="mzc2"/>`+mwrap(secLabels(s)[gi],11,3).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*15).toFixed(1)}" text-anchor="middle" class="mzh">${esc(l)}</text>`).join("");
     svg=`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
@@ -681,9 +700,9 @@ function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g
     svg=`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
   const can=X.some(x=>x.st>=0);
   render(`<div class="wrap">${topBar(esc(SUBJ[s].name),"map")}${mdefs()}
-  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(g.name)}</b><div class="small muted">${m} of ${n} topics mastered · tap a topic to practise it</div>${svg}${mkey()}</div>
+  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(g.name)}</b><div class="small muted">${m} of ${n} topics mastered${msec?` · ${msec} secure 🔒`:""} · tap a topic to practise it</div>${svg}${mkey()}</div>
   ${can?`<button class="big hero" data-act="mapGo" data-s="${s}" data-g="${gi}"><span class="em">${icn("🏋️")}</span><span><b>Practise this section</b><span>Up to 10 questions across its topics, the weakest first</span></span></button>`:""}
-  ${radial?`<h3 style="margin:18px 0 8px">Topics</h3><div class="list">${X.map(x=>`<button class="msec" data-act="mapT" data-k="${esc(s+"|"+x.t.id)}"><span class="mdot md${x.st}">${x.st===2?"✓":""}</span><span class="mname">${esc(x.t.name)}<small>${mstate(x)}${x.due?" · review due":""}</small></span>${x.st>=0?`<span class="mgo">Practise</span>`:""}</button>`).join("")}</div>`:""}
+  ${radial?`<h3 style="margin:18px 0 8px">Topics</h3><div class="list">${X.map(x=>`<button class="msec" data-act="mapT" data-k="${esc(s+"|"+x.t.id)}"><span class="mdot md${x.st}">${x.st===3?"🔒":x.st===2?"✓":""}</span><span class="mname">${esc(x.t.name)}<small>${mstate(x)}${x.due?" · review due":""}</small></span>${x.st>=0?`<span class="mgo">Practise</span>`:""}</button>`).join("")}</div>`:""}
   </div>`,"sec");try{mfit();}catch(e){}}
 /* practise from the map: questions due or missed first, then new ones, then the rest, least recently seen first */
 function mapRun(keys,label,key){const pool=BANK.filter(q=>keys.includes(keyOf(q)));
@@ -700,6 +719,16 @@ ACT.mapRev=d=>{const n=dueLeft(),pool=dueList().filter(q=>q.s===d.s);if(!n||!poo
   const qs=mixTopics(shuffle(pool).sort((a,b)=>((ST.q[a.id]||{}).due||"")<((ST.q[b.id]||{}).due||"")?-1:1).slice(0,Math.min(10,n))).map(q=>inst(q)).filter(Boolean);
   startRun({mode:"review",qs,label:"Review · "+SUBJ[d.s].name,clock:false,key:"review"});};
 ACT.mapList=d=>{TRK=d.s;lsSet("trk",TRK);tracker();};
+/* v1.10 Today: when nothing is due, the biggest gap across every subject */
+function gapOf(s,P){let gap=-1,gv=9;P.forEach((g,gi)=>{const av=g.filter(x=>x.st>=0&&mapCounts(s,x.t));if(!av.length)return;const v=av.reduce((a,x)=>a+(x.st>=2?1:x.st===1?.4:0),0)/av.length;if(v<1&&v<gv){gv=v;gap=gi;}});return [gap,gv];}
+function todayGap(){const ix=tIndex();let best=null;for(const s of SKEYS){const [gi,v]=gapOf(s,subjStates(ix,s));if(gi>=0&&(!best||v<best[2]))best=[s,gi,v];}
+  if(!best)return "";const [s,gi]=best;
+  return `<button class="big hero" data-act="mapGo" data-s="${s}" data-g="${gi}"><span class="em">${icn("🎯")}</span><span><b>Today: ${esc(SUBJ[s].short)}, ${esc(SPEC[s].groups[gi].name)}</b><span>Your biggest gap right now. Up to 10 questions, the weakest first</span></span></button>`;}
+/* v1.10 share my week: a short note the player may choose to send; nothing is sent by itself */
+ACT.shareWeek=()=>{const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay()+6)%7,mon=addDays(d,-dow);let n=0;for(const [k,v] of Object.entries(ST.dayN||{}))if(k>=mon&&k<=d)n+=v;
+  const ix=tIndex();let gap="";{let best=null;for(const s of SKEYS){const [gi,v]=gapOf(s,subjStates(ix,s));if(gi>=0&&(!best||v<best[2]))best=[s,gi,v];}if(best)gap=`\nBiggest gap: ${SUBJ[best[0]].name}, ${SPEC[best[0]].groups[best[1]].name}`;}
+  const t=`Rep Max this week (${PRO.tag}): ${weekDays()} study ${weekDays()===1?"day":"days"}, ${n} questions answered.\nTopics mastered: ${masteredCount()}. Topics secure 🔒: ${secureCount()}.${gap}`;
+  shareText(t,"Your week is ready to send.");};
 function courseSwitch(){return `<div class="cswitch" role="group" aria-label="Course">${["alevel","gcse"].map(k=>k===PROFILE
   ?`<button class="on" aria-current="true" disabled>${esc(PROFILES[k].label)}</button>`
   :`<button data-act="switchCourse" data-p="${k}">${esc(PROFILES[k].label)}</button>`).join("")}</div>`;}
@@ -764,7 +793,11 @@ ACT.resources=()=>{setWide(false);const subs=SKEYS.filter(s=>((SPEC[s]||{}).link
   <div class="small muted center">${subs.length&&SPEC[subs[0]].links_checked?`Links checked ${esc(SPEC[subs[0]].links_checked)}. `:""}If one stops working, tell whoever sent you Rep Max.</div></div>`,"resources");};
 ACT.settings=()=>{
   render(`<div class="wrap">${topBar("Settings & backup")}
-  <div class="card"><h3>How it plays</h3><div class="small muted" style="margin-top:6px">Move on by itself after a right answer${REDUCED?" (off while your device asks for less motion)":""}</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.auto!==false)===!!v?"on":""}" data-act="setAuto" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text size</div><div class="seg">${[[1,"Normal"],[1.15,"Large"],[1.3,"Larger"]].map(([v,l])=>`<button class="chip ${(SET.size||1)==v?"on":""}" data-act="setSize" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text style</div><div class="seg">${[["plain","Standard"],["lexend","Lexend (easy read)"],["dys","OpenDyslexic"]].map(([v,l])=>`<button class="chip ${SET.font===v?"on":""}" data-act="setFont" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Some people find these easier to read; try them and keep what suits you.</div></div>
+  <div class="card"><h3>How it plays</h3><div class="small muted" style="margin-top:6px">Move on by itself after a right answer${REDUCED?" (off while your device asks for less motion)":""}</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.auto!==false)===!!v?"on":""}" data-act="setAuto" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text size</div><div class="seg">${[[1,"Normal"],[1.15,"Large"],[1.3,"Larger"]].map(([v,l])=>`<button class="chip ${(SET.size||1)==v?"on":""}" data-act="setSize" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text style</div><div class="seg">${[["plain","Standard"],["lexend","Lexend (easy read)"],["dys","OpenDyslexic"]].map(([v,l])=>`<button class="chip ${SET.font===v?"on":""}" data-act="setFont" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Some people find these easier to read; try them and keep what suits you.</div>
+  <div class="small muted" style="margin-top:12px">A <b>?</b> beside each answer, to mark a guess</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.conf!==false)===!!v?"on":""}" data-act="setConf" data-v="${v}">${l}</button>`).join("")}</div>
+  <div class="small muted" style="margin-top:12px">Think first: hide the answers until I tap (not in timed modes)</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.think===true)===!!v?"on":""}" data-act="setThink" data-v="${v}">${l}</button>`).join("")}</div>
+  <div class="small muted" style="margin-top:12px">Background pictures</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.bg!==false)===!!v?"on":""}" data-act="setBg" data-v="${v}">${l}</button>`).join("")}</div></div>
+  ${Object.keys(ST.flags||{}).length?`<div class="card"><h3>Reported questions: ${Object.keys(ST.flags).length}</h3><p class="muted small">They stay out of your quizzes until they are fixed.</p><div class="row"><button class="btn" data-act="flagsSend">Send the list</button><button class="btn" data-act="flagsClear">Put them all back</button></div></div>`:""}
   <div class="card"><h3>Move your progress to another device</h3><p class="muted small">Copy this code, then paste it into the box on your other device. It adds to what's there rather than replacing it.</p>
   <div class="kbd" id="bk">${esc(btoa(unescape(encodeURIComponent(JSON.stringify({me:ME,stats:ST,taught:TAUGHT,notyet:NOTYET})))))}</div>
   <div class="row" style="margin-top:8px"><button class="btn" data-act="copyBk">Copy code</button></div>
@@ -774,6 +807,11 @@ ACT.settings=()=>{
   <div class="card"><h3>Start again</h3><p class="muted small">Wipes your XP, stats and ticks on this device.</p><button class="btn warn" data-act="wipe1">Reset progress</button><span id="wipe2"></span></div>
   <div class="card small muted">Quiz nights send your nickname and answers through public relay servers (MQTT). Nothing else leaves this device. Rep Max ${VERSION}.</div></div>`,"settings");
 };
+ACT.setConf=d=>{SET.conf=d.v==="1";lsSet("set",SET);ACT.settings();};
+ACT.setThink=d=>{SET.think=d.v==="1";lsSet("set",SET);ACT.settings();};
+ACT.setBg=d=>{SET.bg=d.v==="1";lsSet("set",SET);ACT.settings();};
+ACT.flagsSend=()=>{const ids=Object.keys(ST.flags||{}),qs=BANK.filter(q=>ids.includes(q.id));shareText(qs.map(q=>reportText(q)).join("\n\n"),"The list is ready to send.");};
+ACT.flagsClear=()=>{ST.flags={};saveST();toast("Put back");ACT.settings();};
 ACT.copyBk=()=>copyText($("#bk").textContent).then(()=>toast("Backup code copied"));
 ACT.loadBk=()=>{try{const o=JSON.parse(decodeURIComponent(escape(atob($("#bkin").value.trim()))));if(!o.stats)throw 0;mergeProgress(o);toast("Backup added");home();}catch(e){$("#bkmsg").textContent="That code didn't work.";}};
 function mergeProgress(o){
@@ -783,6 +821,7 @@ function mergeProgress(o){
   for(const [k,v] of Object.entries(s.best||{}))ST.best[k]=Math.max(ST.best[k]||0,v);
   for(const [d,v] of Object.entries(s.daily||{}))if(!ST.daily[d])ST.daily[d]=v;
   ST.days=[...new Set([...(ST.days||[]),...(s.days||[])])].sort().slice(-120);
+  ST.flags=Object.assign({},s.flags||{},ST.flags||{});
   Object.assign(TAUGHT,o.taught||{});Object.assign(NOTYET,o.notyet||{});
   for(const k of Object.keys(TAUGHT))if(TAUGHT[k])delete NOTYET[k];   // a tick wins
   saveST();lsSet("taught",TAUGHT);lsSet("notyet",NOTYET);
@@ -865,7 +904,7 @@ function showQ(){
   clearInterval(RT);
   const q=RUN.qs[RUN.i],perm=RUN.perms[RUN.i],tp=topicOf(q);
   RUN.locked=false;RUN.start=Date.now();
-  const timed=!!RUN.clock;
+  const timed=!!RUN.clock,conf=confMode(),think=SET.think===true&&!timed;
   render(`<div class="wrap">
   <div class="top"><button class="icon-btn" data-act="quitRun" aria-label="Quit">✕</button>
    <div class="hud"><span class="chip">${RUN.mode==="daily"?"Daily · ":""}Rep ${RUN.i+1}/${RUN.qs.length}</span>${RUN.combo>=2?`<span class="combo">🔥 x${RUN.combo}</span>`:""}</div>
@@ -873,7 +912,9 @@ function showQ(){
   ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
-   <div class="opts">${perm.map((k,i)=>`<button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
+   ${think?`<button class="btn block" id="showOpts" data-act="showOpts" style="margin-top:12px">Think of your answer, then show the options</button>`:""}
+   <div class="opts${conf?" conf":""}${think?" hide":""}">${perm.map((k,i)=>conf?`<div class="orow"><button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button><button class="gq" data-act="pickGuess" data-i="${i}" data-silent="1" aria-label="Guess this answer">?</button></div>`:`<button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
+   ${conf?`<div class="small muted" style="margin-top:8px">Not sure? Tap the <b>?</b> beside your answer.</div>`:""}
    <div id="fb"></div>
    ${q.gen?`<div class="small muted" style="margin-top:12px">Fresh numbers every time</div>`:""}</div></div>`,"run");
   if(timed){
@@ -883,23 +924,28 @@ function showQ(){
 }
 function runTimer(){clearInterval(RT);const q=RUN.qs[RUN.i],dur=qDur(q)*1000;RT=setInterval(()=>{if(!RUN){clearInterval(RT);return;}const left=dur-(Date.now()-RUN.start);const el=$("#tm");if(!el){clearInterval(RT);return;}tmSet(el,left,dur);if(left<=0){clearInterval(RT);answer(-1);}},200);}
 ACT.pickOpt=d=>answer(+d.i);
-function answer(di){
+ACT.pickGuess=d=>answer(+d.i,true);
+ACT.showOpts=()=>{const o=document.querySelector(".opts.hide");if(o)o.classList.remove("hide");const b=$("#showOpts");if(b)b.remove();RUN.start=Date.now();};
+/* the ? for a guess: in untimed practice, reviews and the daily challenge; not in Sprint or quiz nights */
+const confMode=()=>SET.conf!==false&&RUN&&!RUN.clock&&["gym","review","daily"].includes(RUN.mode);
+function answer(di,guess){
   if(!RUN||RUN.locked)return;RUN.locked=true;clearInterval(RT);
   const q=RUN.qs[RUN.i],perm=RUN.perms[RUN.i],right=perm.indexOf(q.a),ok=di===right;
-  const secs=(Date.now()-RUN.start)/1000,dur=qDur(q);
-  recordAnswer(q,ok);
+  const secs=(Date.now()-RUN.start)/1000,dur=qDur(q),cm=confMode(),sure=cm&&!guess&&di>=0;guess=!!guess&&cm;
+  recordAnswer(q,ok,{guess,sure});
   let xp=0,pts=0;
   if(ok){RUN.combo++;RUN.best=Math.max(RUN.best,RUN.combo);xp=XP_LV[q.lv];pts=100;if(RUN.clock){const f=Math.max(0,1-secs/dur);xp+=Math.round(xp*.5*f);pts+=Math.round(50*f);}if(RUN.combo>=3)xp+=5;}
   else RUN.combo=0;
   RUN.xp+=xp;RUN.score+=pts;
-  RUN.res.push({id:q.id,ok,di,secs,timeout:di<0});
+  RUN.res.push({id:q.id,ok,di,secs,timeout:di<0,guess});
+  document.querySelectorAll(".gq").forEach(b=>{b.disabled=true;});const oh=document.querySelector(".opts.hide");if(oh)oh.classList.remove("hide");const sb=$("#showOpts");if(sb)sb.remove();
   document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i===right){b.classList.add("right");b.insertAdjacentHTML("beforeend",'<span class="mark">✓</span>');}else b.classList.add("dim");if(i===di&&!ok){b.classList.add("mine");b.insertAdjacentHTML("beforeend",'<span class="mark">✗</span>');}});
   if(ok){SFX.correct();if(RUN.combo>=3)SFX.combo();if(!REDUCED)popText("+"+xp+" XP");}else SFX.wrong();
   const last=RUN.i===RUN.qs.length-1,card=CARDS[keyOf(q)];
-  const head=ok?(RUN.combo>=3?"🔥 Combo x"+RUN.combo:pick(["Clean rep.","Nailed it.","Strong.","Lift complete."])):di<0?"Out of time.":pick(["Not this one.","Missed."]);
-  const auto=ok&&SET.auto!==false&&!REDUCED,iNow=RUN.i,why=!ok&&di>=0&&q.w?q.w[perm[di]]:"";
+  const head=ok&&guess?"Right.":ok?(RUN.combo>=3?"🔥 Combo x"+RUN.combo:pick(["Clean rep.","Nailed it.","Strong.","Lift complete."])):di<0?"Out of time.":pick(["Not this one.","Missed."]);
+  const auto=ok&&!guess&&SET.auto!==false&&!REDUCED,iNow=RUN.i,why=!ok&&di>=0&&q.w?q.w[perm[di]]:"";
   let twin=false;if(!ok&&(RUN.mode==="gym"||RUN.mode==="review")&&(RUN.twins||0)<2){const cand=BANK.filter(x=>keyOf(x)===keyOf(q)&&x.id!==q.id&&!RUN.qs.some(y=>y.id===x.id));const tw=inst(cand.length?cand[Math.floor(Math.random()*cand.length)]:q);if(tw){const at=Math.min(RUN.qs.length,RUN.i+3);RUN.qs.splice(at,0,tw);RUN.perms.splice(at,0,shuffle([0,1,2,3]));RUN.twins=(RUN.twins||0)+1;twin=true;}}
-  $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}" data-act="nextQ" data-silent="1"><b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div>${why?`<div class="why"><b>Why not your answer:</b> ${tex(why)}</div>`:""}${twin?`<div class="small muted" style="margin-top:6px">A similar question comes back in a moment.</div>`:""}<span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
+  $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}" data-act="nextQ" data-silent="1"><b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div>${why?`<div class="why"><b>Why not your answer:</b> ${tex(why)}</div>`:""}${twin?`<div class="small muted" style="margin-top:6px">A similar question comes back in a moment.</div>`:""}${ok&&guess?`<div class="small" style="margin-top:6px">You weren't sure, so it comes back tomorrow to make it stick.</div>`:""}${!ok&&sure?`<div class="small" style="margin-top:6px">You were sure of that one, so it's worth a second look: it comes back tomorrow.</div>`:""}<span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
    ${card&&!ok?cardHtml(card):""}<div id="cardBox"></div>
    <div class="row small" style="margin-top:10px;gap:16px">${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
    <div class="small muted" style="margin-top:8px">${esc(specRef(q))}</div><div class="footpad"></div><div class="footbar"><button class="btn go block" data-act="nextQ">${last?"Finish":"Next rep →"}</button></div>`;
@@ -911,7 +957,10 @@ ACT.notYet=(d,b)=>{const was=markNotYet(d.k),t=TOPIC[d.k];
   if(b){b.textContent="Undo";b.dataset.act="undoNotYet";b.dataset.was=was?"1":"";}
   toast(`"${t?t.name:"That topic"}" is out of your quizzes until you tick it in the Course map.`,3600);};
 ACT.undoNotYet=(d,b)=>{delete NOTYET[d.k];lsSet("notyet",NOTYET);if(d.was){TAUGHT[d.k]=true;lsSet("taught",TAUGHT);}if(b){b.textContent="Not done this topic yet";b.dataset.act="notYet";}toast("Undone");};
-ACT.report=d=>{const i=d.i!=null?+d.i:RUN&&RUN.i,q=RUN&&RUN.qs[i];if(!q)return;copyText(reportText(q,RUN.perms[i])).then(()=>toast("Copied. Paste it into a message, or fix the line on GitHub.",3600));};
+ACT.report=(d,b)=>{const i=d.i!=null?+d.i:RUN&&RUN.i,q=RUN&&RUN.qs[i];if(!q)return;
+  if(!q.gen){ST.flags=ST.flags||{};ST.flags[q.id]={at:londonDate(),sig:qSig(q)};saveST();if(b){b.textContent="Reported";b.disabled=true;}}
+  shareText(reportText(q,RUN.perms[i]),"Reported. It's out of your quizzes until it's fixed. Send the note to whoever looks after Rep Max.");};
+function shareText(t,msg){if(navigator.share){navigator.share({text:t}).then(()=>toast(msg,3600)).catch(()=>copyText(t).then(()=>toast(msg+" (copied)",3600)));}else copyText(t).then(()=>toast(msg+" The note is copied: paste it into a message.",4200));}
 ACT.nextQ=()=>{if(!RUN||!RUN.locked)return;RUN.i++;if(RUN.i>=RUN.qs.length)endRun();else showQ();};
 ACT.quitRun=()=>{if(RUN&&RUN.res&&RUN.res.length)askEnd("End this workout?","The questions you've answered so far still count.",()=>{clearInterval(RT);RUN=null;home();});else{clearInterval(RT);RUN=null;home();}};   // nothing is recorded for an unfinished daily challenge
 function endRun(){
@@ -1202,7 +1251,7 @@ function peerOnce(id){
 function genCode(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ";let c="";for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];return c;}
 const myPid=()=>{let p=lsGet("pid",null);if(!p){p="p"+rid(10);lsSet("pid",p);}return p;};
 const GRACE=1500;
-function ptsFor(ms,dur){return 800+Math.round(200*Math.max(0,1-ms/(dur*1000)));}
+function ptsFor(ms,dur){return 1000;}   // v1.10: every right answer the same; speed only breaks ties
 let wakeLock=null,WANT_WAKE=false,HID_AT=0;
 document.addEventListener("visibilitychange",()=>{if(document.hidden){HID_AT=Date.now();if(RUN&&RUN.clock&&!RUN.locked)clearInterval(RT);if(SP)clearInterval(SPT);}else{const gap=HID_AT?Date.now()-HID_AT:0;HID_AT=0;if(RUN&&RUN.clock&&!RUN.locked&&VIEW==="run"){RUN.start+=gap;runTimer();}if(SP&&VIEW==="sprintq"){SP.end+=gap;clearInterval(SPT);SPT=setInterval(spTick,200);}if(WANT_WAKE)keepAwake();}});
 async function keepAwake(){WANT_WAKE=true;try{if(navigator.wakeLock)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
@@ -1282,7 +1331,7 @@ const send=(c,o)=>{try{c.send(o);}catch(e){}};
 const hsend=(c,o)=>send(c,{...o,g:H?H.game:0});
 function broadcast(o){if(!H)return;for(const c of H.conns.values())hsend(c,o);}
 function playerList(){return [...H.players.values()].map(p=>({pid:p.pid,name:p.name,badge:p.badge,online:!!(p.online||p.host)}));}
-function boardList(){return [...H.players.values()].sort((a,b)=>b.score-a.score).map((p,i)=>({pid:p.pid,name:p.name,badge:p.badge,score:p.score,pos:i+1}));}
+function boardList(){return [...H.players.values()].sort((a,b)=>b.score-a.score||(a.tsum||0)-(b.tsum||0)).map((p,i)=>({pid:p.pid,name:p.name,badge:p.badge,score:p.score,pos:i+1}));}
 function lobbyMsg(){return{t:"lobby",players:playerList(),code:H.code,subs:HS.subs.map(s=>SUBJ[s].name),n:H.qs.length};}
 function qMsg(){const q=H.cur.q;return{t:"q",n:H.i,total:H.qs.length,dur:H.cur.dur,left:Math.max(0,H.cur.dur*1000-(Date.now()-H.cur.start)),q:{s:q.s,t:topicOf(q).name,lv:q.lv,q:q.q,code:q.code||"",o:H.cur.perm.map(k=>q.o[k])}};}
 function stateFor(pid){
@@ -1311,7 +1360,7 @@ function hostReveal(){
   for(const [pid,p] of H.players){
     const a=H.answers.get(pid);
     if(a)counts[a.c]++;
-    if(a&&a.c===right){p.streak++;const pts=ptsFor(a.ms,H.cur.dur)+Math.min(150,(p.streak-1)*50);p.score+=pts;res[pid]={ok:true,pts,c:a.c,streak:p.streak};}
+    if(a&&a.c===right){p.streak++;const pts=ptsFor(a.ms,H.cur.dur);p.score+=pts;p.tsum=(p.tsum||0)+a.ms;res[pid]={ok:true,pts,c:a.c,streak:p.streak};}
     else{p.streak=0;res[pid]={ok:false,pts:0,c:a?a.c:null};}
   }
   const board=boardList();board.forEach(b=>{if(res[b.pid])res[b.pid].pos=b.pos;});
@@ -1335,7 +1384,7 @@ ACT.hEnd=()=>hostEnd();
 ACT.hRematch=()=>{   // same room, same players, a fresh set of questions
   if(!H)return;clearTimeout(H.autoT);clearInterval(H.qT);
   H.game++;H.qs=hostDeal();H.phase="lobby";H.i=-1;H.cur=null;H.lastRev=null;H.answers=new Map();
-  for(const p of H.players.values()){p.score=0;p.streak=0;}
+  for(const p of H.players.values()){p.score=0;p.streak=0;p.tsum=0;}
   broadcast(lobbyMsg());hostRender();
 };
 ACT.hAgain=()=>{leaveLive();ACT.hostSetup();};
