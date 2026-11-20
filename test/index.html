@@ -260,6 +260,11 @@ body.f-dys .tbar h2{font-family:"RM OpenDyslexic",system-ui,-apple-system,"Segoe
 .opts.hide{display:none}
 .mz3{fill:#f4ffd0}.msp3{stroke:#f4ffd0;stroke-width:4}.mlock{fill:none;stroke:#0d0f13;stroke-width:2.4;stroke-linecap:round}.mlockb{fill:#0d0f13}
 .md3{background:#f4ffd0;box-shadow:0 0 10px rgba(244,255,208,.8);font-size:13px}
+/* v1.11 reports */
+.flagb{font-size:15px}.rptl{margin-top:6px;font-size:calc(12px*var(--fs,1))}
+.rptbox{max-width:440px;width:100%}.rptbox textarea{width:100%;min-height:70px;margin-top:10px;font-size:16px}
+.rr.on{border-color:var(--lime);background:rgba(198,255,61,.12)}
+.lrow{display:flex;gap:6px;align-items:stretch}.lrow .big{flex:1;min-width:0}.lrow .flagb{align-self:center}
 </style>
 </head>
 <body><div style="background:#ffd23f;color:#111;font:700 13px/1.3 system-ui,sans-serif;text-align:center;padding:calc(6px + env(safe-area-inset-top)) 10px 6px">TEST VERSION: progress, scores and quiz rooms here are separate from the real Rep Max</div>
@@ -295,7 +300,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.10";
+const VERSION="1.11";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -502,7 +507,7 @@ function playable(pool,useCover){let p=pool.filter(q=>!NOTYET[keyOf(q)]&&!flagge
 const topicQs=(s,tid)=>BANK.filter(q=>q.s===s&&q.t===tid);
 function mastery(s,tid){const qs=topicQs(s,tid);if(!qs.length)return null;let m=0,n=0,seen=0;for(const q of qs){const r=ST.q[q.id];if(r){m+=Math.min(r.box,4)/4;n+=r.n;seen++;}}return{m:seen?m/seen:0,n,seen};}
 function markNotYet(k){const was=!!TAUGHT[k];if(was){delete TAUGHT[k];lsSet("taught",TAUGHT);}NOTYET[k]=true;lsSet("notyet",NOTYET);return was;}
-function cardHtml(c){if(!c)return"";return `<div class="keycard"><div class="small muted">Key idea · AI-drafted: report it if it's wrong</div><div style="margin-top:4px">${tex(c.key)}</div>${c.trap?`<div class="small" style="margin-top:6px"><b>Common trap:</b> ${tex(c.trap)}</div>`:""}${c.ref?`<div class="small muted" style="margin-top:4px">${esc(c.ref)}</div>`:""}</div>`;}
+function cardHtml(c){if(!c)return"";return `<div class="keycard"><div class="small muted">Key idea · AI-drafted: report it if it's wrong</div><div style="margin-top:4px">${tex(c.key)}</div>${c.trap?`<div class="small" style="margin-top:6px"><b>Common trap:</b> ${tex(c.trap)}</div>`:""}${c.ref?`<div class="small muted" style="margin-top:4px">${esc(c.ref)}</div>`:""}${c.s?`<button class="linkb rptl" data-act="flagCard" data-k="${esc(c.s+"|"+c.t)}">🚩 Report</button>`:""}</div>`;}
 function reportText(q,perm){perm=perm||[0,1,2,3];return `Rep Max: question ${q.id}${q.gen?" (generated)":""} may be wrong.\n${SUBJ[q.s].name}, ${topicOf(q).name}\nQ: ${q.q}${q.code?"\n"+q.code:""}\nOptions: ${perm.map((k,i)=>SHAPES[i]+" "+q.o[k]).join("   ")}\nMarked right: ${q.o[q.a]}\nWhat I think is wrong: `;}
 
 /* ---------- sound ---------- */
@@ -583,7 +588,7 @@ function home(){
     <div class="bar" style="margin-top:8px"><i style="width:${pct}%"></i></div></div></div>
     <div class="stats"><div class="stat"><b>${weekDays()}</b><span>${weekDays()===1?"day":"days"} this week</span></div><div class="stat"><b>${fmt(ST.reps)}</b><span>right answers</span></div><div class="stat"><b>${secureCount()}</b><span>🔒 secure</span></div></div>${earned.length?`<div class="badges">${earned.map(b=>`<span class="chip" title="${esc(b[2])}">${icn("🏅",1)}${esc(b[1])}</span>`).join("")}</div>`:""}</div>
   ${mapStrip()}
-  <div class="row small" style="margin:-4px 0 10px;justify-content:flex-end"><button class="linkb" data-act="shareWeek">Share my week</button></div>
+  <div class="row small" style="margin:-4px 0 10px;justify-content:flex-end;gap:16px"><button class="linkb" data-act="feedback">Send feedback</button><button class="linkb" data-act="shareWeek">Share my week</button></div>
   <div class="list">
     ${dueN?`<button class="big hero" data-act="review"><span class="em">${icn("🔁")}</span><span><b>Today: ${dueN} due for review</b><span>Questions coming back at the right time, so they stick. About ${Math.max(1,Math.round(dueN*0.4))} min</span></span></button>`:todayGap()}
     <button class="big" data-act="daily"><span class="em">${icn("☀️")}</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
@@ -729,6 +734,41 @@ ACT.shareWeek=()=>{const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay(
   const ix=tIndex();let gap="";{let best=null;for(const s of SKEYS){const [gi,v]=gapOf(s,subjStates(ix,s));if(gi>=0&&(!best||v<best[2]))best=[s,gi,v];}if(best)gap=`\nBiggest gap: ${SUBJ[best[0]].name}, ${SPEC[best[0]].groups[best[1]].name}`;}
   const t=`Rep Max this week (${PRO.tag}): ${weekDays()} study ${weekDays()===1?"day":"days"}, ${n} questions answered.\nTopics mastered: ${masteredCount()}. Topics secure 🔒: ${secureCount()}.${gap}`;
   shareText(t,"Your week is ready to send.");};
+/* ---------- v1.11 reports and feedback: a 🚩 wherever a question or other content shows ---------- */
+const RPT_WHY={q:[["wrong","The marked answer is wrong"],["inapp","Not appropriate"],["unclear","Confusing or badly worded"],["other","Something else"]],
+  card:[["wrong","Wrong or misleading"],["inapp","Not appropriate"],["unclear","Confusing"],["other","Something else"]],
+  link:[["broken","Broken, or the wrong page"],["inapp","Not appropriate"],["other","Something else"]]};
+RPT_WHY.tip=RPT_WHY.card;RPT_WHY.topic=RPT_WHY.card;
+function qDetail(q,perm){perm=perm||[0,1,2,3];return `Q: ${q.q}${q.code?"\n"+q.code:""}\nOptions: ${perm.map((k,i)=>SHAPES[i]+" "+q.o[k]).join("   ")}${q.a!=null?"\nMarked right: "+q.o[q.a]:""}`;}
+function sheet(title,sub,choices,notePh,needNote,onSend){if(document.querySelector(".modal"))return;const o=document.createElement("div");o.className="modal";
+  o.innerHTML=`<div class="mbox rptbox" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">${esc(title)}</b>${sub?`<div class="small muted" style="margin-top:4px">${esc(sub)}</div>`:""}
+  <div class="list" style="margin-top:12px">${choices.map(([k,l])=>`<button class="msec rr" data-r="${k}">${esc(l)}</button>`).join("")}</div>
+  <textarea id="rptNote" placeholder="${esc(notePh)}" maxlength="600" autocapitalize="sentences"></textarea>
+  <div class="row" style="margin-top:12px;justify-content:flex-end;gap:10px"><button class="btn" data-m="no">Cancel</button><button class="btn go" data-m="send" disabled>Send</button></div></div>`;
+  document.body.appendChild(o);let r=null;const ta=o.querySelector("#rptNote"),go=o.querySelector("[data-m=send]"),ok=()=>{go.disabled=!(r&&(!needNote||ta.value.trim()));};
+  ta.addEventListener("input",ok);
+  o.addEventListener("click",e=>{const b=e.target.closest(".rr");if(b){r=b.dataset.r;o.querySelectorAll(".rr").forEach(x=>x.classList.toggle("on",x===b));ok();return;}
+    const m=e.target.closest("[data-m]");if(!m&&e.target!==o)return;if(m&&m.dataset.m==="send"){if(go.disabled)return;const n=ta.value.trim();o.remove();onSend(r,n);return;}o.remove();});}
+function openReport(t){const why=RPT_WHY[t.kind]||RPT_WHY.card;
+  sheet("🚩 Report this "+(t.noun||"question"),t.label||"",why,"Anything to add? (optional)",false,(r,note)=>{
+    const w=why.find(x=>x[0]===r);ST.reports=(ST.reports||[]).concat([{k:t.kind,id:t.id||"",r,n:note,at:londonDate(),v:VERSION}]).slice(-200);
+    const bq=t.kind==="q"&&t.id?BANK.find(x=>x.id===t.id):null;if(bq&&!bq.gen&&r!=="other"){ST.flags=ST.flags||{};ST.flags[bq.id]={at:londonDate(),sig:qSig(bq),r};}
+    saveST();
+    const txt=`Rep Max report · ${PRO.tag} · v${VERSION}\nWhat: ${t.noun||"question"}${t.id?" "+t.id:""}${t.label?" ("+t.label+")":""}\nProblem: ${w?w[1]:r}${note?"\nNote: "+note:""}${t.detail?"\n"+t.detail:""}\n#RMREPORT ${t.kind} ${t.id||"-"} ${r}`;
+    shareText(txt,bq&&r!=="other"?"Thanks. It's out of your quizzes until it's fixed.":"Thanks for reporting it.");});}
+const FB_KIND=[["idea","An idea"],["bug","Something isn't working"],["like","Something I like"],["other","Something else"]];
+ACT.feedback=()=>sheet("Send feedback","It goes to whoever looks after Rep Max.",FB_KIND,"Tell us about it",true,(k,note)=>{
+  const w=FB_KIND.find(x=>x[0]===k);ST.feedback=(ST.feedback||[]).concat([{k,n:note,at:londonDate(),v:VERSION}]).slice(-100);saveST();
+  shareText(`Rep Max feedback · ${PRO.tag} · v${VERSION}\n${w?w[1]:k}: ${note}\n#RMFEEDBACK ${k}`,"Thanks for the feedback.");});
+ACT.flagQ=()=>{if(!RUN)return;const i=RUN.i,q=RUN.qs[i];openReport({kind:"q",id:q.id,noun:"question",label:SUBJ[q.s].short+", "+topicOf(q).name,detail:qDetail(q,RUN.perms[i])});};
+ACT.flagSP=()=>{if(!SP||!SP.q)return;const q=SP.q;openReport({kind:"q",id:q.id,noun:"question",label:SUBJ[q.s].short+", "+topicOf(q).name,detail:qDetail(q,SP.perm)});};
+ACT.flagH=()=>{if(!H||!H.cur)return;const q=H.cur.q;openReport({kind:"q",id:q.id,noun:"question",label:SUBJ[q.s].short+", "+topicOf(q).name,detail:qDetail(q,H.cur.perm)});};
+ACT.flagPL=()=>{if(!PL||!PL.q)return;const q=PL.q;openReport({kind:"q",id:q.id||"",noun:"question",label:(SUBJ[q.s]?SUBJ[q.s].short+", ":"")+(q.t||""),detail:`Q: ${q.q}${q.code?"\n"+q.code:""}\nOptions: ${q.o.map((o,i)=>SHAPES[i]+" "+o).join("   ")}`});};
+ACT.flagCard=d=>{const c=CARDS[d.k],t=TOPIC[d.k];if(!c)return;openReport({kind:"card",id:d.k,noun:"key idea",label:t?t.name:"",detail:`Key idea: ${c.key}${c.trap?"\nTrap: "+c.trap:""}`});};
+ACT.flagTopic=d=>{const t=TOPIC[d.k];if(!t)return;openReport({kind:"topic",id:d.k,noun:"topic",label:t.name,detail:`Topic: ${t.name}${t.desc?"\n"+t.desc:""}`});};
+ACT.flagLink=d=>{const l=((SPEC[d.s]||{}).links||[])[+d.i];if(!l)return;openReport({kind:"link",id:d.s+"#"+d.i,noun:"link",label:l.name,detail:`Link: ${l.url}`});};
+ACT.flagTip=d=>{const tp=((SPEC[d.s]||{}).tips||[])[+d.i];if(!tp)return;openReport({kind:"tip",id:d.s+"#"+d.i,noun:"exam tip",label:SUBJ[d.s]?SUBJ[d.s].name:"",detail:`Tip: ${tp.text}`});};
+ACT.reportsSend=()=>{const r=ST.reports||[];if(!r.length)return;shareText(`Rep Max reports · ${PRO.tag} · v${VERSION}\n`+r.map(x=>`${x.at} ${x.k} ${x.id||"-"} ${x.r}${x.n?": "+x.n:""}\n#RMREPORT ${x.k} ${x.id||"-"} ${x.r}`).join("\n"),"Your reports are ready to send.");};
 function courseSwitch(){return `<div class="cswitch" role="group" aria-label="Course">${["alevel","gcse"].map(k=>k===PROFILE
   ?`<button class="on" aria-current="true" disabled>${esc(PROFILES[k].label)}</button>`
   :`<button data-act="switchCourse" data-p="${k}">${esc(PROFILES[k].label)}</button>`).join("")}</div>`;}
@@ -789,7 +829,7 @@ ACT.setSize=d=>{SET.size=+d.v;lsSet("set",SET);applySet();ACT.settings();};
 ACT.setFont=d=>{SET.font=d.v;lsSet("set",SET);applySet();ACT.settings();};
 ACT.resources=()=>{setWide(false);const subs=SKEYS.filter(s=>((SPEC[s]||{}).links||[]).length);
   render(`<div class="wrap">${topBar("Study links")}<p class="small muted" style="margin-top:0">Free pages from the exam boards and other trusted sites. They open outside Rep Max; nothing here needs an account or costs money.</p>
-  ${subs.length?subs.map(s=>`<div class="card"><h3>${icn(SUBJ[s].em,1)}${esc(SUBJ[s].name)}</h3><div class="list">${SPEC[s].links.map(l=>`<a class="big" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="em">${icn("🔗")}</span><span><b>${esc(l.name)}</b><span>${esc(l.desc||"")}</span></span></a>`).join("")}</div></div>`).join(""):`<div class="card small muted">No links checked for this course yet.</div>`}
+  ${subs.length?subs.map(s=>`<div class="card"><h3>${icn(SUBJ[s].em,1)}${esc(SUBJ[s].name)}</h3><div class="list">${SPEC[s].links.map((l,i)=>`<div class="lrow"><a class="big" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="em">${icn("🔗")}</span><span><b>${esc(l.name)}</b><span>${esc(l.desc||"")}</span></span></a><button class="icon-btn flagb" data-act="flagLink" data-s="${s}" data-i="${i}" aria-label="Report this link">🚩</button></div>`).join("")}</div></div>`).join(""):`<div class="card small muted">No links checked for this course yet.</div>`}
   <div class="small muted center">${subs.length&&SPEC[subs[0]].links_checked?`Links checked ${esc(SPEC[subs[0]].links_checked)}. `:""}If one stops working, tell whoever sent you Rep Max.</div></div>`,"resources");};
 ACT.settings=()=>{
   render(`<div class="wrap">${topBar("Settings & backup")}
@@ -797,7 +837,8 @@ ACT.settings=()=>{
   <div class="small muted" style="margin-top:12px">A <b>?</b> beside each answer, to mark a guess</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.conf!==false)===!!v?"on":""}" data-act="setConf" data-v="${v}">${l}</button>`).join("")}</div>
   <div class="small muted" style="margin-top:12px">Think first: hide the answers until I tap (not in timed modes)</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.think===true)===!!v?"on":""}" data-act="setThink" data-v="${v}">${l}</button>`).join("")}</div>
   <div class="small muted" style="margin-top:12px">Background pictures</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.bg!==false)===!!v?"on":""}" data-act="setBg" data-v="${v}">${l}</button>`).join("")}</div></div>
-  ${Object.keys(ST.flags||{}).length?`<div class="card"><h3>Reported questions: ${Object.keys(ST.flags).length}</h3><p class="muted small">They stay out of your quizzes until they are fixed.</p><div class="row"><button class="btn" data-act="flagsSend">Send the list</button><button class="btn" data-act="flagsClear">Put them all back</button></div></div>`:""}
+  <div class="card"><h3>Feedback and reports</h3><p class="muted small">Spotted a wrong answer, something unsuitable or a bug, or got an idea? Every question, key idea, topic, link and tip has a 🚩, and this sends anything else. It goes to whoever looks after Rep Max through your device's share menu.</p>
+  <div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn" data-act="feedback">Send feedback</button>${(ST.reports||[]).length?`<button class="btn" data-act="reportsSend">Send my ${ST.reports.length} report${ST.reports.length===1?"":"s"} again</button>`:""}${Object.keys(ST.flags||{}).length?`<button class="btn" data-act="flagsClear">Put ${Object.keys(ST.flags).length} reported question${Object.keys(ST.flags).length===1?"":"s"} back</button>`:""}</div></div>
   <div class="card"><h3>Move your progress to another device</h3><p class="muted small">Copy this code, then paste it into the box on your other device. It adds to what's there rather than replacing it.</p>
   <div class="kbd" id="bk">${esc(btoa(unescape(encodeURIComponent(JSON.stringify({me:ME,stats:ST,taught:TAUGHT,notyet:NOTYET})))))}</div>
   <div class="row" style="margin-top:8px"><button class="btn" data-act="copyBk">Copy code</button></div>
@@ -908,7 +949,7 @@ function showQ(){
   render(`<div class="wrap">
   <div class="top"><button class="icon-btn" data-act="quitRun" aria-label="Quit">✕</button>
    <div class="hud"><span class="chip">${RUN.mode==="daily"?"Daily · ":""}Rep ${RUN.i+1}/${RUN.qs.length}</span>${RUN.combo>=2?`<span class="combo">🔥 x${RUN.combo}</span>`:""}</div>
-   <button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>
+   <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn flagb" data-act="flagQ" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
@@ -957,9 +998,7 @@ ACT.notYet=(d,b)=>{const was=markNotYet(d.k),t=TOPIC[d.k];
   if(b){b.textContent="Undo";b.dataset.act="undoNotYet";b.dataset.was=was?"1":"";}
   toast(`"${t?t.name:"That topic"}" is out of your quizzes until you tick it in the Course map.`,3600);};
 ACT.undoNotYet=(d,b)=>{delete NOTYET[d.k];lsSet("notyet",NOTYET);if(d.was){TAUGHT[d.k]=true;lsSet("taught",TAUGHT);}if(b){b.textContent="Not done this topic yet";b.dataset.act="notYet";}toast("Undone");};
-ACT.report=(d,b)=>{const i=d.i!=null?+d.i:RUN&&RUN.i,q=RUN&&RUN.qs[i];if(!q)return;
-  if(!q.gen){ST.flags=ST.flags||{};ST.flags[q.id]={at:londonDate(),sig:qSig(q)};saveST();if(b){b.textContent="Reported";b.disabled=true;}}
-  shareText(reportText(q,RUN.perms[i]),"Reported. It's out of your quizzes until it's fixed. Send the note to whoever looks after Rep Max.");};
+ACT.report=()=>ACT.flagQ();
 function shareText(t,msg){if(navigator.share){navigator.share({text:t}).then(()=>toast(msg,3600)).catch(()=>copyText(t).then(()=>toast(msg+" (copied)",3600)));}else copyText(t).then(()=>toast(msg+" The note is copied: paste it into a message.",4200));}
 ACT.nextQ=()=>{if(!RUN||!RUN.locked)return;RUN.i++;if(RUN.i>=RUN.qs.length)endRun();else showQ();};
 ACT.quitRun=()=>{if(RUN&&RUN.res&&RUN.res.length)askEnd("End this workout?","The questions you've answered so far still count.",()=>{clearInterval(RT);RUN=null;home();});else{clearInterval(RT);RUN=null;home();}};   // nothing is recorded for an unfinished daily challenge
@@ -980,14 +1019,14 @@ function endRun(){
   if(pb||right===n){SFX.fanfare();confetti();}
   const missed=RUN.res.map((r,i)=>r.ok?null:i).filter(i=>i!=null);
   const subjCount={};RUN.qs.forEach(q=>subjCount[q.s]=(subjCount[q.s]||0)+1);const tipS=Object.keys(subjCount).sort((a,b)=>subjCount[b]-subjCount[a])[0];
-  const tips=((SPEC[tipS]||{}).tips)||[],tip=tips.length?tips[(dayDiff(LAUNCH,londonDate())+RUN.qs.length)%tips.length]:null;
+  const tips=((SPEC[tipS]||{}).tips)||[],tipI=tips.length?(dayDiff(LAUNCH,londonDate())+RUN.qs.length)%tips.length:-1,tip=tipI>=0?tips[tipI]:null;
   render(`<div class="wrap">${topBar(daily?"Daily challenge":"Workout done")}
    <div class="card center"><div class="big-num">${right}/${n}</div>
    <div class="muted" style="margin-top:6px">+${fmt(RUN.xp)} XP · best combo ${RUN.best}${daily&&RUN.clock?" · "+fmt(RUN.score)+" pts against the clock":""}</div>
    ${pb?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">🏆 New PB</div>`:right===n?`<div style="margin-top:10px;font-weight:900;color:var(--lime);font-size:20px">💯 Perfect set</div>`:""}
    ${daily&&!RUN.practice?`<div class="grid-emoji" style="margin-top:12px">${ST.daily[RUN.date].grid}</div><div class="row" style="justify-content:center;margin-top:12px"><button class="btn go" data-act="shareDaily">Share result</button></div>`:""}
    </div>
-   ${tip?`<div class="card tipcard"><div class="small muted">Exam tip · ${icn(SUBJ[tipS].em,1)}${esc(SUBJ[tipS].name)}</div><div style="margin-top:6px;font-weight:650">${esc(tip.text)}</div>${tip.src?`<a class="small muted" style="display:inline-block;margin-top:6px" href="${esc(tip.src)}" target="_blank" rel="noopener">Source (opens an outside site)</a>`:""}</div>`:""}
+   ${tip?`<div class="card tipcard"><div class="small muted">Exam tip · ${icn(SUBJ[tipS].em,1)}${esc(SUBJ[tipS].name)}</div><div style="margin-top:6px;font-weight:650">${esc(tip.text)}</div>${tip.src?`<a class="small muted" style="display:inline-block;margin-top:6px" href="${esc(tip.src)}" target="_blank" rel="noopener">Source (opens an outside site)</a>`:""} <button class="linkb rptl" data-act="flagTip" data-s="${tipS}" data-i="${tipI}">🚩 Report</button></div>`:""}
    ${missed.length?`<div class="card"><h3>Review your misses</h3><div class="list">${missed.map(i=>{const q=RUN.qs[i],c=CARDS[keyOf(q)];return `<div class="topic" style="display:block"><div class="row" style="margin-bottom:6px">${subjTag(q.s)}<span class="small muted">${esc(topicOf(q).name)}</span></div><div>${tex(q.q)}</div>${codeHtml(q.code)}<div style="margin-top:8px"><b style="color:var(--lime)">Answer:</b> ${tex(q.o[q.a])}</div><div class="small muted" style="margin-top:4px">${tex(q.x||"")}</div>${c?`<div class="small" style="margin-top:6px"><b>Key idea:</b> ${tex(c.key)}</div>`:""}<div style="margin-top:6px"><button class="linkb" data-act="report" data-i="${i}">Report a problem</button></div></div>`;}).join("")}</div></div>`:""}
    <div class="row">${daily?"":`<button class="btn go" data-act="again">Go again</button>`}<button class="btn" data-act="home">Home</button></div></div>`,"end");
   RUN.done=true;
@@ -1064,7 +1103,7 @@ function tracker(){
    ${sp.groups.map(g=>`<details ${g.topics.every(t=>String(t.year)==="13")?"":"open"}><summary>${esc(g.name)}<span class="spacer"></span><span class="small muted">${g.topics.length} topics</span></summary><div class="inner list">${g.topics.map(t=>{
      const m=mastery(s,t.id),qs=topicQs(s,t.id),nf=qs.filter(q=>!q.gen).length,ng=qs.length-nf,key=s+"|"+t.id,card=CARDS[key],id="slot"+(slot++);
      return `<div class="topic"><button class="tick ${TAUGHT[key]?"on":""}" data-act="taught" data-k="${esc(key)}" aria-label="Taught">${TAUGHT[key]?"✓":""}</button>
-     <div class="nm"><b>${esc(t.name)}</b>${PRO.quiz&&topicMastered(s,t.id)?` <span class="mpill">Mastered</span>`:""}<span>${[meta(t),PRO.quiz?nf+" question"+(nf===1?"":"s")+(ng?` + ${ng} generator${ng===1?"":"s"}`:""):"",NOTYET[key]?"not done yet":""].filter(Boolean).join(" · ")}</span>${card?`<div><button class="linkb" data-act="trkCard" data-k="${esc(key)}" data-slot="${id}">Key idea</button></div>`:""}</div>
+     <div class="nm"><b>${esc(t.name)}</b>${PRO.quiz&&topicMastered(s,t.id)?` <span class="mpill">Mastered</span>`:""}<span>${[meta(t),PRO.quiz?nf+" question"+(nf===1?"":"s")+(ng?` + ${ng} generator${ng===1?"":"s"}`:""):"",NOTYET[key]?"not done yet":""].filter(Boolean).join(" · ")}</span><div>${card?`<button class="linkb" data-act="trkCard" data-k="${esc(key)}" data-slot="${id}">Key idea</button> · `:""}<button class="linkb" data-act="flagTopic" data-k="${esc(key)}">🚩 Report</button></div></div>
      ${PRO.quiz?`<div class="mini"><i style="width:${!m?0:Math.max(4,m.m*100)}%;background:${col(m)}"></i></div>
      ${qs.length?`<button class="btn" style="padding:8px 10px;font-size:13px" data-act="trainT" data-k="${esc(key)}">Train</button>`:`<span class="tag">soon</span>`}`:""}
      ${t.desc?`<div class="desc">${esc(t.desc)}</div>`:""}</div><div id="${id}"></div>`;}).join("")}</div></details>`).join("")}
@@ -1333,7 +1372,7 @@ function broadcast(o){if(!H)return;for(const c of H.conns.values())hsend(c,o);}
 function playerList(){return [...H.players.values()].map(p=>({pid:p.pid,name:p.name,badge:p.badge,online:!!(p.online||p.host)}));}
 function boardList(){return [...H.players.values()].sort((a,b)=>b.score-a.score||(a.tsum||0)-(b.tsum||0)).map((p,i)=>({pid:p.pid,name:p.name,badge:p.badge,score:p.score,pos:i+1}));}
 function lobbyMsg(){return{t:"lobby",players:playerList(),code:H.code,subs:HS.subs.map(s=>SUBJ[s].name),n:H.qs.length};}
-function qMsg(){const q=H.cur.q;return{t:"q",n:H.i,total:H.qs.length,dur:H.cur.dur,left:Math.max(0,H.cur.dur*1000-(Date.now()-H.cur.start)),q:{s:q.s,t:topicOf(q).name,lv:q.lv,q:q.q,code:q.code||"",o:H.cur.perm.map(k=>q.o[k])}};}
+function qMsg(){const q=H.cur.q;return{t:"q",n:H.i,total:H.qs.length,dur:H.cur.dur,left:Math.max(0,H.cur.dur*1000-(Date.now()-H.cur.start)),q:{id:q.id,s:q.s,t:topicOf(q).name,lv:q.lv,q:q.q,code:q.code||"",o:H.cur.perm.map(k=>q.o[k])}};}
 function stateFor(pid){
   if(H.phase==="lobby")return lobbyMsg();
   if(H.phase==="q"){const m=qMsg();m.mine=H.answers.has(pid)?H.answers.get(pid).c:null;return m;}
@@ -1412,7 +1451,7 @@ function hostRender(){
     <div class="timer" id="tm"><i></i><b></b></div>
     <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
     <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i}" ${HS.play&&!mine?`data-act="hPick" data-i="${i}" data-silent="1"`:"disabled"}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div></div>
-    <div class="row"><div class="pchips" id="hPlayers">${playerChips()}</div><span class="spacer"></span><span class="muted" id="hLock">${mine?"🔒 Your answer is in":""}</span><button class="btn" data-act="hReveal">Reveal now</button></div></div>`,"host");
+    <div class="row"><div class="pchips" id="hPlayers">${playerChips()}</div><span class="spacer"></span><span class="muted" id="hLock">${mine?"🔒 Your answer is in":""}</span><button class="icon-btn flagb" data-act="flagH" aria-label="Report this question">🚩</button><button class="btn" data-act="hReveal">Reveal now</button></div></div>`,"host");
     return;
   }
   if(H.phase==="rev"){
@@ -1535,7 +1574,7 @@ function recordLive(ok){ST.done++;if(ok)ST.reps++;markDay();saveST();}   // quiz
 function plRenderQ(){
   const q=PL.q;clearInterval(PL.timer);
   render(`<div class="wrap">${plTop()}
-  <div class="row"><span class="chip">Q ${PL.n+1}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="spacer"></span><b id="plSec" style="font-size:22px"></b></div>
+  <div class="row"><span class="chip">Q ${PL.n+1}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="spacer"></span><button class="icon-btn flagb" data-act="flagPL" aria-label="Report this question">🚩</button><b id="plSec" style="font-size:22px"></b></div>
   <div class="timer" id="tm"><i></i><b></b></div>
   <div class="qbox"><div class="small muted" style="margin-bottom:6px">${esc(q.t)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
   <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i} ${PL.mine!=null?(PL.mine===i?"mine":"dim"):""}" data-act="plPick" data-i="${i}" data-silent="1" ${PL.mine!=null?"disabled":""}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div>
@@ -1612,7 +1651,7 @@ function spNext(){
   render(`<div class="wrap">
   <div class="top"><button class="icon-btn" data-act="spQuit" aria-label="Stop">✕</button>
    <div class="hud"><span class="chip">⚡ ${SP.pts} pts</span><span class="chip">${SP.right} right</span></div>
-   <button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>
+   <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn flagb" data-act="flagSP" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   <div class="timer" id="tm"><i></i><b></b></div>
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">+${SP_PTS[q.lv]} pt${SP_PTS[q.lv]>1?"s":""}</span></div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
