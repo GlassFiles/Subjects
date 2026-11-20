@@ -170,6 +170,27 @@ details .inner{padding:0 12px 12px}
 .status-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--green)}
 .status-dot.off{background:var(--red)}
 .linkb{text-decoration:underline;color:var(--mute);font-size:calc(13px*var(--fs,1));padding:2px 0}
+.modal.lessonov{display:flex;flex-direction:column;align-items:stretch;padding:0;background:var(--bg);z-index:55;overflow:hidden}
+.lsn{display:flex;flex-direction:column;flex:1;min-height:0;max-width:620px;margin:0 auto;width:100%}
+.lsn .lhead{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left))}
+.lsn .lhead b{flex:1;min-width:0;font-size:calc(15px*var(--fs,1));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lsn .lx{min-width:44px;min-height:44px;font-size:22px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.lsn .ldots{display:flex;gap:4px;padding:0 max(14px,env(safe-area-inset-right)) 0 max(14px,env(safe-area-inset-left))}
+.lsn .ldots i{flex:1;height:4px;border-radius:2px;background:var(--panel2)}.lsn .ldots i.on{background:var(--lime)}
+.lsn .lbody{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:14px max(16px,env(safe-area-inset-right)) 20px max(16px,env(safe-area-inset-left));font-size:calc(17px*var(--fs,1));line-height:1.5}
+.lsn .lkind{font-size:calc(12px*var(--fs,1));font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--lime)}
+.lsn h2{font-size:calc(22px*var(--fs,1));margin:4px 0 10px;line-height:1.25}
+.lsn .ltask{padding:12px 14px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);margin:8px 0 12px}
+.lsn .lstep{padding:10px 0 10px 12px;border-left:3px solid var(--lime);margin:0 0 10px}
+.lsn .lstep .lwhy{color:var(--mute);font-size:calc(15px*var(--fs,1));margin-top:4px}
+.lsn .lgiven{padding:8px 0 8px 12px;border-left:3px solid var(--line);margin:0 0 8px;color:var(--mute)}
+.lsn .lans{margin-top:6px;padding:12px 14px;border-radius:14px;background:#161d10;border:1px solid #3f5414}
+.lsn .lopt{display:block;width:100%;text-align:left;min-height:52px;padding:12px 14px;margin:0 0 8px;border-radius:14px;background:var(--panel);border:1px solid var(--line);font-size:calc(16px*var(--fs,1));line-height:1.35}
+.lsn .lopt:disabled{opacity:.55}.lsn .lopt.right{opacity:1;outline:3px solid var(--lime);outline-offset:1px}.lsn .lopt.mine{opacity:1;border-color:var(--red)}
+.lsn .lfb{margin-top:6px;padding:12px 14px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);font-size:calc(15px*var(--fs,1))}
+.lsn .lfoot{display:flex;gap:10px;padding:10px max(14px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));border-top:1px solid var(--line)}
+.lsn .lfoot .btn{flex:1;min-height:48px}.lsn .lfoot .btn.lback{flex:0 0 auto}
+.lchoice .msec{display:block;width:100%;text-align:left;margin-top:8px}
 .keycard{margin-top:10px;padding:12px 14px;border-radius:14px;background:#161d10;border:1px solid #3f5414;font-size:calc(15px*var(--fs,1));line-height:1.45}
 .cswitch{display:flex;gap:0;margin:0 0 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel2)}
 .cswitch button{flex:1;padding:12px 8px;font-size:calc(17px*var(--fs,1));font-weight:800;color:var(--mute);background:transparent;border:0}
@@ -300,7 +321,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.11";
+const VERSION="1.12";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -377,7 +398,7 @@ function codeHtml(c){if(!c)return"";return '<pre class="code">'+String(c).replac
 const SPEC=window.RM.spec||{};
 const TOPIC={};            // "subject|id" -> {id,name,year,s,group}
 for(const s of SKEYS){for(const g of ((SPEC[s]||{}).groups||[])){for(const t of g.topics){TOPIC[s+"|"+t.id]={...t,s,group:g.name};}}}
-const BANK=[],BAD=[],BYID={},CARDS={},LOAD_ERR=[];
+const BANK=[],BAD=[],BYID={},CARDS={},LESSONS={},LOAD_ERR=[];
 function validQ(q){
   if(!q||typeof q.id!=="string"||!SUBJ[q.s]||![1,2,3].includes(q.lv))return false;
   if(q.gen)return typeof q.make==="function";
@@ -396,8 +417,11 @@ function parseLines(name,text){
 async function loadAll(){
   if(!PRO.quiz)return;                                  // course map and tracker only
   for(const g of (window.RM.gens||[]))addQ({...g,gen:true},"generator "+((g&&g.id)||"?"));
+  const SIDE=Promise.all(["cards","lessons"].map(n=>readData(n).catch(()=>"")));
   await Promise.all(SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s)).map(async s=>{try{parseLines(s,await readData(s)).forEach((q,i)=>addQ(q,s+".jsonl "+((q&&q.id)||"item "+(i+1))));}catch(e){LOAD_ERR.push(SUBJ[s].name);}}));
-  try{for(const c of parseLines("cards",await readData("cards")))if(c&&SUBJ[c.s]&&c.t&&c.key)CARDS[c.s+"|"+c.t]=c;}catch(e){}
+  const [CTXT,LTXT]=await SIDE;
+  try{for(const c of parseLines("cards",CTXT))if(c&&SUBJ[c.s]&&c.t&&c.key)CARDS[c.s+"|"+c.t]=c;}catch(e){}
+  try{for(const l of parseLines("lessons",LTXT))if(lessonOk(l))LESSONS[l.s+"|"+l.t]=l;}catch(e){}
   BANK.sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
   if(BAD.length)console.warn("Rep Max skipped:",BAD);
 }
@@ -550,7 +574,7 @@ function busyView(){return (VIEW==="run"&&!!RUN)||(VIEW==="sprintq"&&!!SP)||(VIE
 function askEnd(msg,sub,onYes){if(document.querySelector(".modal"))return;const o=document.createElement("div");o.className="modal";o.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">${esc(msg)}</b>${sub?`<div class="small muted" style="margin-top:6px">${esc(sub)}</div>`:""}<div class="row" style="margin-top:16px;justify-content:flex-end;gap:10px"><button class="btn" data-m="no">Keep going</button><button class="btn warn" data-m="yes">End it</button></div></div>`;document.body.appendChild(o);o.addEventListener("click",e=>{const m=e.target.closest("[data-m]");if(!m&&e.target!==o)return;o.remove();if(m&&m.dataset.m==="yes")onYes();});}
 function endBusy(){if(VIEW==="run"){clearInterval(RT);RUN=null;home();}else if(VIEW==="sprintq"){clearInterval(SPT);SP=null;home();}else ACT.home();}
 function askEndBusy(){const m=VIEW==="sprintq"?["Stop this sprint?","This sprint won't count."]:VIEW==="host"?["Close the room?","Everyone in the room is sent home."]:VIEW==="play"?["Leave the quiz?","You can join again with the code."]:["End this workout?","The questions you've answered so far still count."];askEnd(m[0],m[1],endBusy);}
-window.addEventListener("popstate",()=>{if(NAV_SKIP){NAV_SKIP=false;return;}NAV_IN=false;const m=document.querySelector(".modal");if(m)m.remove();if(busyView()){try{history.pushState({rm:1},"",location.href);NAV_IN=true;}catch(e){}askEndBusy();}else if(VIEW==="sec")mapView(MAPS);else ACT.home();});
+window.addEventListener("popstate",()=>{if(NAV_SKIP){NAV_SKIP=false;return;}NAV_IN=false;const ms=document.querySelectorAll(".modal"),m=ms[ms.length-1];if(m){const wasL=m.classList.contains("lessonov");m.remove();if(wasL)LSN=null;if(busyView()){try{history.pushState({rm:1},"",location.href);NAV_IN=true;}catch(e){}return;}}if(busyView()){try{history.pushState({rm:1},"",location.href);NAV_IN=true;}catch(e){}askEndBusy();}else if(VIEW==="sec")mapView(MAPS);else ACT.home();});
 
 /* every [data-act] button calls ACT[name](dataset, element) */
 const ACT={};
@@ -718,7 +742,7 @@ function mapRun(keys,label,key){const pool=BANK.filter(q=>keys.includes(keyOf(q)
   startRun({mode:"gym",qs,label,clock:false,key:"map|"+key});}
 ACT.map=d=>mapView(d&&d.s||MAPS);
 ACT.mapSec=d=>secView(d.s,+d.g);
-ACT.mapT=d=>{const t=TOPIC[d.k];mapRun([d.k],t?t.name:"Topic",d.k);};
+ACT.mapT=d=>{const t=TOPIC[d.k];if(t&&LESSONS[d.k]&&!topicMastered(t.s,t.id)){learnChoice(d.k);return;}mapRun([d.k],t?t.name:"Topic",d.k);};
 ACT.mapGo=d=>{const g=SPEC[d.s].groups[+d.g];let ks=g.topics.filter(t=>mapCounts(d.s,t)).map(t=>d.s+"|"+t.id);if(!BANK.some(q=>ks.includes(keyOf(q))))ks=g.topics.map(t=>d.s+"|"+t.id);mapRun(ks,g.name,d.s+"|g"+d.g);};
 ACT.mapRev=d=>{const n=dueLeft(),pool=dueList().filter(q=>q.s===d.s);if(!n||!pool.length){toast("Nothing due right now");return;}
   const qs=mixTopics(shuffle(pool).sort((a,b)=>((ST.q[a.id]||{}).due||"")<((ST.q[b.id]||{}).due||"")?-1:1).slice(0,Math.min(10,n))).map(q=>inst(q)).filter(Boolean);
@@ -740,7 +764,7 @@ const RPT_WHY={q:[["wrong","The marked answer is wrong"],["inapp","Not appropria
   link:[["broken","Broken, or the wrong page"],["inapp","Not appropriate"],["other","Something else"]]};
 RPT_WHY.tip=RPT_WHY.card;RPT_WHY.topic=RPT_WHY.card;
 function qDetail(q,perm){perm=perm||[0,1,2,3];return `Q: ${q.q}${q.code?"\n"+q.code:""}\nOptions: ${perm.map((k,i)=>SHAPES[i]+" "+q.o[k]).join("   ")}${q.a!=null?"\nMarked right: "+q.o[q.a]:""}`;}
-function sheet(title,sub,choices,notePh,needNote,onSend){if(document.querySelector(".modal"))return;const o=document.createElement("div");o.className="modal";
+function sheet(title,sub,choices,notePh,needNote,onSend){if(document.querySelector(".modal:not(.lessonov)"))return;const o=document.createElement("div");o.className="modal";
   o.innerHTML=`<div class="mbox rptbox" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">${esc(title)}</b>${sub?`<div class="small muted" style="margin-top:4px">${esc(sub)}</div>`:""}
   <div class="list" style="margin-top:12px">${choices.map(([k,l])=>`<button class="msec rr" data-r="${k}">${esc(l)}</button>`).join("")}</div>
   <textarea id="rptNote" placeholder="${esc(notePh)}" maxlength="600" autocapitalize="sentences"></textarea>
@@ -769,6 +793,65 @@ ACT.flagTopic=d=>{const t=TOPIC[d.k];if(!t)return;openReport({kind:"topic",id:d.
 ACT.flagLink=d=>{const l=((SPEC[d.s]||{}).links||[])[+d.i];if(!l)return;openReport({kind:"link",id:d.s+"#"+d.i,noun:"link",label:l.name,detail:`Link: ${l.url}`});};
 ACT.flagTip=d=>{const tp=((SPEC[d.s]||{}).tips||[])[+d.i];if(!tp)return;openReport({kind:"tip",id:d.s+"#"+d.i,noun:"exam tip",label:SUBJ[d.s]?SUBJ[d.s].name:"",detail:`Tip: ${tp.text}`});};
 ACT.reportsSend=()=>{const r=ST.reports||[];if(!r.length)return;shareText(`Rep Max reports · ${PRO.tag} · v${VERSION}\n`+r.map(x=>`${x.at} ${x.k} ${x.id||"-"} ${x.r}${x.n?": "+x.n:""}\n#RMREPORT ${x.k} ${x.id||"-"} ${x.r}`).join("\n"),"Your reports are ready to send.");};
+/* ---------- v1.12 Learn: short lessons before the questions ---------- */
+function lessonOk(l){const mc=m=>m&&typeof m.q==="string"&&Array.isArray(m.o)&&m.o.length===4&&Array.isArray(m.f)&&m.f.length===4&&Number.isInteger(m.a)&&m.a>=0&&m.a<4;
+  return !!(l&&SUBJ[l.s]&&l.t&&Array.isArray(l.chunks)&&l.chunks.length&&l.example&&Array.isArray(l.example.steps)&&l.example.steps.length&&mc(l.selfx)&&mc(l.faded)&&(!l.hook||mc(l.hook)));}
+function ltx(s){return tex(s).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");}
+const lfb=x=>String(x||"").replace(/^\s*(right|wrong|correct|incorrect|not quite|yes|no)\s*[.:!,]\s*/i,"");   // the screen already says Right or Not quite
+const LKIND={method:"Method",idea:"Idea",writing:"Writing"};
+let LSN=null;
+function lessonScreens(l){const sc=[];if(l.hook)sc.push({k:"hook"});l.chunks.forEach((c,i)=>sc.push({k:"chunk",i}));sc.push({k:"example"},{k:"selfx"},{k:"faded"},{k:"remember"},{k:"end"});return sc;}
+function openLesson(key,o){const l=LESSONS[key],t=TOPIC[key];if(!l||!t)return;o=o||{};const sc=lessonScreens(l);
+  let i=0;if(o.start){const j=sc.findIndex(x=>x.k===o.start);if(j>=0)i=j;}
+  LSN={key,l,t,sc,i,from:o.from||"",ans:{},shown:0,perm:{hook:shuffle([0,1,2,3]),selfx:shuffle([0,1,2,3]),faded:shuffle([0,1,2,3])}};
+  const ov=document.createElement("div");ov.className="modal lessonov";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");
+  ov.addEventListener("click",e=>{const b=e.target.closest("[data-la]");if(!b||b.disabled)return;const f=LACT[b.dataset.la];if(f)f(b.dataset,b);});
+  document.body.appendChild(ov);lessonDraw();}
+function lessonMC(id,m,head){const a=LSN.ans[id];const done=a!=null;
+  return `${head?`<div class="lkind">${esc(head)}</div>`:""}<h2>${ltx(m.q)}</h2><div>${LSN.perm[id].map(j=>`<button class="lopt ${done&&j===m.a?"right":""} ${done&&j===a&&a!==m.a?"mine":""}" data-la="pick" data-id="${id}" data-j="${j}" ${done?"disabled":""}>${ltx(m.o[j])}</button>`).join("")}</div>
+  ${done?`<div class="lfb"><b>${a===m.a?"Right.":"Not quite."}</b> ${ltx(lfb(m.f[a]))}${a!==m.a?`<div style="margin-top:6px"><b>The right answer:</b> ${ltx(m.o[m.a])}. ${ltx(lfb(m.f[m.a]))}</div>`:""}</div>`:""}`;}
+function lessonDraw(){const ov=document.querySelector(".lessonov");if(!ov||!LSN)return;const {l,t,sc,i}=LSN,cur=sc[i];let body="",canNext=true,nextLbl="Next";
+  if(cur.k==="hook"){body=lessonMC("hook",l.hook,"Have a go first");canNext=LSN.ans.hook!=null;}
+  else if(cur.k==="chunk"){const c=l.chunks[cur.i];body=`${cur.i===0&&!l.hook?`<div class="lkind">${esc(LKIND[l.kind]||"Learn")}</div>`:""}<h2>${ltx(c.h)}</h2><div>${ltx(c.b)}</div>`;}
+  else if(cur.k==="example"){const e=l.example,n=e.steps.length,shown=Math.min(LSN.shown,n);
+    body=`<div class="lkind">${l.kind==="writing"?"Model answer":"Worked example"}</div><div class="ltask">${ltx(e.task)}</div>
+    ${e.steps.slice(0,shown).map((st,j)=>`<div class="lstep"><div>${l.kind==="writing"?"":`<b>Step ${j+1}.</b> `}${ltx(st.do)}</div>${st.why?`<div class="lwhy">${ltx(st.why)}</div>`:""}</div>`).join("")}
+    ${shown<n?`<button class="btn block" data-la="step" style="width:100%;min-height:48px">${shown?"Show the next step":"Show the first step"}</button>`:`${e.answer?`<div class="lans"><b>${l.kind==="writing"?"Why it works":"Answer"}:</b> ${ltx(e.answer)}</div>`:""}`}`;
+    canNext=shown>=n;}
+  else if(cur.k==="selfx"){body=lessonMC("selfx",l.selfx,"Why?");canNext=LSN.ans.selfx!=null;}
+  else if(cur.k==="faded"){const f=l.faded,a=LSN.ans.faded;body=`<div class="lkind">Your turn</div><div class="ltask">${ltx(f.task)}</div>${(f.given||[]).map(g=>`<div class="lgiven">${ltx(g)}</div>`).join("")}${lessonMC("faded",f,"")}`;canNext=a!=null;}
+  else if(cur.k==="remember"){body=`<div class="lkind">Remember</div>${l.trap?`<h2>The common mistake</h2><div>${ltx(l.trap)}</div>`:""}${l.recap?`<div class="lans" style="margin-top:14px"><b>In one line:</b> ${ltx(l.recap)}</div>`:""}`;}
+  else if(cur.k==="end"){const run=LSN.from==="run";const qs=topicQs(t.s,t.id).length;
+    body=`<div class="lkind">Done</div><h2>${esc(t.name)}</h2><div>${run?"Back to your workout: the questions are what make it stick.":qs?"Now practise it. Answering questions, spread over a few days, is what makes it stick.":"There are no practice questions on this topic yet."}</div>`;
+    nextLbl=run?"Back to your workout":qs?"Practise this topic":"Close";}
+  const intro=i===0&&l.why?`<div class="small muted" style="margin-bottom:10px">${ltx(l.why)}</div>`:"";
+  ov.innerHTML=`<div class="lsn"><div class="lhead"><b>📖 ${esc(t.name)}</b><button class="linkb" data-la="flag" style="min-height:44px">🚩 Report</button><button class="lx" data-la="close" aria-label="Close">✕</button></div>
+  <div class="ldots">${sc.map((x,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div>
+  <div class="lbody">${intro}${body}</div>
+  <div class="lfoot">${i>0?`<button class="btn lback" data-la="back" aria-label="Back">←</button>`:""}<button class="btn go" data-la="${cur.k==="end"?"finish":"next"}" ${canNext?"":"disabled"}>${esc(nextLbl)}</button></div></div>`;
+  const lb=ov.querySelector(".lbody");if(lb&&!LSN.keepScroll)lb.scrollTop=0;LSN.keepScroll=false;}
+const LACT={};
+LACT.next=()=>{if(LSN.i<LSN.sc.length-1){LSN.i++;if(LSN.sc[LSN.i].k==="end"){ST.lread=ST.lread||{};ST.lread[LSN.key]=londonDate();saveST();}lessonDraw();}};
+LACT.back=()=>{if(LSN.i>0){LSN.i--;lessonDraw();}};
+LACT.step=()=>{LSN.shown++;LSN.keepScroll=true;lessonDraw();const s=document.querySelectorAll(".lessonov .lstep");if(s.length)s[s.length-1].scrollIntoView({block:"nearest",behavior:REDUCED?"auto":"smooth"});};
+LACT.pick=d=>{if(LSN.ans[d.id]!=null)return;LSN.ans[d.id]=+d.j;LSN.keepScroll=true;lessonDraw();const fb=document.querySelector(".lessonov .lfb");if(fb)fb.scrollIntoView({block:"nearest",behavior:REDUCED?"auto":"smooth"});};
+function closeLesson(){const ov=document.querySelector(".lessonov");if(ov)ov.remove();LSN=null;}
+LACT.close=()=>{const at=LSN?LSN.sc[LSN.i].k:"";closeLesson();if(VIEW==="tracker")tracker();};
+LACT.finish=()=>{const {key,t,from}=LSN;closeLesson();if(from==="run")return;if(topicQs(t.s,t.id).length)mapRun([key],t.name,key);else if(VIEW==="tracker")tracker();};
+LACT.flag=()=>{if(!LSN)return;const {l,t,sc,i,key}=LSN,cur=sc[i];const part=cur.k==="chunk"?"screen "+(cur.i+1):cur.k;
+  const det={hook:()=>`Q: ${l.hook.q}\nOptions: ${l.hook.o.join(" | ")}\nMarked right: ${l.hook.o[l.hook.a]}`,chunk:()=>`${l.chunks[cur.i].h}: ${l.chunks[cur.i].b}`,
+    example:()=>`Task: ${l.example.task}\n${l.example.steps.map((s,j)=>(j+1)+". "+s.do).join("\n")}\nAnswer: ${l.example.answer||""}`,selfx:()=>`Q: ${l.selfx.q}\nMarked right: ${l.selfx.o[l.selfx.a]}`,
+    faded:()=>`Task: ${l.faded.task}\nQ: ${l.faded.q}\nMarked right: ${l.faded.o[l.faded.a]}`,remember:()=>`Mistake: ${l.trap||""}\nRecap: ${l.recap||""}`,end:()=>""}[cur.k];
+  openReport({kind:"lesson",id:key+"#"+cur.k+(cur.k==="chunk"?cur.i+1:""),noun:"lesson",label:t.name+" ("+part+")",detail:det?det():""});};
+RPT_WHY.lesson=RPT_WHY.card;
+ACT.learn=d=>openLesson(d.k,{from:VIEW==="tracker"?"tracker":""});
+ACT.lessonEx=d=>openLesson(d.k,{from:"run",start:"example"});
+function learnChoice(key){const t=TOPIC[key];if(document.querySelector(".modal"))return;const o=document.createElement("div");o.className="modal";
+  o.innerHTML=`<div class="mbox lchoice" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">${esc(t.name)}</b><div class="small muted" style="margin-top:4px">${ST.lread&&ST.lread[key]?"You've read the lesson on this one.":"New to this topic, or rusty: a short lesson first helps most."}</div>
+  <button class="msec" data-c="learn">📖 Learn it first <span class="small muted">· about 3 minutes</span></button><button class="msec" data-c="go">🏋️ Practise now</button>
+  <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-c="no">Cancel</button></div></div>`;
+  document.body.appendChild(o);o.addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b&&e.target!==o)return;o.remove();if(!b)return;
+    if(b.dataset.c==="learn")openLesson(key,{from:"map"});else if(b.dataset.c==="go")mapRun([key],t.name,key);});}
 function courseSwitch(){return `<div class="cswitch" role="group" aria-label="Course">${["alevel","gcse"].map(k=>k===PROFILE
   ?`<button class="on" aria-current="true" disabled>${esc(PROFILES[k].label)}</button>`
   :`<button data-act="switchCourse" data-p="${k}">${esc(PROFILES[k].label)}</button>`).join("")}</div>`;}
@@ -988,7 +1071,7 @@ function answer(di,guess){
   let twin=false;if(!ok&&(RUN.mode==="gym"||RUN.mode==="review")&&(RUN.twins||0)<2){const cand=BANK.filter(x=>keyOf(x)===keyOf(q)&&x.id!==q.id&&!RUN.qs.some(y=>y.id===x.id));const tw=inst(cand.length?cand[Math.floor(Math.random()*cand.length)]:q);if(tw){const at=Math.min(RUN.qs.length,RUN.i+3);RUN.qs.splice(at,0,tw);RUN.perms.splice(at,0,shuffle([0,1,2,3]));RUN.twins=(RUN.twins||0)+1;twin=true;}}
   $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}" data-act="nextQ" data-silent="1"><b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div>${why?`<div class="why"><b>Why not your answer:</b> ${tex(why)}</div>`:""}${twin?`<div class="small muted" style="margin-top:6px">A similar question comes back in a moment.</div>`:""}${ok&&guess?`<div class="small" style="margin-top:6px">You weren't sure, so it comes back tomorrow to make it stick.</div>`:""}${!ok&&sure?`<div class="small" style="margin-top:6px">You were sure of that one, so it's worth a second look: it comes back tomorrow.</div>`:""}<span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
    ${card&&!ok?cardHtml(card):""}<div id="cardBox"></div>
-   <div class="row small" style="margin-top:10px;gap:16px">${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
+   <div class="row small" style="margin-top:10px;gap:16px;flex-wrap:wrap">${!ok&&LESSONS[keyOf(q)]&&!topicMastered(q.s,q.t)?`<button class="linkb" data-act="lessonEx" data-k="${esc(keyOf(q))}">📖 See a worked example</button>`:""}${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
    <div class="small muted" style="margin-top:8px">${esc(specRef(q))}</div><div class="footpad"></div><div class="footbar"><button class="btn go block" data-act="nextQ">${last?"Finish":"Next rep →"}</button></div>`;
   if(auto)setTimeout(()=>{if(RUN&&RUN.locked&&RUN.i===iNow&&VIEW==="run"&&!document.querySelector(".modal"))ACT.nextQ();},1100);
 }
@@ -1103,7 +1186,7 @@ function tracker(){
    ${sp.groups.map(g=>`<details ${g.topics.every(t=>String(t.year)==="13")?"":"open"}><summary>${esc(g.name)}<span class="spacer"></span><span class="small muted">${g.topics.length} topics</span></summary><div class="inner list">${g.topics.map(t=>{
      const m=mastery(s,t.id),qs=topicQs(s,t.id),nf=qs.filter(q=>!q.gen).length,ng=qs.length-nf,key=s+"|"+t.id,card=CARDS[key],id="slot"+(slot++);
      return `<div class="topic"><button class="tick ${TAUGHT[key]?"on":""}" data-act="taught" data-k="${esc(key)}" aria-label="Taught">${TAUGHT[key]?"✓":""}</button>
-     <div class="nm"><b>${esc(t.name)}</b>${PRO.quiz&&topicMastered(s,t.id)?` <span class="mpill">Mastered</span>`:""}<span>${[meta(t),PRO.quiz?nf+" question"+(nf===1?"":"s")+(ng?` + ${ng} generator${ng===1?"":"s"}`:""):"",NOTYET[key]?"not done yet":""].filter(Boolean).join(" · ")}</span><div>${card?`<button class="linkb" data-act="trkCard" data-k="${esc(key)}" data-slot="${id}">Key idea</button> · `:""}<button class="linkb" data-act="flagTopic" data-k="${esc(key)}">🚩 Report</button></div></div>
+     <div class="nm"><b>${esc(t.name)}</b>${PRO.quiz&&topicMastered(s,t.id)?` <span class="mpill">Mastered</span>`:""}<span>${[meta(t),PRO.quiz?nf+" question"+(nf===1?"":"s")+(ng?` + ${ng} generator${ng===1?"":"s"}`:""):"",NOTYET[key]?"not done yet":""].filter(Boolean).join(" · ")}</span><div>${LESSONS[key]?`<button class="linkb" data-act="learn" data-k="${esc(key)}">📖 Learn${ST.lread&&ST.lread[key]?" ✓":""}</button> · `:""}${card?`<button class="linkb" data-act="trkCard" data-k="${esc(key)}" data-slot="${id}">Key idea</button> · `:""}<button class="linkb" data-act="flagTopic" data-k="${esc(key)}">🚩 Report</button></div></div>
      ${PRO.quiz?`<div class="mini"><i style="width:${!m?0:Math.max(4,m.m*100)}%;background:${col(m)}"></i></div>
      ${qs.length?`<button class="btn" style="padding:8px 10px;font-size:13px" data-act="trainT" data-k="${esc(key)}">Train</button>`:`<span class="tag">soon</span>`}`:""}
      ${t.desc?`<div class="desc">${esc(t.desc)}</div>`:""}</div><div id="${id}"></div>`;}).join("")}</div></details>`).join("")}
