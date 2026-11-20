@@ -235,10 +235,28 @@ a.big{color:inherit;text-decoration:none}
 .mdot{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#0d0f13}
 .md2{background:var(--lime);box-shadow:0 0 8px rgba(198,255,61,.6)}.md1{background:#2a2412;border:3px solid #e8a317}.md0{background:var(--panel2);border:2px solid var(--line)}.md-1{border:2px dashed #2a303b}
 .mgo{flex:none;font-weight:800;font-size:calc(13px*var(--fs,1));color:var(--lime)}
+/* v1.9.1 art: a picture behind the screens, banners on the title bars */
+@font-face{font-family:"RM Display";src:url(lib/fonts/rm-display.woff2) format("woff2");font-weight:400 900;font-display:swap}
+#app{position:relative;z-index:1}
+#bgart{position:fixed;inset:0;z-index:0;background:#0d0f13 center 58%/cover no-repeat;opacity:0;transition:opacity .6s}
+#bgart.on{opacity:1}
+#bgart::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,15,19,.4) 0%,rgba(13,15,19,.55) 45%,rgba(13,15,19,.66) 100%)}
+.card,.big,.msec{background-color:rgba(27,33,43,.86)}
+.card{background:rgba(27,33,43,.86)}
+.card.mapcard{background:rgba(13,15,19,.4);border-color:rgba(59,68,86,.6)}
+.ttop{position:relative;border:1px solid #2b3445;border-radius:18px;padding:12px 12px 12px 14px;min-height:84px;background:linear-gradient(90deg,rgba(10,12,16,.92) 0%,rgba(10,12,16,.6) 50%,rgba(10,12,16,.12) 100%),url(lib/bg/header.jpg) right center/cover no-repeat,#12161d;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.ttop.tbar{min-height:66px;padding:8px 10px}
+.ttop .logo>div{font-family:"RM Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:400;letter-spacing:.04em;font-size:calc(27px*var(--fs,1))}
+.ttop .logo b{font-weight:400;text-shadow:0 0 12px rgba(198,255,61,.6)}
+.ttop .logo small{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.14em;margin-top:5px}
+.tbar h2{font-family:"RM Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:400;letter-spacing:.02em;text-shadow:0 1px 10px rgba(0,0,0,.7)}
+body.f-dys .tbar h2{font-family:"RM OpenDyslexic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:700}
+.ttop .icon-btn{background:rgba(13,15,19,.62)}
+@media (prefers-reduced-motion:reduce){#bgart{transition:none}}
 </style>
 </head>
 <body>
-<div id="app"><div class="wrap"><p class="muted">Loading Rep Max…</p></div></div>
+<div id="bgart" aria-hidden="true"></div><div id="app"><div class="wrap"><p class="muted">Loading Rep Max…</p></div></div>
 <canvas id="confetti"></canvas>
 <script>
 /* data/<profile>/spec.js calls RM.setSpec, data/<profile>/generators.js calls RM.gen; the questions are in data/<profile>/*.jsonl */
@@ -270,7 +288,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.9";
+const VERSION="1.9.1";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -494,10 +512,17 @@ function subjTag(s){const S=SUBJ[s]||{name:s,col:"#888"};return `<span class="su
 function lvTag(lv){return `<span class="lv ${lv===3?"l3":""}">${lv===3?"🔥 ":""}${esc(LVNAME[lv]||"")}</span>`;}
 /* timer bar: width, red when low, and the seconds printed (colour is never the only signal) */
 function tmSet(el,left,total){if(!el)return;el.querySelector("i").style.width=Math.max(0,left/total*100)+"%";el.classList.toggle("low",left<total*.25);const b=el.querySelector("b");if(b)b.textContent=Math.max(0,Math.ceil(left/1000))+" s";}
-function topBar(title,back="home"){return `<div class="top"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
+function topBar(title,back="home"){return `<div class="top ttop tbar"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
 function setWide(on){document.body.classList.toggle("wide",!!on);}
 let VIEW="home";
-function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();}
+function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();bgSync();}
+const BG_OF={chem:"chemistry"};   // the A-level and GCSE Chemistry share a picture, as do the two Maths
+let BGK=null;
+function bgSync(){const el=document.getElementById("bgart");if(!el)return;
+  const k=busyView()?"":(VIEW==="map"||VIEW==="sec")&&MAPS?"s_"+(BG_OF[MAPS]||MAPS):"gym";
+  if(k===BGK)return;BGK=k;el.classList.remove("on");if(k)bgLoad(el,k,k);}
+function bgLoad(el,k,f){const img=new Image();img.onload=()=>{if(BGK!==k)return;el.style.backgroundImage="url(lib/bg/"+f+".jpg)";el.classList.add("on");};
+  img.onerror=()=>{if(BGK===k&&f!=="gym")bgLoad(el,k,"gym");};img.src="lib/bg/"+f+".jpg";}
 let NAV_IN=false,NAV_SKIP=false;
 function navSync(){try{const atHome=VIEW==="home"||VIEW==="chooser";if(!atHome&&!NAV_IN){history.pushState({rm:1},"",location.href);NAV_IN=true;}else if(atHome&&NAV_IN){NAV_IN=false;NAV_SKIP=true;history.back();}}catch(e){}}
 function busyView(){return (VIEW==="run"&&!!RUN)||(VIEW==="sprintq"&&!!SP)||(VIEW==="host"&&typeof H!=="undefined"&&!!H)||VIEW==="play";}
@@ -533,7 +558,7 @@ function home(){
   const covStale=taughtOn()&&Date.now()-lsGet("covAt",Date.now())>7*864e5;
   const a2hs=!lsGet("a2hs",false)&&!isStandalone()&&!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+  <div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="chip" data-act="profile">${esc(ME.badge)} ${esc(ME.name)}</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${courseSwitch()}
   ${LOAD_ERR.length?`<div class="card err">Couldn't load the ${esc(LOAD_ERR.join(", "))} questions. Open Rep Max from its web address: it can't read its question files from a file saved on this device.</div>`:""}
@@ -575,12 +600,13 @@ function subjStates(ix,s){return ((SPEC[s]||{}).groups||[]).map(g=>g.topics.map(
 function mpol(cx,cy,r,a){a=(a-90)*Math.PI/180;return [+(cx+r*Math.cos(a)).toFixed(1),+(cy+r*Math.sin(a)).toFixed(1)];}
 function marc(cx,cy,r0,r1,a0,a1){if(a1-a0>=359.9)a1=a0+359.8;const L=a1-a0>180?1:0,[x0,y0]=mpol(cx,cy,r1,a0),[x1,y1]=mpol(cx,cy,r1,a1),[x2,y2]=mpol(cx,cy,r0,a1),[x3,y3]=mpol(cx,cy,r0,a0);return `M${x0} ${y0}A${r1} ${r1} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${r0} ${r0} 0 ${L} 0 ${x3} ${y3}Z`;}
 function mwrap(t,n,max){const L=[];let c="";for(const x of String(t).split(" ")){if((c+" "+x).trim().length>n&&c){L.push(c);c=x;}else c=(c+" "+x).trim();}L.push(c);if(L.length>max){L.length=max;L[max-1]+="…";}return L;}
+function secLabels(s){const gs=(SPEC[s]||{}).groups||[],a=gs.map(g=>secShort(g.name));return a.map((x,i)=>a.indexOf(x)!==a.lastIndexOf(x)?String(gs[i].name).split(": ")[0]:x);}
 function secShort(n){n=String(n).replace(/\s*\([^)]*\)/g,"");const c=n.indexOf(": ");if(c>0)n=/^Paper \d/.test(n)?n.slice(0,c):n.slice(c+2);if(n.length>24&&n.indexOf(",")>0)n=n.slice(0,n.indexOf(","));return n;}
 const mdefs=()=>`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="mglow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>`;
 const mkey=()=>`<div class="mkey"><span><i style="background:#323b4b"></i>Not started</span><span><i style="background:#e8a317"></i>Started</span><span><i style="background:var(--lime);box-shadow:0 0 6px var(--lime)"></i>Mastered</span><span><i style="background:#ff7a2f;border-radius:2px;height:5px"></i>Review due</span></div><div class="small muted center">Each piece fills up as that topic gets stronger.</div>`;
 /* the ring: inner ring a piece per section, lit from the middle by its share mastered; outer ring a piece per topic, filled as
    the topic gets stronger and glowing once mastered; an orange mark outside a topic with questions due for review */
-function ringSvg(s,P,big){const W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?84:44,ci=big?.33:.42,i0=big?.36:.45,i1=big?.6:.62,o0=big?.63:.66,all=P.flat(),tot=all.length||1,gap=big?.6:.9;let a=0,out="";
+function ringSvg(s,P,big){const SL=big?secLabels(s):[],W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?84:44,ci=big?.33:.42,i0=big?.36:.45,i1=big?.6:.62,o0=big?.63:.66,all=P.flat(),tot=all.length||1,gap=big?.6:.9;let a=0,out="";
   P.forEach((g,gi)=>{const span=360*g.length/tot,a0=a,mm=g.filter(x=>x.st===2).length/(g.length||1),gr=SPEC[s].groups[gi];
     let p=`<path class="mz0" d="${marc(cx,cy,R*i0,R*i1,a0+gap,a0+span-gap)}"/>`;
     if(mm>0)p+=`<path class="mz2" d="${marc(cx,cy,R*i0,R*i0+R*(i1-i0)*mm,a0+gap,a0+span-gap)}"/>`;
@@ -589,7 +615,7 @@ function ringSvg(s,P,big){const W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?
       if(x.f>0)p+=`<path class="mz${x.st}"${x.st===2?' filter="url(#mglow)"':""} d="${marc(cx,cy,R*o0,R*o0+R*(1-o0)*x.f,b0+gg,b1-gg)}"/>`;
       if(x.due)p+=`<path class="mzd" d="${marc(cx,cy,R*1.04,R*1.1,b0+gg,b1-gg)}"/>`;});
     if(big){const mid=a0+span/2;
-      if(P.length<=8){const [x1,y1]=mpol(cx,cy,R*1.14,mid),[x2,y2]=mpol(cx,cy,R*1.3,mid),right=x2>=cx-2,ls=mwrap(secShort(gr.name),11,3);
+      if(P.length<=8){const [x1,y1]=mpol(cx,cy,R*1.14,mid),[x2,y2]=mpol(cx,cy,R*1.3,mid),right=x2>=cx-2,ls=mwrap(SL[gi],11,3);
         p+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="mzl"/>`+ls.map((l,i)=>`<text x="${(x2+(right?4:-4)).toFixed(1)}" y="${(y2+4+(i-(ls.length-1)/2)*12).toFixed(1)}" text-anchor="${right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("");}
       else{const [x2,y2]=mpol(cx,cy,R*1.26,mid);p+=`<circle cx="${x2}" cy="${y2}" r="10" class="mzn"/><text x="${x2}" y="${(y2+4).toFixed(1)}" text-anchor="middle" class="mzt mzb">${gi+1}</text>`;}
       out+=`<g class="mzg" data-act="mapSec" data-s="${s}" data-g="${gi}" role="button" aria-label="${esc(gr.name)}">${p}</g>`;}
@@ -613,7 +639,7 @@ function mapView(s){setWide(false);if(!SUBJ[s])s=MAPS&&SUBJ[MAPS]?MAPS:SKEYS[0];
   const dueS=Math.min(dueList().filter(q=>q.s===s).length,dueLeft()),named=P.length<=8;
   render(`<div class="wrap">${topBar("Your map")}${mdefs()}
   <div class="pchips">${tabs}</div>
-  <div class="card"><b style="font-size:calc(18px*var(--fs,1))">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${nm} of ${f.length} topics mastered · ${ns} started · ${P.length} section${P.length===1?"":"s"}</div>
+  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(sp.name||SUBJ[s].name)}</b><div class="small muted">${nm} of ${f.length} topics mastered · ${ns} started · ${P.length} section${P.length===1?"":"s"}</div>
    <div class="bar sbar2" style="margin-top:8px"><i style="width:${(nm/tot*100).toFixed(1)}%"></i><i class="am" style="width:${(ns/tot*100).toFixed(1)}%"></i></div>
    ${ringSvg(s,P,true)}${mkey()}</div>
   <div class="list">
@@ -645,7 +671,7 @@ function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g
     X.forEach((x,i)=>{const a=i*360/n,[nx,ny]=mpol(cx,cy,R,a),[lx,ly]=mpol(cx,cy,R+36,a),k=s+"|"+x.t.id,right=lx>=cx-2,mid=Math.abs(lx-cx)<20,ls=mwrap(x.t.name,12,4);
       o+=`<g class="mzg" data-act="mapT" data-k="${esc(k)}" role="button" aria-label="${esc(x.t.name)}: ${mstate(x)}"><line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" class="msp${x.st}"${x.st===2?' filter="url(#mglow)"':""}/>${mnode(nx,ny,x)}`+
         ls.map((l,j)=>`<text x="${(lx+(mid?0:right?5:-5)).toFixed(1)}" y="${(ly+4+(j-(ls.length-1)/2)*13+(mid?(ly<cy?-12:12):0)).toFixed(1)}" text-anchor="${mid?"middle":right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("")+`</g>`;});
-    o+=`<circle cx="${cx}" cy="${cy}" r="44" class="mzc2"/>`+mwrap(secShort(g.name),11,3).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*15).toFixed(1)}" text-anchor="middle" class="mzh">${esc(l)}</text>`).join("");
+    o+=`<circle cx="${cx}" cy="${cy}" r="44" class="mzc2"/>`+mwrap(secLabels(s)[gi],11,3).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*15).toFixed(1)}" text-anchor="middle" class="mzh">${esc(l)}</text>`).join("");
     svg=`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
   else{const W=390,rh=52,H=n*rh+16,sx=30,sy=H/2,nx=104;
     X.forEach((x,i)=>{const y=8+rh/2+i*rh,k=s+"|"+x.t.id,ls=mwrap(x.t.name,30,2);
@@ -655,7 +681,7 @@ function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g
     svg=`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
   const can=X.some(x=>x.st>=0);
   render(`<div class="wrap">${topBar(esc(SUBJ[s].name),"map")}${mdefs()}
-  <div class="card"><b style="font-size:calc(18px*var(--fs,1))">${esc(g.name)}</b><div class="small muted">${m} of ${n} topics mastered · tap a topic to practise it</div>${svg}${mkey()}</div>
+  <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(g.name)}</b><div class="small muted">${m} of ${n} topics mastered · tap a topic to practise it</div>${svg}${mkey()}</div>
   ${can?`<button class="big hero" data-act="mapGo" data-s="${s}" data-g="${gi}"><span class="em">${icn("🏋️")}</span><span><b>Practise this section</b><span>Up to 10 questions across its topics, the weakest first</span></span></button>`:""}
   ${radial?`<h3 style="margin:18px 0 8px">Topics</h3><div class="list">${X.map(x=>`<button class="msec" data-act="mapT" data-k="${esc(s+"|"+x.t.id)}"><span class="mdot md${x.st}">${x.st===2?"✓":""}</span><span class="mname">${esc(x.t.name)}<small>${mstate(x)}${x.due?" · review due":""}</small></span>${x.st>=0?`<span class="mgo">Practise</span>`:""}</button>`).join("")}</div>`:""}
   </div>`,"sec");try{mfit();}catch(e){}}
@@ -684,7 +710,7 @@ ACT.pickCourse=d=>setCourse(d.p);
 /* first visit on this device: which course? */
 function chooser(){
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>REVISION</small></div></div></div>
+  <div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>REVISION</small></div></div></div>
   <div class="card"><h3 style="margin-top:0">Which are you doing?</h3><p class="small muted" style="margin:0">You can switch later at the bottom of the home screen. Each keeps its own progress on this device.</p></div>
   <div class="list">
     <button class="big hero" data-act="pickCourse" data-p="alevel"><span class="em">${icn("🎓")}</span><span><b>A-level</b><span>${esc(Object.values(PROFILES.alevel.subj).map(x=>x.name).join(", "))}. Course map, solo gym, daily challenge and quiz nights.</span></span></button>
@@ -697,7 +723,7 @@ function homeMap(){
   const all=SKEYS.flatMap(s=>((SPEC[s]||{}).groups||[]).flatMap(g=>g.topics.map(t=>s+"|"+t.id)));
   const done=all.filter(k=>TAUGHT[k]).length;
   render(`<div class="wrap">
-  <div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
+  <div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>${esc(PRO.tag)}</small></div></div>
     <div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${courseSwitch()}
   <div class="card"><b style="font-size:18px">Your ${SKEYS.length} subjects</b><div class="small muted" style="margin-top:4px">${all.length} topics in all · ${done} ticked as covered so far</div>
@@ -1321,7 +1347,7 @@ function playerChips(){return [...H.players.values()].map(p=>`<span class="chip"
 function boardHtml(board,meId){return `<div class="board">${board.map(b=>`<div class="brow ${b.pid===meId?"me":""}"><span class="pos">${b.pos<=3&&b.score>0?["🥇","🥈","🥉"][b.pos-1]:b.pos}</span><span class="av">${esc(b.badge)}</span><span>${esc(b.name)}</span><span class="pts">${fmt(b.score)}</span></div>`).join("")}</div>`;}
 function hostRender(){
   if(!H)return;setWide(true);
-  const top=`<div class="top"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>QUIZ NIGHT · ROOM ${H.code}</small></div></div><div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button><button class="btn" data-act="closeRoom">Close room</button></div></div>`;
+  const top=`<div class="top ttop"><div class="logo"><span class="lg">${icn("🏋️")}</span><div>REP <b>MAX</b><small>QUIZ NIGHT · ROOM ${H.code}</small></div></div><div class="row"><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button><button class="btn" data-act="closeRoom">Close room</button></div></div>`;
   if(H.phase==="lobby"){
     render(`<div class="wrap">${top}
     <div class="grid2"><div class="card center"><div class="muted">Join on your device: open Rep Max, tap <b>Join a game</b>, enter</div><div class="code-big" style="margin:10px 0">${H.code}</div><div class="muted small">or scan</div><div id="qr" class="qr" style="margin-top:8px"></div><div style="margin-top:10px"><button class="btn" data-act="hCopy">Copy join link</button></div></div>
