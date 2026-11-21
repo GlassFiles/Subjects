@@ -334,7 +334,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.16";
+const VERSION="1.17";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -966,7 +966,7 @@ function lessonDraw(){const ov=document.querySelector(".lessonov");if(!ov||!LSN)
     body=`<div class="lkind">Done</div><h2>${esc(t.name)}</h2><div>${run?"Back to your workout: the questions are what make it stick.":qs?"Now practise it. Answering questions, spread over a few days, is what makes it stick.":"There are no practice questions on this topic yet."}</div>`;
     nextLbl=run?"Back to your workout":qs?"Practise this topic":"Close";}
   const intro=i===0&&l.why?`<div class="small muted" style="margin-bottom:10px">${ltx(l.why)}</div>`:"";
-  ov.innerHTML=`<div class="lsn"><div class="lhead"><b>📖 ${esc(t.name)}</b><button class="linkb" data-la="flag" style="min-height:44px">🚩 Report</button><button class="lx" data-la="close" aria-label="Close">✕</button></div>
+  ov.innerHTML=`<div class="lsn"><div class="lhead"><b>📖 ${esc(t.name)}</b><button class="linkb" data-la="share" style="min-height:44px;min-width:44px" aria-label="Share a link to this lesson">🔗</button><button class="linkb" data-la="flag" style="min-height:44px">🚩 Report</button><button class="lx" data-la="close" aria-label="Close">✕</button></div>
   <div class="ldots">${sc.map((x,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div>
   <div class="lbody">${intro}${body}</div>
   <div class="lfoot">${i>0?`<button class="btn lback" data-la="back" aria-label="Back">←</button>`:""}<button class="btn go" data-la="${cur.k==="end"?"finish":"next"}" ${canNext?"":"disabled"}>${esc(nextLbl)}</button></div></div>`;
@@ -979,6 +979,7 @@ LACT.pick=d=>{if(LSN.ans[d.id]!=null)return;LSN.ans[d.id]=+d.j;LSN.keepScroll=tr
 function closeLesson(){const ov=document.querySelector(".lessonov");if(ov)ov.remove();LSN=null;}
 LACT.close=()=>{closeLesson();if(VIEW==="tracker")tracker();else if(VIEW==="lessons")ACT.lessons();};
 LACT.finish=()=>{const {key,t,from}=LSN;closeLesson();if(from==="run")return;if(topicQs(t.s,t.id).length)mapRun([key],t.name,key);else if(VIEW==="tracker")tracker();};
+LACT.share=()=>{if(LSN)shareLink(lessonLink(LSN.key,LSN.i),"Rep Max lesson: "+LSN.t.name);};
 LACT.flag=()=>{if(!LSN)return;const {l,t,sc,i,key}=LSN,cur=sc[i];const part=cur.k==="chunk"?"screen "+(cur.i+1):cur.k;
   const det={hook:()=>`Q: ${l.hook.q}\nOptions: ${l.hook.o.join(" | ")}\nMarked right: ${l.hook.o[l.hook.a]}`,chunk:()=>`${l.chunks[cur.i].h}: ${l.chunks[cur.i].b}`,
     example:()=>`Task: ${l.example.task}\n${l.example.steps.map((s,j)=>(j+1)+". "+s.do).join("\n")}\nAnswer: ${l.example.answer||""}`,selfx:()=>`Q: ${l.selfx.q}\nMarked right: ${l.selfx.o[l.selfx.a]}`,
@@ -1173,7 +1174,7 @@ function showQ(){
   render(`<div class="wrap">
   <div class="top"><button class="icon-btn" data-act="quitRun" aria-label="Quit">✕</button>
    <div class="hud"><span class="chip">${RUN.mode==="daily"?"Daily · ":""}Rep ${RUN.i+1}/${RUN.qs.length}</span>${RUN.combo>=2?`<span class="combo">🔥 x${RUN.combo}</span>`:""}</div>
-   <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn flagb" data-act="flagQ" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
+   <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn" data-act="shareQ" aria-label="Share a link to this question">🔗</button><button class="icon-btn flagb" data-act="flagQ" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
@@ -1223,6 +1224,12 @@ ACT.notYet=(d,b)=>{const was=markNotYet(d.k),t=TOPIC[d.k];
   toast(`"${t?t.name:"That topic"}" is out of your quizzes until you tick it in the Course map.`,3600);};
 ACT.undoNotYet=(d,b)=>{delete NOTYET[d.k];lsSet("notyet",NOTYET);if(d.was){TAUGHT[d.k]=true;lsSet("taught",TAUGHT);}if(b){b.textContent="Not done this topic yet";b.dataset.act="notYet";}toast("Undone");};
 ACT.report=()=>ACT.flagQ();
+ACT.shareQ=()=>{const q=RUN&&RUN.qs[RUN.i];if(q&&q.id)shareLink(qLink(q.id),"Rep Max question");};
+/* v1.17 links straight to a lesson or a question */
+function deepBase(){return location.origin+location.pathname+"?p="+PROFILE;}
+function lessonLink(key,i){const b=key.indexOf("|");return deepBase()+"#learn/"+key.slice(0,b)+"/"+encodeURIComponent(key.slice(b+1))+(i?"/"+i:"");}
+function qLink(id){return deepBase()+"#q/"+encodeURIComponent(id);}
+function shareLink(url,title){if(navigator.share&&COARSE){navigator.share({title,url}).catch(()=>{});}else copyText(url).then(()=>toast("Link copied: "+url,4200));}
 function shareText(t,msg){if(navigator.share){navigator.share({text:t}).then(()=>toast(msg,3600)).catch(()=>copyText(t).then(()=>toast(msg+" (copied)",3600)));}else copyText(t).then(()=>toast(msg+" The note is copied: paste it into a message.",4200));}
 ACT.nextQ=()=>{if(!RUN||!RUN.locked)return;RUN.i++;if(RUN.i>=RUN.qs.length)endRun();else showQ();};
 ACT.quitRun=()=>{if(RUN&&RUN.res&&RUN.res.length)askEnd("End this workout?","The questions you've answered so far still count.",()=>{clearInterval(RT);RUN=null;home();});else{clearInterval(RT);RUN=null;home();}};   // nothing is recorded for an unfinished daily challenge
@@ -1942,6 +1949,11 @@ if(DBG){window.addEventListener("resize",dbgShow);setInterval(dbgShow,1000);}
 function route(){
   const m=(location.hash||"").match(/^#join-([A-Za-z]{4})(?:-(?:gcse|alevel))?$/);
   if(m){history.replaceState(null,"",location.pathname+location.search);ACT.join({code:m[1].toUpperCase()});return;}
+  const h=location.hash||"",L=h.match(/^#learn\/([a-z_]+)\/([^\/]+)(?:\/(\d+))?$/),Q=h.match(/^#q\/([^\/]+)$/);
+  if(L){history.replaceState(null,"",location.pathname+location.search);home();let key=L[1]+"|";try{key+=decodeURIComponent(L[2]);}catch(e){key+=L[2];}
+    if(LESSONS[key]){openLesson(key,{});const n=+L[3]||0;if(n>0&&LSN){LSN.i=Math.min(LSN.sc.length-1,n);lessonDraw();}}else toast("That lesson is not in this course.",4200);return;}
+  if(Q){history.replaceState(null,"",location.pathname+location.search);home();let id=Q[1];try{id=decodeURIComponent(id);}catch(e){}
+    const q=BYID[id],one=q&&inst(q);if(one)startRun({mode:"gym",qs:[one],label:"Shared question",clock:false,key:"shared"});else toast("That question is not in this course.",4200);return;}
   home();
 }
 let READY=false;   // a join link opened while the questions are still loading is handled once they are in
