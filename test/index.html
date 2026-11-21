@@ -321,7 +321,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.12";
+const VERSION="1.12.1";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -617,6 +617,7 @@ function home(){
     ${dueN?`<button class="big hero" data-act="review"><span class="em">${icn("🔁")}</span><span><b>Today: ${dueN} due for review</b><span>Questions coming back at the right time, so they stick. About ${Math.max(1,Math.round(dueN*0.4))} min</span></span></button>`:todayGap()}
     <button class="big" data-act="daily"><span class="em">${icn("☀️")}</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>
     <button class="big" data-act="gym"><span class="em">${icn("🏋️")}</span><span><b>Solo gym</b><span>Quick 5, warm-ups, working sets, 1-rep max and weak spots</span></span></button>
+    ${learnTile()}
     <button class="big" data-act="sprint"><span class="em">${icn("⚡")}</span><span><b>Sprint</b><span>As many as you can before the clock runs out. Harder questions score more</span></span></button>
     <div class="grid2">
       <button class="big" data-act="hostSetup"><span class="em">${icn("📺")}</span><span><b>Host a quiz night</b><span>On a laptop or TV; friends join on their own devices</span></span></button>
@@ -794,6 +795,15 @@ ACT.flagLink=d=>{const l=((SPEC[d.s]||{}).links||[])[+d.i];if(!l)return;openRepo
 ACT.flagTip=d=>{const tp=((SPEC[d.s]||{}).tips||[])[+d.i];if(!tp)return;openReport({kind:"tip",id:d.s+"#"+d.i,noun:"exam tip",label:SUBJ[d.s]?SUBJ[d.s].name:"",detail:`Tip: ${tp.text}`});};
 ACT.reportsSend=()=>{const r=ST.reports||[];if(!r.length)return;shareText(`Rep Max reports · ${PRO.tag} · v${VERSION}\n`+r.map(x=>`${x.at} ${x.k} ${x.id||"-"} ${x.r}${x.n?": "+x.n:""}\n#RMREPORT ${x.k} ${x.id||"-"} ${x.r}`).join("\n"),"Your reports are ready to send.");};
 /* ---------- v1.12 Learn: short lessons before the questions ---------- */
+function learnTile(){const n=Object.keys(LESSONS).length;if(!n)return"";const r=Object.keys(LESSONS).filter(k=>ST.lread&&ST.lread[k]).length;
+  return `<button class="big" data-act="lessons"><span class="em">${icn("📖")}</span><span><b>Learn</b><span>Short lessons with worked examples, step by step: ${n} topic${n===1?"":"s"} so far${r?`, ${r} read`:""}</span></span></button>`;}
+ACT.lessons=()=>{setWide(false);const by={};for(const k of Object.keys(LESSONS)){const [s]=k.split("|");(by[s]=by[s]||[]).push(k);}
+  const subs=SKEYS.filter(s=>by[s]);
+  render(`<div class="wrap">${topBar("Learn")}<p class="small muted" style="margin-top:0">A short lesson on a topic: the idea, a worked example step by step, a question to check it, then practice. About 3 minutes each. More topics are coming.</p>
+  ${subs.map(s=>{const ord=[];for(const g of (SPEC[s]||{}).groups||[])for(const t of g.topics)if(LESSONS[s+"|"+t.id])ord.push(s+"|"+t.id);for(const k of by[s])if(!ord.includes(k))ord.push(k);
+    return `<div class="card"><h3>${icn(SUBJ[s].em,1)}${esc(SUBJ[s].name)}</h3><div class="list">${ord.map(k=>{const t=TOPIC[k],l=LESSONS[k];if(!t)return"";const rd=ST.lread&&ST.lread[k];
+      return `<button class="big" data-act="learn" data-k="${esc(k)}"><span class="em">${icn(rd?"✅":"📖")}</span><span><b>${esc(t.name)}</b><span>${esc(LKIND[l.kind]||"Lesson")}${rd?" · read":""}${topicMastered(t.s,t.id)?" · topic mastered":""}</span></span></button>`;}).join("")}</div></div>`;}).join("")}
+  </div>`,"lessons");};
 function lessonOk(l){const mc=m=>m&&typeof m.q==="string"&&Array.isArray(m.o)&&m.o.length===4&&Array.isArray(m.f)&&m.f.length===4&&Number.isInteger(m.a)&&m.a>=0&&m.a<4;
   return !!(l&&SUBJ[l.s]&&l.t&&Array.isArray(l.chunks)&&l.chunks.length&&l.example&&Array.isArray(l.example.steps)&&l.example.steps.length&&mc(l.selfx)&&mc(l.faded)&&(!l.hook||mc(l.hook)));}
 function ltx(s){return tex(s).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");}
@@ -836,7 +846,7 @@ LACT.back=()=>{if(LSN.i>0){LSN.i--;lessonDraw();}};
 LACT.step=()=>{LSN.shown++;LSN.keepScroll=true;lessonDraw();const s=document.querySelectorAll(".lessonov .lstep");if(s.length)s[s.length-1].scrollIntoView({block:"nearest",behavior:REDUCED?"auto":"smooth"});};
 LACT.pick=d=>{if(LSN.ans[d.id]!=null)return;LSN.ans[d.id]=+d.j;LSN.keepScroll=true;lessonDraw();const fb=document.querySelector(".lessonov .lfb");if(fb)fb.scrollIntoView({block:"nearest",behavior:REDUCED?"auto":"smooth"});};
 function closeLesson(){const ov=document.querySelector(".lessonov");if(ov)ov.remove();LSN=null;}
-LACT.close=()=>{const at=LSN?LSN.sc[LSN.i].k:"";closeLesson();if(VIEW==="tracker")tracker();};
+LACT.close=()=>{closeLesson();if(VIEW==="tracker")tracker();else if(VIEW==="lessons")ACT.lessons();};
 LACT.finish=()=>{const {key,t,from}=LSN;closeLesson();if(from==="run")return;if(topicQs(t.s,t.id).length)mapRun([key],t.name,key);else if(VIEW==="tracker")tracker();};
 LACT.flag=()=>{if(!LSN)return;const {l,t,sc,i,key}=LSN,cur=sc[i];const part=cur.k==="chunk"?"screen "+(cur.i+1):cur.k;
   const det={hook:()=>`Q: ${l.hook.q}\nOptions: ${l.hook.o.join(" | ")}\nMarked right: ${l.hook.o[l.hook.a]}`,chunk:()=>`${l.chunks[cur.i].h}: ${l.chunks[cur.i].b}`,
@@ -844,7 +854,7 @@ LACT.flag=()=>{if(!LSN)return;const {l,t,sc,i,key}=LSN,cur=sc[i];const part=cur.
     faded:()=>`Task: ${l.faded.task}\nQ: ${l.faded.q}\nMarked right: ${l.faded.o[l.faded.a]}`,remember:()=>`Mistake: ${l.trap||""}\nRecap: ${l.recap||""}`,end:()=>""}[cur.k];
   openReport({kind:"lesson",id:key+"#"+cur.k+(cur.k==="chunk"?cur.i+1:""),noun:"lesson",label:t.name+" ("+part+")",detail:det?det():""});};
 RPT_WHY.lesson=RPT_WHY.card;
-ACT.learn=d=>openLesson(d.k,{from:VIEW==="tracker"?"tracker":""});
+ACT.learn=d=>openLesson(d.k,{from:VIEW==="tracker"?"tracker":VIEW==="lessons"?"lessons":""});
 ACT.lessonEx=d=>openLesson(d.k,{from:"run",start:"example"});
 function learnChoice(key){const t=TOPIC[key];if(document.querySelector(".modal"))return;const o=document.createElement("div");o.className="modal";
   o.innerHTML=`<div class="mbox lchoice" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">${esc(t.name)}</b><div class="small muted" style="margin-top:4px">${ST.lread&&ST.lread[key]?"You've read the lesson on this one.":"New to this topic, or rusty: a short lesson first helps most."}</div>
