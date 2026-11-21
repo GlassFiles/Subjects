@@ -96,6 +96,13 @@ h3{font-size:calc(16px*var(--fs,1));font-weight:800}
 .qbox{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin:12px 0}
 .qtext{font-size:calc(19px*var(--fs,1));line-height:1.45;font-weight:600}
 .wide .qtext{font-size:calc(28px*var(--fs,1))}
+.fig{margin:12px 0 0;background:#f7f8fa;border-radius:12px;padding:6px 4px 2px;max-width:520px}
+.fig svg{display:block;width:100%;height:auto;font:11px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#333a46}
+.fig .fg{stroke:#d5dae2;stroke-width:.8}.fig .fz{stroke:#7d8696;stroke-width:1.2}.fig .fax{fill:none;stroke:#525b6b;stroke-width:1.2}
+.fig .fln{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}.fig .fdash{stroke-dasharray:6 4}
+.fig .fl0{stroke:#1f5fd1;fill:#1f5fd1}.fig .fl1{stroke:#d1452c;fill:#d1452c}.fig .fl2{stroke:#1d8a4c;fill:#1d8a4c}.fig .fl3{stroke:#8a3fc7;fill:#8a3fc7}
+.fig .fln.fl0,.fig .fln.fl1,.fig .fln.fl2,.fig .fln.fl3{fill:none}.fig .fd{stroke:none}.fig .flab{stroke:#f7f8fa;stroke-width:3px;paint-order:stroke;font-weight:700;font-size:12px}
+.fig .fpt{fill:#111;stroke:#fff;stroke-width:1.2}.fig .fplab{font-weight:700;font-size:12px;fill:#111;stroke:#f7f8fa;stroke-width:3px;paint-order:stroke}.fig .fbar{fill:#1f5fd1}.fig .faxl{font-size:11.5px;fill:#222}
 pre.code{background:#0a0c10;border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 0;margin:12px 0 0;overflow-x:auto;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;counter-reset:ln}
 .wide pre.code{font-size:calc(20px*var(--fs,1))}
 pre.code span{display:block;padding-left:44px;position:relative;white-space:pre}
@@ -321,7 +328,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.12.2";
+const VERSION="1.13";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -389,6 +396,55 @@ function tex(s){
   }).join("");
 }
 window.addEventListener("katex-ready",()=>{document.querySelectorAll(".tex-raw").forEach(el=>{try{el.outerHTML=katex.renderToString(el.dataset.tex,{throwOnError:false,output:"html"});}catch(e){}});});
+function figNum(v){const r=Math.round(v*1e6)/1e6;return String(r).replace("-","−");}
+function figHtml(f){
+  try{
+  if(!f||typeof f!=="object")return"";
+  const W=340,H=236,L=46,R=12,T=12,B=40,pw=W-L-R,ph=H-T-B;
+  const num=v=>typeof v==="number"&&isFinite(v);
+  let out=[],x0,x1,y0,y1,xs,ys,sx,sy;
+  const yr=f.y||[0,1];y0=+yr[0];y1=+yr[1];ys=+f.ystep||((y1-y0)/5);if(!(y1>y0)||!(ys>0))return"";
+  sy=v=>T+ph-(v-y0)/(y1-y0)*ph;
+  const ylines=[];for(let v=y0,i=0;v<=y1+1e-9&&i<41;v=y0+ys*++i)ylines.push(v);
+  const yEvery=ylines.length>11?2:1;
+  const txt=(x,y,t,a,extra)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a||"middle"}"${extra||""}>${esc(String(t))}</text>`;
+  ylines.forEach((v,i)=>{const y=sy(v);out.push(`<line class="fg" x1="${L}" x2="${L+pw}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`);
+    if(f.ynums!==false&&i%yEvery===0)out.push(txt(L-5,y+4,figNum(v),"end"));});
+  if(f.type==="bar"){
+    const cats=f.cats||[],vals=f.vals||[],n=cats.length;if(!n||vals.length!==n)return"";
+    const bw=pw/n;
+    cats.forEach((c,i)=>{const v=+vals[i];if(!num(v))return;const x=L+bw*i+bw*.18,top=sy(Math.min(Math.max(v,y0),y1));
+      out.push(`<rect class="fbar" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${(sy(Math.max(y0,0))-top).toFixed(1)}"/>`);
+      out.push(txt(L+bw*i+bw/2,T+ph+15,String(c).slice(0,14)));});
+  }else{
+    const xr=f.x||[0,1];x0=+xr[0];x1=+xr[1];xs=+f.xstep||((x1-x0)/5);if(!(x1>x0)||!(xs>0))return"";
+    sx=v=>L+(v-x0)/(x1-x0)*pw;
+    const xlines=[];for(let v=x0,i=0;v<=x1+1e-9&&i<41;v=x0+xs*++i)xlines.push(v);
+    const xEvery=xlines.length>9?2:1;
+    xlines.forEach((v,i)=>{const x=sx(v);out.push(`<line class="fg" y1="${T}" y2="${T+ph}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"/>`);
+      if(f.xnums!==false&&i%xEvery===0)out.push(txt(x,T+ph+15,figNum(v)));});
+    if(x0<0&&x1>0)out.push(`<line class="fz" y1="${T}" y2="${T+ph}" x1="${sx(0).toFixed(1)}" x2="${sx(0).toFixed(1)}"/>`);
+    if(y0<0&&y1>0)out.push(`<line class="fz" x1="${L}" x2="${L+pw}" y1="${sy(0).toFixed(1)}" y2="${sy(0).toFixed(1)}"/>`);
+    const cls=["fl0","fl1","fl2","fl3"];
+    const placed=[],spot=(x,y,w)=>{for(let k=0;k<6;k++){const hit=placed.some(b=>Math.abs(b[0]-x)<(b[2]+w)/2+4&&Math.abs(b[1]-y)<13);if(!hit)break;y=y+14>T+ph-2?y-28:y+14;}placed.push([x,y,w]);return y;};
+    const labs=[];
+    (f.lines||[]).slice(0,8).forEach((ln,j)=>{const ci=Number.isInteger(ln.c)?((ln.c%4)+4)%4:j%4;const P=(ln.pts||[]).filter(p=>Array.isArray(p)&&num(+p[0])&&num(+p[1])).map(p=>[+p[0],+p[1]]);if(!P.length)return;
+      if(ln.dots)P.forEach(p=>{if(p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1)out.push(`<circle class="fd ${cls[ci]}" cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}" r="3.6"/>`);});
+      else out.push(`<polyline class="fln ${cls[ci]}${ln.dash?" fdash":""}" clip-path="url(#fclip)" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
+      if(ln.label){const vis=P.filter(p=>p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1),e=vis[vis.length-1]||P[P.length-1],t=String(ln.label).slice(0,12),w=t.length*7+4;
+        const x=Math.min(Math.max(sx(e[0]),L+14),L+pw-4),y=Math.min(Math.max(sy(e[1])-6,T+11),T+ph-4);labs.push([x-w/2,y,w,t,"end",` class="flab ${cls[ci]}"`,x]);}});
+    (f.points||[]).slice(0,4).forEach(pt=>{const a=pt&&pt.at;if(!a||!num(+a[0])||!num(+a[1]))return;const x=sx(+a[0]),y=sy(+a[1]);
+      out.push(`<circle class="fpt" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4"/>`);
+      if(pt.label){const t=String(pt.label).slice(0,12),w=t.length*7+4,right=x+7>L+pw-30,lx=right?x-7:x+7,ly=y-7<T+10?y+17:y-7;placed.push([right?lx-w/2:lx+w/2,ly,w]);out.push(txt(lx,ly,t,right?"end":"start",' class="fplab"'));}});
+    labs.forEach(l=>{const y=spot(l[0],l[1],l[2]);out.push(txt(l[6],y,l[3],l[4],l[5]));});
+  }
+  out.push(`<rect class="fax" x="${L}" y="${T}" width="${pw}" height="${ph}"/>`);
+  if(f.xlabel)out.push(txt(L+pw/2,H-6,String(f.xlabel).slice(0,40),"middle",' class="faxl"'));
+  if(f.ylabel)out.push(`<text class="faxl" text-anchor="middle" transform="translate(11 ${(T+ph/2).toFixed(1)}) rotate(-90)">${esc(String(f.ylabel).slice(0,40))}</text>`);
+  const desc="Graph"+(f.ylabel?" of "+f.ylabel:"")+(f.xlabel?" against "+f.xlabel:"");
+  return `<div class="fig"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}"><defs><clipPath id="fclip"><rect x="${L}" y="${T}" width="${pw}" height="${ph}"/></clipPath></defs>${out.join("")}</svg></div>`;
+  }catch(e){return"";}
+}
 function codeHtml(c){if(!c)return"";return '<pre class="code">'+String(c).replace(/\t/g,"    ").split("\n").map(l=>"<span>"+(esc(l)||" ")+"</span>").join("")+"</pre>";}
 
 /* ---------- the question bank ----------
@@ -1045,7 +1101,7 @@ function showQ(){
    <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn flagb" data-act="flagQ" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
-   <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+   <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
    ${think?`<button class="btn block" id="showOpts" data-act="showOpts" style="margin-top:12px">Think of your answer, then show the options</button>`:""}
    <div class="opts${conf?" conf":""}${think?" hide":""}">${perm.map((k,i)=>conf?`<div class="orow"><button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button><button class="gq" data-act="pickGuess" data-i="${i}" data-silent="1" aria-label="Guess this answer">?</button></div>`:`<button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
    ${conf?`<div class="small muted" style="margin-top:8px">Not sure? Tap the <b>?</b> beside your answer.</div>`:""}
@@ -1120,7 +1176,7 @@ function endRun(){
    ${daily&&!RUN.practice?`<div class="grid-emoji" style="margin-top:12px">${ST.daily[RUN.date].grid}</div><div class="row" style="justify-content:center;margin-top:12px"><button class="btn go" data-act="shareDaily">Share result</button></div>`:""}
    </div>
    ${tip?`<div class="card tipcard"><div class="small muted">Exam tip · ${icn(SUBJ[tipS].em,1)}${esc(SUBJ[tipS].name)}</div><div style="margin-top:6px;font-weight:650">${esc(tip.text)}</div>${tip.src?`<a class="small muted" style="display:inline-block;margin-top:6px" href="${esc(tip.src)}" target="_blank" rel="noopener">Source (opens an outside site)</a>`:""} <button class="linkb rptl" data-act="flagTip" data-s="${tipS}" data-i="${tipI}">🚩 Report</button></div>`:""}
-   ${missed.length?`<div class="card"><h3>Review your misses</h3><div class="list">${missed.map(i=>{const q=RUN.qs[i],c=CARDS[keyOf(q)];return `<div class="topic" style="display:block"><div class="row" style="margin-bottom:6px">${subjTag(q.s)}<span class="small muted">${esc(topicOf(q).name)}</span></div><div>${tex(q.q)}</div>${codeHtml(q.code)}<div style="margin-top:8px"><b style="color:var(--lime)">Answer:</b> ${tex(q.o[q.a])}</div><div class="small muted" style="margin-top:4px">${tex(q.x||"")}</div>${c?`<div class="small" style="margin-top:6px"><b>Key idea:</b> ${tex(c.key)}</div>`:""}<div style="margin-top:6px"><button class="linkb" data-act="report" data-i="${i}">Report a problem</button></div></div>`;}).join("")}</div></div>`:""}
+   ${missed.length?`<div class="card"><h3>Review your misses</h3><div class="list">${missed.map(i=>{const q=RUN.qs[i],c=CARDS[keyOf(q)];return `<div class="topic" style="display:block"><div class="row" style="margin-bottom:6px">${subjTag(q.s)}<span class="small muted">${esc(topicOf(q).name)}</span></div><div>${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}<div style="margin-top:8px"><b style="color:var(--lime)">Answer:</b> ${tex(q.o[q.a])}</div><div class="small muted" style="margin-top:4px">${tex(q.x||"")}</div>${c?`<div class="small" style="margin-top:6px"><b>Key idea:</b> ${tex(c.key)}</div>`:""}<div style="margin-top:6px"><button class="linkb" data-act="report" data-i="${i}">Report a problem</button></div></div>`;}).join("")}</div></div>`:""}
    <div class="row">${daily?"":`<button class="btn go" data-act="again">Go again</button>`}<button class="btn" data-act="home">Home</button></div></div>`,"end");
   RUN.done=true;
 }
@@ -1292,7 +1348,7 @@ ACT.mkBuild=()=>{
   q.o=o;q.a=MK_RIGHT;q.x=$("#mk_x").value.trim();
   const errs=[];if(!q.q)errs.push("Write the question.");if(o.some(x=>!x))errs.push("Fill in all four options.");if(new Set(o).size<4)errs.push("Options must all be different.");if(!q.x)errs.push("Add an explanation.");
   const line=JSON.stringify(q);
-  $("#mk_out").innerHTML=`<div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(s)}${lvTag(q.lv)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+  $("#mk_out").innerHTML=`<div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(s)}${lvTag(q.lv)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
    <div class="opts">${o.map((x,i)=>`<div class="opt o${i} ${i===q.a?"right":""}"><span class="sh">${SHAPES[i]}</span><span>${tex(x)}</span></div>`).join("")}</div>
    <div class="feedback">${tex(q.x)}</div></div>
    ${errs.length?`<p class="err">${errs.map(esc).join(" ")}</p>`:`<div class="card"><h3>Your line for data/${PROFILE}/${s}.jsonl</h3><div class="kbd" id="mk_line">${esc(line)}</div><button class="btn" style="margin-top:8px" data-act="mkCopy">Copy line</button></div>`}`;
@@ -1465,7 +1521,7 @@ function broadcast(o){if(!H)return;for(const c of H.conns.values())hsend(c,o);}
 function playerList(){return [...H.players.values()].map(p=>({pid:p.pid,name:p.name,badge:p.badge,online:!!(p.online||p.host)}));}
 function boardList(){return [...H.players.values()].sort((a,b)=>b.score-a.score||(a.tsum||0)-(b.tsum||0)).map((p,i)=>({pid:p.pid,name:p.name,badge:p.badge,score:p.score,pos:i+1}));}
 function lobbyMsg(){return{t:"lobby",players:playerList(),code:H.code,subs:HS.subs.map(s=>SUBJ[s].name),n:H.qs.length};}
-function qMsg(){const q=H.cur.q;return{t:"q",n:H.i,total:H.qs.length,dur:H.cur.dur,left:Math.max(0,H.cur.dur*1000-(Date.now()-H.cur.start)),q:{id:q.id,s:q.s,t:topicOf(q).name,lv:q.lv,q:q.q,code:q.code||"",o:H.cur.perm.map(k=>q.o[k])}};}
+function qMsg(){const q=H.cur.q;return{t:"q",n:H.i,total:H.qs.length,dur:H.cur.dur,left:Math.max(0,H.cur.dur*1000-(Date.now()-H.cur.start)),q:{id:q.id,s:q.s,t:topicOf(q).name,lv:q.lv,q:q.q,code:q.code||"",fig:q.fig||null,o:H.cur.perm.map(k=>q.o[k])}};}
 function stateFor(pid){
   if(H.phase==="lobby")return lobbyMsg();
   if(H.phase==="q"){const m=qMsg();m.mine=H.answers.has(pid)?H.answers.get(pid).c:null;return m;}
@@ -1542,7 +1598,7 @@ function hostRender(){
     render(`<div class="wrap">${top}
     <div class="row"><span class="chip">Question ${H.i+1}/${H.qs.length}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="muted small">${esc(q.t)}</span><span class="spacer"></span><span class="chip" id="hAns">${H.answers.size} / ${activeCount()} answered</span><span class="big-num" id="hSec" style="font-size:34px;min-width:50px;text-align:right">${Math.ceil(m.left/1000)}</span></div>
     <div class="timer" id="tm"><i></i><b></b></div>
-    <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+    <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
     <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i}" ${HS.play&&!mine?`data-act="hPick" data-i="${i}" data-silent="1"`:"disabled"}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div></div>
     <div class="row"><div class="pchips" id="hPlayers">${playerChips()}</div><span class="spacer"></span><span class="muted" id="hLock">${mine?"🔒 Your answer is in":""}</span><button class="icon-btn flagb" data-act="flagH" aria-label="Report this question">🚩</button><button class="btn" data-act="hReveal">Reveal now</button></div></div>`,"host");
     return;
@@ -1551,7 +1607,7 @@ function hostRender(){
     const r=H.lastRev,q=H.cur.q;
     render(`<div class="wrap">${top}
     <div class="row"><span class="chip">Question ${H.i+1}/${H.qs.length}</span>${subjTag(q.s)}${lvTag(q.lv)}</div>
-    <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+    <div class="qbox hostq"><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
     <div class="opts">${r.q.o.map((o,i)=>`<div class="opt o${i} ${i===r.a?"right":"dim"}"><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span><span class="mark">${r.counts[i]}</span></div>`).join("")}</div>
     <div class="feedback ok"><b>Why:</b> ${tex(r.x)}</div></div>
     <div class="grid2"><div class="card"><h3>Leaderboard</h3>${boardHtml(boardList().slice(0,6))}</div>
@@ -1669,7 +1725,7 @@ function plRenderQ(){
   render(`<div class="wrap">${plTop()}
   <div class="row"><span class="chip">Q ${PL.n+1}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="spacer"></span><button class="icon-btn flagb" data-act="flagPL" aria-label="Report this question">🚩</button><b id="plSec" style="font-size:22px"></b></div>
   <div class="timer" id="tm"><i></i><b></b></div>
-  <div class="qbox"><div class="small muted" style="margin-bottom:6px">${esc(q.t)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+  <div class="qbox"><div class="small muted" style="margin-bottom:6px">${esc(q.t)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
   <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i} ${PL.mine!=null?(PL.mine===i?"mine":"dim"):""}" data-act="plPick" data-i="${i}" data-silent="1" ${PL.mine!=null?"disabled":""}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div>
   <div id="plMsg" class="center muted" style="margin-top:12px">${PL.mine!=null?"🔒 Locked in. Waiting for the others…":""}</div></div></div>`,"play");
   tmSet($("#tm"),PL.dur*1000-(Date.now()-PL.start),PL.dur*1000);PL.timer=setInterval(()=>{const left=PL.dur*1000-(Date.now()-PL.start),el=$("#tm");if(!el)return clearInterval(PL.timer);tmSet(el,left,PL.dur*1000);const s=$("#plSec");if(s)s.textContent=Math.max(0,Math.ceil(left/1000));if(left<=0){clearInterval(PL.timer);if(PL.mine==null){document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;b.classList.add("dim");});const m=$("#plMsg");if(m)m.textContent="⏱ Time's up";}}},200);
@@ -1747,7 +1803,7 @@ function spNext(){
    <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn flagb" data-act="flagSP" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   <div class="timer" id="tm"><i></i><b></b></div>
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">+${SP_PTS[q.lv]} pt${SP_PTS[q.lv]>1?"s":""}</span></div>
-   <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}
+   <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
    <div class="opts">${SP.perm.map((k,i)=>`<button class="opt o${i}" data-act="spPick" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
    <div class="row" style="margin-top:12px"><span class="spacer"></span><button class="btn" data-act="spSkip">Skip (−${SP_SKIP} s)</button></div></div></div>`,"sprintq");
   spTick();
