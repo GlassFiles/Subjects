@@ -102,6 +102,12 @@ h3{font-size:calc(16px*var(--fs,1));font-weight:800}
 .fig .fln{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}.fig .fdash{stroke-dasharray:6 4}
 .fig .fl0{stroke:#1f5fd1;fill:#1f5fd1}.fig .fl1{stroke:#d1452c;fill:#d1452c}.fig .fl2{stroke:#1d8a4c;fill:#1d8a4c}.fig .fl3{stroke:#8a3fc7;fill:#8a3fc7}
 .fig .fln.fl0,.fig .fln.fl1,.fig .fln.fl2,.fig .fln.fl3{fill:none}.fig .fd{stroke:none}.fig .flab{stroke:#f7f8fa;stroke-width:3px;paint-order:stroke;font-weight:700;font-size:12px}
+.fig .fnew{animation:fnew .5s ease-out}@keyframes fnew{from{opacity:0}to{opacity:1}}
+.fig .fctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 4px 4px}
+.fig .fctl button{min-height:44px;min-width:44px;padding:0 14px;border-radius:12px;background:#fff;border:1px solid #c9d0db;color:#1d2430;font-weight:800;font-size:calc(15px*var(--fs,1))}
+.fig .fctl button:disabled{opacity:.4}.fig .fctl .fpos{color:#475062;font-size:calc(14px*var(--fs,1));font-weight:700}
+.fig .fctl input[type=range]{flex:1;min-width:120px;height:44px;accent-color:#1f5fd1;margin:0}
+.fig .fcap{color:#1d2430;font-size:calc(15px*var(--fs,1));line-height:1.4;padding:0 6px 6px;min-height:1.4em}
 .fig .fpt{fill:#111;stroke:#fff;stroke-width:1.2}.fig .fplab{font-weight:700;font-size:12px;fill:#111;stroke:#f7f8fa;stroke-width:3px;paint-order:stroke}.fig .fbar{fill:#1f5fd1}.fig .faxl{font-size:11.5px;fill:#222}
 pre.code{background:#0a0c10;border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 0;margin:12px 0 0;overflow-x:auto;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;counter-reset:ln}
 .wide pre.code{font-size:calc(20px*var(--fs,1))}
@@ -328,7 +334,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.15";
+const VERSION="1.17";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -402,7 +408,7 @@ function figCat(x,y,t,two){let sp=t.indexOf(" "),a,b;if(sp>=0){a=t.slice(0,sp);b
   if(a==null)return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" style="font-size:10px">${esc(t)}</text>`;
   return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" style="font-size:10px"><tspan x="${x.toFixed(1)}">${esc(a)}</tspan><tspan x="${x.toFixed(1)}" dy="11">${esc(b)}</tspan></text>`;}
 function figNum(v){const r=Math.round(v*1e6)/1e6;if(Math.abs(r*1000-Math.round(r*1000))>1e-6){for(let d=2;d<=12;d++){const n=Math.round(r*d);if(Math.abs(n/d-r)<1e-6)return (n<0?"−":"")+Math.abs(n)+"/"+d;}return String(Math.round(r*1000)/1000).replace("-","−");}return String(r).replace("-","−");}
-function figHtml(f){
+function figSvg(f){
   try{
   if(!f||typeof f!=="object")return"";
   const W=340,R=12,B=40,cid="fclip"+(++FIGN);let H=236,L=46,T=12,pw=W-L-R,ph=H-T-B;
@@ -427,27 +433,91 @@ function figHtml(f){
     const xlines=[];for(let v=x0,i=0;v<=x1+1e-9&&i<41;v=x0+xs*++i)xlines.push(v);
     const xEvery=xlines.length>9?2:1;
     xlines.forEach((v,i)=>{const x=sx(v);out.push(`<line class="fg" y1="${T}" y2="${T+ph}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"/>`);
-      if(f.xnums!==false&&i%xEvery===0)out.push(txt(x,T+ph+15,figNum(v)));});
+      if(f.xnums!==false&&i%xEvery===0){const t=figNum(v),hw=t.length*3.4;out.push(x+hw>W-1?txt(W-1,T+ph+15,t,"end"):txt(x,T+ph+15,t));}});
     if(x0<0&&x1>0)out.push(`<line class="fz" y1="${T}" y2="${T+ph}" x1="${sx(0).toFixed(1)}" x2="${sx(0).toFixed(1)}"/>`);
     if(y0<0&&y1>0)out.push(`<line class="fz" x1="${L}" x2="${L+pw}" y1="${sy(0).toFixed(1)}" y2="${sy(0).toFixed(1)}"/>`);
     const cls=["fl0","fl1","fl2","fl3"];
     const placed=[],spot=(x,y,w)=>{for(let k=0;k<6;k++){const hit=placed.some(b=>Math.abs(b[0]-x)<(b[2]+w)/2+4&&Math.abs(b[1]-y)<13);if(!hit)break;y=y+14>T+ph-2?y-28:y+14;}placed.push([x,y,w]);return y;};
     const labs=[];
     (f.lines||[]).slice(0,12).forEach((ln,j)=>{const ci=Number.isInteger(ln.c)?((ln.c%4)+4)%4:j%4;const P=(ln.pts||[]).filter(p=>Array.isArray(p)&&num(+p[0])&&num(+p[1])).map(p=>[+p[0],+p[1]]);if(!P.length)return;
-      if(ln.dots)P.forEach(p=>{if(p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1)out.push(`<circle class="fd ${cls[ci]}" cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}" r="3.6"/>`);});
-      else out.push(`<polyline class="fln ${cls[ci]}${ln.dash?" fdash":""}" clip-path="url(#${cid})" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
+      if(ln.dots)P.forEach(p=>{if(p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1)out.push(`<circle class="fd ${cls[ci]}${ln._new?" fnew":""}" cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}" r="3.6"/>`);});
+      else out.push(`<polyline class="fln ${cls[ci]}${ln.dash?" fdash":""}${ln._new?" fnew":""}" clip-path="url(#${cid})" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
       if(ln.label){const vis=P.filter(p=>p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1),e=vis[vis.length-1]||P[P.length-1],t=String(ln.label).slice(0,18),w=t.length*7+4;
         const x=Math.min(Math.max(sx(e[0]),L+14),L+pw-4),y=Math.min(Math.max(sy(e[1])-6,T+11),T+ph-4);labs.push([x-w/2,y,w,t,"end",` class="flab ${cls[ci]}"`,x]);}});
     (f.points||[]).slice(0,6).forEach(pt=>{const a=pt&&pt.at;if(!a||!num(+a[0])||!num(+a[1]))return;const x=sx(+a[0]),y=sy(+a[1]);
-      out.push(`<circle class="fpt" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4"/>`);
-      if(pt.label){const t=String(pt.label).slice(0,18),w=t.length*7+4,right=x+7+w>W-4,lx=right?x-7:x+7,ly=y-7<T+10?y+17:y-7;placed.push([right?lx-w/2:lx+w/2,ly,w]);out.push(txt(lx,ly,t,right?"end":"start",' class="fplab"'));}});
+      out.push(`<circle class="fpt${pt._new?" fnew":""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4"/>`);
+      if(pt.label){const t=String(pt.label).slice(0,18),w=t.length*7+4,right=x+7+w>W-4,lx=right?x-7:x+7,ly=y-7<T+10?y+17:y-7;const cy=spot(right?lx-w/2:lx+w/2,ly,w);out.push(txt(lx,cy,t,right?"end":"start",' class="fplab"'));}});
     labs.forEach(l=>{const y=spot(l[0],l[1],l[2]);out.push(txt(l[6],y,l[3],l[4],l[5]));});
   }
   out.push(`<rect class="fax" x="${L}" y="${T}" width="${pw}" height="${ph}"/>`);
   if(f.xlabel)out.push(txt(L+pw/2,H-6,String(f.xlabel).slice(0,40),"middle",' class="faxl"'));
   if(f.ylabel)out.push(`<text class="faxl" text-anchor="middle" transform="translate(11 ${(T+ph/2).toFixed(1)}) rotate(-90)">${esc(String(f.ylabel).slice(0,40))}</text>`);
   const desc="Graph"+(f.ylabel?" of "+f.ylabel:"")+(f.xlabel?" against "+f.xlabel:"");
-  return `<div class="fig"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}"><defs><clipPath id="${cid}"><rect x="${L}" y="${T}" width="${pw}" height="${ph}"/></clipPath></defs>${out.join("")}</svg></div>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}"><defs><clipPath id="${cid}"><rect x="${L}" y="${T}" width="${pw}" height="${ph}"/></clipPath></defs>${out.join("")}</svg>`;
+  }catch(e){return"";}
+}
+/* ---------- animated figures (v1.16) ---------- */
+const FIGA={};let FIGAN=0;
+const figInt=v=>Number.isInteger(v)&&v>0;
+function figKind(f){if(!f||typeof f!=="object"||f.type==="bar")return"";
+  if(f.anim==="steps"){const n=Array.isArray(f.steps)?f.steps.length:0;const has=[...(f.lines||[]),...(f.points||[])].some(x=>x&&figInt(x.step));return n>=2&&n<=12&&has?"steps":"";}
+  if(f.anim==="draw")return (f.lines||[]).length?"draw":"";
+  if(f.anim==="frames"){const n=Array.isArray(f.frames)?f.frames.length:0,c=f.ctl||{};return n>=2&&n<=61&&Array.isArray(c.vals)&&c.vals.length===n?"frames":"";}
+  return"";}
+function figLen(P,f){const dx=(+f.x[1]-+f.x[0])||1,dy=(+(f.y||[0,1])[1]-+(f.y||[0,1])[0])||1,c=[0];for(let i=1;i<P.length;i++)c.push(c[i-1]+Math.hypot((P[i][0]-P[i-1][0])/dx,(P[i][1]-P[i-1][1])/dy));return c;}
+function figCut(P,f,u){if(u>=1)return P;if(u<=0||P.length<2)return [P[0]];const c=figLen(P,f),L=c[c.length-1]*u;let i=1;while(i<P.length&&c[i]<L)i++;if(i>=P.length)return P;
+  const a=P[i-1],b=P[i],r=c[i]>c[i-1]?(L-c[i-1])/(c[i]-c[i-1]):0;return [...P.slice(0,i),[a[0]+(b[0]-a[0])*r,a[1]+(b[1]-a[1])*r]];}
+function figNumR(v,dp){const m=Math.pow(10,dp);return String(Math.round(v*m)/m).replace("-","−");}
+// the still fig for one state of an animated fig; A.k is the step or frame, A.t the drawing's progress (0 to 1)
+function figState(A){const f=A.f,k=A.k;
+  if(A.kind==="steps"){const sel=a=>(a||[]).map((x,j)=>x&&a===f.lines&&!Number.isInteger(x.c)?{...x,c:j}:x).filter(x=>!(x&&figInt(x.step)&&x.step>k)).map(x=>x&&x.step===k&&A.moved?{...x,_new:1}:x);
+    return {fig:{...f,lines:sel(f.lines),points:sel(f.points)},cap:String(f.steps[k-1]||"")};}
+  if(A.kind==="frames"){const fr=f.frames[k]||{};return {fig:{...f,lines:[...(f.lines||[]),...(fr.lines||[])],points:[...(f.points||[]),...(fr.points||[])]},cap:(Array.isArray(fr.read)?fr.read:[]).map(String).join("  ·  ")};}
+  const lines=(f.lines||[]).map((l,j)=>({...l,c:Number.isInteger(l.c)?l.c:j})),ph=[...new Set(lines.map(l=>l.step).filter(figInt))].sort((a,b)=>a-b);
+  const nP=ph.length||1,t=Math.max(0,Math.min(1,A.t)),p=Math.min(nP-1,Math.floor(t*nP)),u=t>=1?1:t*nP-p;
+  let tip=null;const outL=[];
+  lines.forEach(l=>{const P=(l.pts||[]).filter(q=>Array.isArray(q)&&isFinite(+q[0])&&isFinite(+q[1])).map(q=>[+q[0],+q[1]]);
+    const q=ph.length?ph.indexOf(l.step):0;if(ph.length&&q<0){outL.push(l);return;}
+    if(q<p||t>=1){outL.push(l);return;}if(q>p)return;
+    const C=l.dots?P.slice(0,Math.max(1,Math.round(P.length*u))):figCut(P,f,u);if(!C.length)return;outL.push({...l,pts:C});if(!tip)tip=C[C.length-1];});
+  const pts=(f.points||[]).filter(pt=>{if(t>=1)return true;const q=pt&&figInt(pt.step)?ph.indexOf(pt.step):-1;return q>=0&&q<p;});
+  if(f.pen&&tip&&t<1)pts.push({at:tip});
+  const rd=Array.isArray(f.read)&&f.read.length===2&&tip&&t<1?`${f.read[0]} = ${figNumR(tip[0],+f.dp>=0?+f.dp:1)},  ${f.read[1]} = ${figNumR(tip[1],+f.dp>=0?+f.dp:1)}`:"";
+  return {fig:{...f,lines:outL,points:pts},cap:rd||(t>=1?String(f.cap||""):"")};}
+function figCtl(id,A){const n=A.kind==="steps"?A.f.steps.length:A.kind==="frames"?A.f.frames.length:0;
+  if(A.kind==="steps")return `<button data-fa="prev" data-id="${id}" aria-label="Back a step"${A.k<=1?" disabled":""}>◀</button><span class="fpos">Step ${A.k} of ${n}</span><button data-fa="next" data-id="${id}"${A.k>=n?" disabled":""}>Next step ▶</button>`;
+  if(A.kind==="draw")return `<button data-fa="draw" data-id="${id}">${A.timer?"Drawing…":"↻ Replay"}</button>`;
+  const c=A.f.ctl,lab=`<span class="fpos">${esc(String(c.label||""))} = ${esc(String(c.vals[A.k]))}</span>`,rng=`<input type="range" data-fa="sl" data-id="${id}" min="0" max="${n-1}" step="1" value="${A.k}" aria-label="${esc(String(c.label||"value"))}">`;
+  return c.type==="play"?`<button data-fa="play" data-id="${id}">${A.timer?"❚❚ Pause":"▶ Play"}</button>${rng}${lab}`:`${rng}${lab}`;}
+function figPaint(id){const A=FIGA[id],el=document.getElementById(id);if(!A)return false;if(!el){figStop(A);delete FIGA[id];return false;}
+  const s=figState(A),v=el.querySelector(".fsv"),c=el.querySelector(".fctl"),p=el.querySelector(".fcap");
+  if(v)v.innerHTML=figSvg(s.fig);if(p)p.textContent=s.cap;
+  if(c){const r=c.querySelector("input[type=range]");if(r&&document.activeElement===r){r.value=A.k;const l=c.querySelector(".fpos");if(l)l.textContent=`${A.f.ctl.label||""} = ${A.f.ctl.vals[A.k]}`;const b=c.querySelector("[data-fa=play]");if(b)b.textContent=A.timer?"❚❚ Pause":"▶ Play";}else c.innerHTML=figCtl(id,A);}
+  return true;}
+function figStop(A){if(A&&A.timer){clearInterval(A.timer);A.timer=null;}}
+function figRun(id){const A=FIGA[id];if(!A)return;figStop(A);
+  if(A.kind==="draw"){const ms=Math.max(800,Math.min(8000,+A.f.ms||2500)),t0=Date.now();A.t=0;
+    A.timer=setInterval(()=>{A.t=Math.min(1,(Date.now()-t0)/ms);if(A.t>=1)figStop(A);if(!figPaint(id))figStop(A);},40);figPaint(id);}
+  else if(A.kind==="frames"){const n=A.f.frames.length,ms=Math.max(40,Math.min(1000,+A.f.ms||150));if(A.k>=n-1)A.k=0;
+    A.timer=setInterval(()=>{A.k++;if(A.k>=n-1){A.k=n-1;figStop(A);}if(!figPaint(id))figStop(A);},ms);figPaint(id);}}
+function figAct(id,a){const A=FIGA[id];if(!A)return;
+  if(a==="prev"&&A.k>1){A.k--;A.moved=0;}else if(a==="next"&&A.k<A.f.steps.length){A.k++;A.moved=1;}
+  else if(a==="draw"){figRun(id);return;}else if(a==="play"){if(A.timer){figStop(A);}else{figRun(id);return;}}
+  figPaint(id);}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-fa]");if(!b)return;e.stopPropagation();if(b.tagName==="BUTTON"){e.preventDefault();figAct(b.dataset.id,b.dataset.fa);}},true);
+document.addEventListener("input",e=>{const b=e.target.closest&&e.target.closest("input[data-fa]");if(!b)return;e.stopPropagation();const A=FIGA[b.dataset.id];if(!A)return;figStop(A);A.k=Math.max(0,Math.min(A.f.frames.length-1,+b.value|0));figPaint(b.dataset.id);},true);
+["pointerdown","touchstart","mousedown"].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest(".fctl"))e.stopPropagation();},true));
+function figHtml(f){
+  try{
+  const kind=figKind(f);
+  if(!kind){if(f&&f.anim){const g={...f};if(f.anim==="frames"&&Array.isArray(f.frames)&&f.frames.length){const fr=f.frames[Math.min(f.frames.length-1,Math.max(0,(f.ctl&&f.ctl.start)|0))]||{};g.lines=[...(f.lines||[]),...(fr.lines||[])];g.points=[...(f.points||[]),...(fr.points||[])];}const s=figSvg(g);return s?`<div class="fig">${s}</div>`:"";}
+    const s=figSvg(f);return s?`<div class="fig">${s}</div>`:"";}
+  if(Object.keys(FIGA).length>60)for(const k of Object.keys(FIGA))if(!document.getElementById(k)){figStop(FIGA[k]);delete FIGA[k];}
+  const id="fa"+(++FIGAN),A={f,kind,k:kind==="steps"?1:kind==="frames"?Math.min(f.frames.length-1,Math.max(0,(f.ctl&&f.ctl.start)|0)):0,t:1,timer:null,moved:0};
+  FIGA[id]=A;
+  if(kind==="draw"&&!REDUCED){A.t=0;setTimeout(()=>{if(document.getElementById(id))figRun(id);},250);}
+  const s=figState(A),svg=figSvg(s.fig);if(!svg){delete FIGA[id];return"";}
+  return `<div class="fig fanim" id="${id}" data-kind="${kind}"><div class="fsv">${svg}</div><div class="fctl">${figCtl(id,A)}</div><div class="fcap" aria-live="polite">${esc(s.cap)}</div></div>`;
   }catch(e){return"";}
 }
 function codeHtml(c){if(!c)return"";return '<pre class="code">'+String(c).replace(/\t/g,"    ").split("\n").map(l=>"<span>"+(esc(l)||" ")+"</span>").join("")+"</pre>";}
@@ -896,7 +966,7 @@ function lessonDraw(){const ov=document.querySelector(".lessonov");if(!ov||!LSN)
     body=`<div class="lkind">Done</div><h2>${esc(t.name)}</h2><div>${run?"Back to your workout: the questions are what make it stick.":qs?"Now practise it. Answering questions, spread over a few days, is what makes it stick.":"There are no practice questions on this topic yet."}</div>`;
     nextLbl=run?"Back to your workout":qs?"Practise this topic":"Close";}
   const intro=i===0&&l.why?`<div class="small muted" style="margin-bottom:10px">${ltx(l.why)}</div>`:"";
-  ov.innerHTML=`<div class="lsn"><div class="lhead"><b>📖 ${esc(t.name)}</b><button class="linkb" data-la="flag" style="min-height:44px">🚩 Report</button><button class="lx" data-la="close" aria-label="Close">✕</button></div>
+  ov.innerHTML=`<div class="lsn"><div class="lhead"><b>📖 ${esc(t.name)}</b><button class="linkb" data-la="share" style="min-height:44px;min-width:44px" aria-label="Share a link to this lesson">🔗</button><button class="linkb" data-la="flag" style="min-height:44px">🚩 Report</button><button class="lx" data-la="close" aria-label="Close">✕</button></div>
   <div class="ldots">${sc.map((x,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div>
   <div class="lbody">${intro}${body}</div>
   <div class="lfoot">${i>0?`<button class="btn lback" data-la="back" aria-label="Back">←</button>`:""}<button class="btn go" data-la="${cur.k==="end"?"finish":"next"}" ${canNext?"":"disabled"}>${esc(nextLbl)}</button></div></div>`;
@@ -909,6 +979,7 @@ LACT.pick=d=>{if(LSN.ans[d.id]!=null)return;LSN.ans[d.id]=+d.j;LSN.keepScroll=tr
 function closeLesson(){const ov=document.querySelector(".lessonov");if(ov)ov.remove();LSN=null;}
 LACT.close=()=>{closeLesson();if(VIEW==="tracker")tracker();else if(VIEW==="lessons")ACT.lessons();};
 LACT.finish=()=>{const {key,t,from}=LSN;closeLesson();if(from==="run")return;if(topicQs(t.s,t.id).length)mapRun([key],t.name,key);else if(VIEW==="tracker")tracker();};
+LACT.share=()=>{if(LSN)shareLink(lessonLink(LSN.key,LSN.i),"Rep Max lesson: "+LSN.t.name);};
 LACT.flag=()=>{if(!LSN)return;const {l,t,sc,i,key}=LSN,cur=sc[i];const part=cur.k==="chunk"?"screen "+(cur.i+1):cur.k;
   const det={hook:()=>`Q: ${l.hook.q}\nOptions: ${l.hook.o.join(" | ")}\nMarked right: ${l.hook.o[l.hook.a]}`,chunk:()=>`${l.chunks[cur.i].h}: ${l.chunks[cur.i].b}`,
     example:()=>`Task: ${l.example.task}\n${l.example.steps.map((s,j)=>(j+1)+". "+s.do).join("\n")}\nAnswer: ${l.example.answer||""}`,selfx:()=>`Q: ${l.selfx.q}\nMarked right: ${l.selfx.o[l.selfx.a]}`,
@@ -1103,7 +1174,7 @@ function showQ(){
   render(`<div class="wrap">
   <div class="top"><button class="icon-btn" data-act="quitRun" aria-label="Quit">✕</button>
    <div class="hud"><span class="chip">${RUN.mode==="daily"?"Daily · ":""}Rep ${RUN.i+1}/${RUN.qs.length}</span>${RUN.combo>=2?`<span class="combo">🔥 x${RUN.combo}</span>`:""}</div>
-   <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn flagb" data-act="flagQ" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
+   <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn" data-act="shareQ" aria-label="Share a link to this question">🔗</button><button class="icon-btn flagb" data-act="flagQ" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
   <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
@@ -1153,6 +1224,12 @@ ACT.notYet=(d,b)=>{const was=markNotYet(d.k),t=TOPIC[d.k];
   toast(`"${t?t.name:"That topic"}" is out of your quizzes until you tick it in the Course map.`,3600);};
 ACT.undoNotYet=(d,b)=>{delete NOTYET[d.k];lsSet("notyet",NOTYET);if(d.was){TAUGHT[d.k]=true;lsSet("taught",TAUGHT);}if(b){b.textContent="Not done this topic yet";b.dataset.act="notYet";}toast("Undone");};
 ACT.report=()=>ACT.flagQ();
+ACT.shareQ=()=>{const q=RUN&&RUN.qs[RUN.i];if(q&&q.id)shareLink(qLink(q.id),"Rep Max question");};
+/* v1.17 links straight to a lesson or a question */
+function deepBase(){return location.origin+location.pathname+"?p="+PROFILE;}
+function lessonLink(key,i){const b=key.indexOf("|");return deepBase()+"#learn/"+key.slice(0,b)+"/"+encodeURIComponent(key.slice(b+1))+(i?"/"+i:"");}
+function qLink(id){return deepBase()+"#q/"+encodeURIComponent(id);}
+function shareLink(url,title){if(navigator.share&&COARSE){navigator.share({title,url}).catch(()=>{});}else copyText(url).then(()=>toast("Link copied: "+url,4200));}
 function shareText(t,msg){if(navigator.share){navigator.share({text:t}).then(()=>toast(msg,3600)).catch(()=>copyText(t).then(()=>toast(msg+" (copied)",3600)));}else copyText(t).then(()=>toast(msg+" The note is copied: paste it into a message.",4200));}
 ACT.nextQ=()=>{if(!RUN||!RUN.locked)return;RUN.i++;if(RUN.i>=RUN.qs.length)endRun();else showQ();};
 ACT.quitRun=()=>{if(RUN&&RUN.res&&RUN.res.length)askEnd("End this workout?","The questions you've answered so far still count.",()=>{clearInterval(RT);RUN=null;home();});else{clearInterval(RT);RUN=null;home();}};   // nothing is recorded for an unfinished daily challenge
@@ -1872,6 +1949,11 @@ if(DBG){window.addEventListener("resize",dbgShow);setInterval(dbgShow,1000);}
 function route(){
   const m=(location.hash||"").match(/^#join-([A-Za-z]{4})(?:-(?:gcse|alevel))?$/);
   if(m){history.replaceState(null,"",location.pathname+location.search);ACT.join({code:m[1].toUpperCase()});return;}
+  const h=location.hash||"",L=h.match(/^#learn\/([a-z_]+)\/([^\/]+)(?:\/(\d+))?$/),Q=h.match(/^#q\/([^\/]+)$/);
+  if(L){history.replaceState(null,"",location.pathname+location.search);home();let key=L[1]+"|";try{key+=decodeURIComponent(L[2]);}catch(e){key+=L[2];}
+    if(LESSONS[key]){openLesson(key,{});const n=+L[3]||0;if(n>0&&LSN){LSN.i=Math.min(LSN.sc.length-1,n);lessonDraw();}}else toast("That lesson is not in this course.",4200);return;}
+  if(Q){history.replaceState(null,"",location.pathname+location.search);home();let id=Q[1];try{id=decodeURIComponent(id);}catch(e){}
+    const q=BYID[id],one=q&&inst(q);if(one)startRun({mode:"gym",qs:[one],label:"Shared question",clock:false,key:"shared"});else toast("That question is not in this course.",4200);return;}
   home();
 }
 let READY=false;   // a join link opened while the questions are still loading is handled once they are in
