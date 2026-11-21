@@ -328,7 +328,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.13.1";
+const VERSION="1.14";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -881,12 +881,12 @@ function lessonDraw(){const ov=document.querySelector(".lessonov");if(!ov||!LSN)
   if(cur.k==="hook"){body=lessonMC("hook",l.hook,"Have a go first");canNext=LSN.ans.hook!=null;}
   else if(cur.k==="chunk"){const c=l.chunks[cur.i];body=`${cur.i===0&&!l.hook?`<div class="lkind">${esc(LKIND[l.kind]||"Learn")}</div>`:""}<h2>${ltx(c.h)}</h2><div>${ltx(c.b)}</div>`;}
   else if(cur.k==="example"){const e=l.example,n=e.steps.length,shown=Math.min(LSN.shown,n);
-    body=`<div class="lkind">${l.kind==="writing"?"Model answer":"Worked example"}</div><div class="ltask">${ltx(e.task)}</div>
+    body=`<div class="lkind">${l.kind==="writing"?"Model answer":"Worked example"}</div><div class="ltask">${ltx(e.task)}</div>${figHtml(e.fig)}
     ${e.steps.slice(0,shown).map((st,j)=>`<div class="lstep"><div>${l.kind==="writing"?"":`<b>Step ${j+1}.</b> `}${ltx(st.do)}</div>${st.why?`<div class="lwhy">${ltx(st.why)}</div>`:""}</div>`).join("")}
     ${shown<n?`<button class="btn block" data-la="step" style="width:100%;min-height:48px">${shown?"Show the next step":"Show the first step"}</button>`:`${e.answer?`<div class="lans"><b>${l.kind==="writing"?"Why it works":"Answer"}:</b> ${ltx(e.answer)}</div>`:""}`}`;
     canNext=shown>=n;}
   else if(cur.k==="selfx"){body=lessonMC("selfx",l.selfx,"Why?");canNext=LSN.ans.selfx!=null;}
-  else if(cur.k==="faded"){const f=l.faded,a=LSN.ans.faded;body=`<div class="lkind">Your turn</div><div class="ltask">${ltx(f.task)}</div>${(f.given||[]).map(g=>`<div class="lgiven">${ltx(g)}</div>`).join("")}${lessonMC("faded",f,"")}`;canNext=a!=null;}
+  else if(cur.k==="faded"){const f=l.faded,a=LSN.ans.faded;body=`<div class="lkind">Your turn</div><div class="ltask">${ltx(f.task)}</div>${figHtml(f.fig)}${(f.given||[]).map(g=>`<div class="lgiven">${ltx(g)}</div>`).join("")}${lessonMC("faded",f,"")}`;canNext=a!=null;}
   else if(cur.k==="remember"){body=`<div class="lkind">Remember</div>${l.trap?`<h2>The common mistake</h2><div>${ltx(l.trap)}</div>`:""}${l.recap?`<div class="lans" style="margin-top:14px"><b>In one line:</b> ${ltx(l.recap)}</div>`:""}`;}
   else if(cur.k==="end"){const run=LSN.from==="run";const qs=topicQs(t.s,t.id).length;
     body=`<div class="lkind">Done</div><h2>${esc(t.name)}</h2><div>${run?"Back to your workout: the questions are what make it stick.":qs?"Now practise it. Answering questions, spread over a few days, is what makes it stick.":"There are no practice questions on this topic yet."}</div>`;
