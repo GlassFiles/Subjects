@@ -55,6 +55,19 @@ label,textarea,input{scroll-margin-top:8px}   /* room below, so a box near the e
 .logo small{display:block;font-size:calc(11px*var(--fs,1));letter-spacing:.12em;color:var(--mute);font-weight:700;margin-top:3px}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:calc(14px*var(--fs,1));font-weight:600}
 .chip.on{background:var(--lime);color:#111;border-color:var(--lime)}
+.calcov{position:fixed;left:0;right:0;bottom:0;z-index:58;display:flex;justify-content:center;pointer-events:none}
+.calc{pointer-events:auto;width:100%;max-width:520px;background:var(--panel);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.45);padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.calc .chead{display:flex;align-items:center;gap:8px;margin-bottom:6px}.calc .chead b{flex:1;font-size:calc(15px*var(--fs,1))}
+.calc .cnote{font-size:calc(12px*var(--fs,1));color:var(--mute);margin:-2px 0 6px}
+.calc .cdisp{background:#0b0e12;border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.calc .cexp{min-height:22px;font-size:calc(16px*var(--fs,1));color:var(--mute);word-break:break-all;line-height:1.35}
+.calc .cres{min-height:34px;font-size:calc(26px*var(--fs,1));font-weight:800;text-align:right;word-break:break-all}
+.calc .cmode{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--lime)}
+.calc .ckeys{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.calc .ck{min-height:44px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:calc(17px*var(--fs,1));font-weight:700;padding:0 2px;touch-action:manipulation}
+.calc .ck.fn{font-size:calc(14px*var(--fs,1));font-weight:600;color:#cfd6e0}.calc .ck.num{background:#1d2430}.calc .ck.op{color:var(--lime)}
+.calc .ck.on{outline:2px solid var(--lime);outline-offset:-2px}.calc .ck.eq{background:var(--lime);color:#111;grid-column:span 2}.calc .ck.zero{grid-column:span 2}
+.calc .ck:active{transform:scale(.97)}
 .icon-btn{width:44px;height:44px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:inline-grid;place-items:center;font-size:calc(18px*var(--fs,1))}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
 .card h2,.card h3{margin:0 0 8px}
@@ -334,7 +347,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.17";
+const VERSION="1.18";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -691,7 +704,7 @@ function tmSet(el,left,total){if(!el)return;el.querySelector("i").style.width=Ma
 function topBar(title,back="home"){return `<div class="top ttop tbar"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
 function setWide(on){document.body.classList.toggle("wide",!!on);}
 let VIEW="home";
-function render(html,view){VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();bgSync();}
+function render(html,view){if(view&&!['run','sprintq','play','host'].includes(view))calcClose();VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();bgSync();}
 const BG_OF={chem:"chemistry"};   // the A-level and GCSE Chemistry share a picture, as do the two Maths
 let BGK=null;
 function bgSync(){const el=document.getElementById("bgart");if(!el)return;
@@ -935,6 +948,94 @@ ACT.lessons=()=>{setWide(false);const by={};for(const k of Object.keys(LESSONS))
     return `<div class="card"><h3>${icn(SUBJ[s].em,1)}${esc(SUBJ[s].name)}</h3><div class="list">${ord.map(k=>{const t=TOPIC[k],l=LESSONS[k];if(!t)return"";const rd=ST.lread&&ST.lread[k];
       return `<button class="big" data-act="learn" data-k="${esc(k)}"><span class="em">${icn(rd?"✅":"📖")}</span><span><b>${esc(t.name)}</b><span>${esc(LKIND[l.kind]||"Lesson")}${rd?" · read":""}${topicMastered(t.s,t.id)?" · topic mastered":""}</span></span></button>`;}).join("")}</div></div>`;}).join("")}
   </div>`,"lessons");};
+/* ---------- v1.18 calculator ---------- */
+const CALC_SUBJ=new Set(["maths","further","chem","biology","chemistry","physics","dt","business"]);
+function calcOK(s){return SET.calc!==false&&CALC_SUBJ.has(s);}
+function calcBtn(s,la){return calcOK(s)?`<button class="${la?"linkb":"icon-btn"}" ${la?'data-la="calc" style="min-height:44px;min-width:44px"':'data-act="calc"'} aria-label="Calculator">🧮</button>`:"";}
+const CALC={tok:[],ans:0,deg:true,inv:false,out:"",val:null,frac:false,done:false,s:""};
+const CDISP={"*":"×","/":"÷","-":"−",neg:"−",E:"×10^",pi:"π",e:"e",Ans:"Ans",C:"C",sq:"²",cube:"³","!":"!",
+  "sin(":"sin(","cos(":"cos(","tan(":"tan(","asin(":"sin⁻¹(","acos(":"cos⁻¹(","atan(":"tan⁻¹(","log(":"log(","ln(":"ln(",
+  "sqrt(":"√(","cbrt(":"∛(","pow10(":"10^(","exp(":"e^("};
+const CFUN=new Set(["sin(","cos(","tan(","asin(","acos(","atan(","log(","ln(","sqrt(","cbrt(","pow10(","exp("]);
+function calcEval(tok,deg,ans){
+  // numbers first: digits and points join; a number followed by E, an optional minus and digits is one number
+  const T=[];for(let i=0;i<tok.length;i++){const k=tok[i];
+    if(/^[0-9.]$/.test(k)){let n=k;while(i+1<tok.length&&/^[0-9.]$/.test(tok[i+1]))n+=tok[++i];
+      if(tok[i+1]==="E"){let j=i+2,ex="";if(tok[j]==="neg"||tok[j]==="-"){ex="-";j++;}let d="";while(j<tok.length&&/^[0-9]$/.test(tok[j]))d+=tok[j++];if(!d)throw"Syntax error";n+="e"+ex+d;i=j-1;}
+      if((n.match(/\./g)||[]).length>1||n===".")throw"Syntax error";T.push({n:parseFloat(n)});}
+    else if(k==="E")throw"Syntax error";else T.push(k);}
+  let p=0;const peek=()=>T[p],eat=()=>T[p++];
+  const starts=t=>t!==undefined&&(typeof t==="object"||t==="pi"||t==="e"||t==="Ans"||t==="("||CFUN.has(t));
+  const rad=x=>deg?x*Math.PI/180:x,unrad=x=>deg?x*180/Math.PI:x;
+  const fact=n=>{if(!Number.isInteger(n)||n<0||n>170)throw"Math error";let r=1;for(let i=2;i<=n;i++)r*=i;return r;};
+  function expr(){let v=term();while(peek()==="+"||peek()==="-"){const o=eat(),w=term();v=o==="+"?v+w:v-w;}return v;}
+  function term(){let v=unary();for(;;){const t=peek();if(t==="*"||t==="/"){eat();const w=unary();if(t==="/"&&w===0)throw"Math error";v=t==="*"?v*w:v/w;}else if(starts(t)){v*=unary();}else break;}return v;}
+  function unary(){const t=peek();if(t==="neg"||t==="-"){eat();return -unary();}if(t==="+"){eat();return unary();}return power();}
+  function power(){const b=ncr();if(peek()==="^"){eat();const x=unary();const r=Math.pow(b,x);if(Number.isNaN(r))throw"Math error";return r;}return b;}
+  function ncr(){let a=post();if(peek()==="C"){eat();const r=post();if(!Number.isInteger(a)||!Number.isInteger(r)||r<0||a<0||r>a)throw"Math error";let v=1;for(let i=1;i<=r;i++)v=v*(a-r+i)/i;a=Math.round(v);}return a;}
+  function post(){let v=prim();for(;;){const t=peek();if(t==="!"){eat();v=fact(v);}else if(t==="sq"){eat();v=v*v;}else if(t==="cube"){eat();v=v*v*v;}else break;}return v;}
+  function prim(){const t=eat();if(t===undefined)throw"Syntax error";
+    if(typeof t==="object")return t.n;if(t==="pi")return Math.PI;if(t==="e")return Math.E;if(t==="Ans")return ans;
+    if(t==="("){const v=expr();if(peek()===")")eat();return v;}
+    if(CFUN.has(t)){const x=expr();if(peek()===")")eat();let r;
+      switch(t){case"sin(":r=Math.sin(rad(x));break;case"cos(":r=Math.cos(rad(x));break;
+        case"tan(":{if(Math.abs(Math.cos(rad(x)))<1e-12)throw"Math error";r=Math.tan(rad(x));break;}
+        case"asin(":case"acos(":if(x<-1||x>1)throw"Math error";r=unrad(t==="asin("?Math.asin(x):Math.acos(x));break;
+        case"atan(":r=unrad(Math.atan(x));break;case"log(":if(x<=0)throw"Math error";r=Math.log10(x);break;
+        case"ln(":if(x<=0)throw"Math error";r=Math.log(x);break;case"sqrt(":if(x<0)throw"Math error";r=Math.sqrt(x);break;
+        case"cbrt(":r=Math.cbrt(x);break;case"pow10(":r=Math.pow(10,x);break;case"exp(":r=Math.exp(x);break;}
+      if(Math.abs(r)<1e-13)r=0;return r;}
+    throw"Syntax error";}
+  if(!T.length)throw"Syntax error";const v=expr();if(p<T.length)throw"Syntax error";if(!Number.isFinite(v))throw"Math error";return v;}
+const SUP={"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function calcFmt(v){if(v===0)return"0";const a=Math.abs(v);let r;
+  if(a>=1e10||a<1e-9){const [m,ex]=v.toExponential(9).split("e");r=m.replace(/\.?0+$/,"")+"×10"+String(+ex).split("").map(c=>SUP[c]||c).join("");}
+  else r=String(Number(v.toPrecision(10)));return r.replace(/^-/,"−");}
+function calcFrac(v){if(!Number.isFinite(v)||Number.isInteger(v)||Math.abs(v)>1e9)return null;let h1=1,h0=0,k1=0,k0=1,x=v;
+  for(let i=0;i<30;i++){const a=Math.floor(x);[h1,h0]=[a*h1+h0,h1];[k1,k0]=[a*k1+k0,k1];if(k1>10000)return null;if(Math.abs(v-h1/k1)<1e-9*Math.max(1,Math.abs(v)))return k1===1?null:(h1<0?"−":"")+Math.abs(h1)+"/"+k1;x=1/(x-a);if(!Number.isFinite(x))break;}
+  return null;}
+function calcShow(){const o=document.querySelector(".calcov");if(!o)return;const C=CALC;
+  o.querySelector(".cexp").textContent=C.tok.map(k=>CDISP[k]!==undefined?CDISP[k]:k).join("")||"\u00a0";
+  const fr=C.frac&&C.val!=null?calcFrac(C.val):null;o.querySelector(".cres").textContent=C.out?(fr||C.out):"\u00a0";
+  o.querySelector(".cmode").textContent=(C.deg?"DEG":"RAD")+(C.inv?" · INV":"");
+  o.querySelectorAll("[data-ck=inv]").forEach(b=>b.classList.toggle("on",C.inv));o.querySelectorAll("[data-ck=sd]").forEach(b=>b.classList.toggle("on",C.frac));
+  const L=C.inv?{sin:"sin⁻¹",cos:"cos⁻¹",tan:"tan⁻¹",sq:"x³",sqrt:"∛",log:"10ˣ",ln:"eˣ"}:{sin:"sin",cos:"cos",tan:"tan",sq:"x²",sqrt:"√",log:"log",ln:"ln"};
+  for(const k in L){const b=o.querySelector(`[data-ck=${k}]`);if(b)b.textContent=L[k];}}
+function calcKey(k){const C=CALC;
+  if(k==="eq"){if(!C.tok.length)return;try{const v=calcEval(C.tok,C.deg,C.ans);C.val=v;C.ans=v;C.out=calcFmt(v);}catch(e){C.val=null;C.out=typeof e==="string"?e:"Math error";}C.done=true;C.frac=false;calcShow();return;}
+  if(k==="ac"){C.tok=[];C.out="";C.val=null;C.done=false;C.frac=false;calcShow();return;}
+  if(k==="del"){if(C.done){C.done=false;C.out="";C.val=null;}C.tok.pop();calcShow();return;}
+  if(k==="deg"){C.deg=!C.deg;calcShow();return;}
+  if(k==="inv"){C.inv=!C.inv;calcShow();return;}
+  if(k==="sd"){if(C.val!=null&&calcFrac(C.val))C.frac=!C.frac;calcShow();return;}
+  const fn={sin:"sin(",cos:"cos(",tan:"tan(",log:"log(",ln:"ln(",sqrt:"sqrt("},ifn={sin:"asin(",cos:"acos(",tan:"atan(",log:"pow10(",ln:"exp(",sqrt:"cbrt("};
+  let add;if(fn[k])add=[C.inv?ifn[k]:fn[k]];else if(k==="sq")add=[C.inv?"cube":"sq"];else if(k==="pow")add=["^"];else add=[k];
+  if(fn[k]||k==="sq")C.inv=false;
+  const op=["+","-","*","/","^","sq","cube","!","C","E"].includes(add[0]);
+  if(C.done){C.tok=op?["Ans"]:[];C.done=false;C.out="";C.val=null;C.frac=false;}
+  C.tok.push(...add);calcShow();}
+function calcKeydown(e){if(!document.querySelector(".calcov"))return;if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  const m={"Enter":"eq","=":"eq","Backspace":"del","Escape":"close","*":"*","x":"*","/":"/","+":"+","-":"-","^":"^","(":"(",")":")",".":".","!":"!"};
+  let k=/^[0-9]$/.test(e.key)?e.key:m[e.key];if(!k)return;e.preventDefault();if(k==="close")return calcClose();calcKey(k);}
+function calcOpen(s){if(document.querySelector(".calcov"))return calcClose();CALC.s=s||"";const o=document.createElement("div");o.className="calcov";
+  const K=(k,l,c)=>`<button class="ck ${c||""}" data-ck="${k}">${l}</button>`;
+  o.innerHTML=`<div class="calc" role="dialog" aria-label="Calculator"><div class="chead"><b>🧮 Calculator</b><span class="cmode"></span><button class="ck fn" data-ck="close" aria-label="Close the calculator" style="min-width:44px">✕</button></div>
+  ${PROFILE==="gcse"&&s==="maths"?`<div class="cnote">Paper 1 is non-calculator, so try some without it.</div>`:""}
+  <div class="cdisp"><div class="cexp"></div><div class="cres" aria-live="polite"></div></div>
+  <div class="ckeys">${K("deg","DEG/RAD","fn")}${K("inv","inv","fn")}${K("sin","sin","fn")}${K("cos","cos","fn")}${K("tan","tan","fn")}
+  ${K("sq","x²","fn")}${K("pow","xʸ","fn")}${K("sqrt","√","fn")}${K("log","log","fn")}${K("ln","ln","fn")}
+  ${K("pi","π","fn")}${K("e","e","fn")}${K("!","x!","fn")}${K("C","nCr","fn")}${K("E","×10ˣ","fn")}
+  ${K("(","(","fn")}${K(")",")","fn")}${K("Ans","Ans","fn")}${K("del","⌫","fn")}${K("ac","AC","fn")}
+  ${K("7","7","num")}${K("8","8","num")}${K("9","9","num")}${K("/","÷","op")}${K("neg","(−)","op")}
+  ${K("4","4","num")}${K("5","5","num")}${K("6","6","num")}${K("*","×","op")}${K("sd","S⇔D","fn")}
+  ${K("1","1","num")}${K("2","2","num")}${K("3","3","num")}${K("-","−","op")}${K("+","+","op")}
+  ${K("0","0","num zero")}${K(".",".","num")}${K("eq","=","eq")}</div></div>`;
+  o.addEventListener("click",e=>{const b=e.target.closest("[data-ck]");if(!b)return;const k=b.dataset.ck;if(k==="close")return calcClose();calcKey(k);});
+  document.body.appendChild(o);document.addEventListener("keydown",calcKeydown);calcShow();
+  document.body.style.paddingBottom=o.querySelector(".calc").offsetHeight+"px";
+  const qt=document.querySelector(".qtext");if(qt)window.scrollTo(0,Math.max(0,window.scrollY+qt.getBoundingClientRect().top-12));}   // the question to the top, above the calculator   // the page scrolls clear of the calculator, so all of the question can be read above it
+function calcClose(){const o=document.querySelector(".calcov");if(o)o.remove();document.body.style.paddingBottom="";document.removeEventListener("keydown",calcKeydown);}
+ACT.calc=()=>{const q=VIEW==="sprintq"&&SP?SP.q:VIEW==="play"&&typeof PL!=="undefined"&&PL?PL.q:RUN&&RUN.qs?RUN.qs[RUN.i]:null;calcOpen(q?q.s:"");};
 function lessonOk(l){const mc=m=>m&&typeof m.q==="string"&&Array.isArray(m.o)&&m.o.length===4&&Array.isArray(m.f)&&m.f.length===4&&Number.isInteger(m.a)&&m.a>=0&&m.a<4;
   return !!(l&&SUBJ[l.s]&&l.t&&Array.isArray(l.chunks)&&l.chunks.length&&l.example&&Array.isArray(l.example.steps)&&l.example.steps.length&&mc(l.selfx)&&mc(l.faded)&&(!l.hook||mc(l.hook)));}
 function ltx(s){return tex(s).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");}
@@ -966,12 +1067,13 @@ function lessonDraw(){const ov=document.querySelector(".lessonov");if(!ov||!LSN)
     body=`<div class="lkind">Done</div><h2>${esc(t.name)}</h2><div>${run?"Back to your workout: the questions are what make it stick.":qs?"Now practise it. Answering questions, spread over a few days, is what makes it stick.":"There are no practice questions on this topic yet."}</div>`;
     nextLbl=run?"Back to your workout":qs?"Practise this topic":"Close";}
   const intro=i===0&&l.why?`<div class="small muted" style="margin-bottom:10px">${ltx(l.why)}</div>`:"";
-  ov.innerHTML=`<div class="lsn"><div class="lhead"><b>📖 ${esc(t.name)}</b><button class="linkb" data-la="share" style="min-height:44px;min-width:44px" aria-label="Share a link to this lesson">🔗</button><button class="linkb" data-la="flag" style="min-height:44px">🚩 Report</button><button class="lx" data-la="close" aria-label="Close">✕</button></div>
+  ov.innerHTML=`<div class="lsn"><div class="lhead"><b>📖 ${esc(t.name)}</b>${calcBtn(t.s,1)}<button class="linkb" data-la="share" style="min-height:44px;min-width:44px" aria-label="Share a link to this lesson">🔗</button><button class="linkb" data-la="flag" style="min-height:44px">🚩 Report</button><button class="lx" data-la="close" aria-label="Close">✕</button></div>
   <div class="ldots">${sc.map((x,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div>
   <div class="lbody">${intro}${body}</div>
   <div class="lfoot">${i>0?`<button class="btn lback" data-la="back" aria-label="Back">←</button>`:""}<button class="btn go" data-la="${cur.k==="end"?"finish":"next"}" ${canNext?"":"disabled"}>${esc(nextLbl)}</button></div></div>`;
   const lb=ov.querySelector(".lbody");if(lb&&!LSN.keepScroll)lb.scrollTop=0;LSN.keepScroll=false;}
 const LACT={};
+LACT.calc=()=>calcOpen(LSN?LSN.t.s:"");
 LACT.next=()=>{if(LSN.i<LSN.sc.length-1){LSN.i++;if(LSN.sc[LSN.i].k==="end"){ST.lread=ST.lread||{};ST.lread[LSN.key]=londonDate();saveST();}lessonDraw();}};
 LACT.back=()=>{if(LSN.i>0){LSN.i--;lessonDraw();}};
 LACT.step=()=>{LSN.shown++;LSN.keepScroll=true;lessonDraw();const s=document.querySelectorAll(".lessonov .lstep");if(s.length)s[s.length-1].scrollIntoView({block:"nearest",behavior:REDUCED?"auto":"smooth"});};
@@ -1061,6 +1163,7 @@ ACT.settings=()=>{
   <div class="card"><h3>How it plays</h3><div class="small muted" style="margin-top:6px">Move on by itself after a right answer${REDUCED?" (off while your device asks for less motion)":""}</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.auto!==false)===!!v?"on":""}" data-act="setAuto" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text size</div><div class="seg">${[[1,"Normal"],[1.15,"Large"],[1.3,"Larger"]].map(([v,l])=>`<button class="chip ${(SET.size||1)==v?"on":""}" data-act="setSize" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:12px">Text style</div><div class="seg">${[["plain","Standard"],["lexend","Lexend (easy read)"],["dys","OpenDyslexic"]].map(([v,l])=>`<button class="chip ${SET.font===v?"on":""}" data-act="setFont" data-v="${v}">${l}</button>`).join("")}</div><div class="small muted" style="margin-top:8px">Some people find these easier to read; try them and keep what suits you.</div>
   <div class="small muted" style="margin-top:12px">A <b>?</b> beside each answer, to mark a guess</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.conf!==false)===!!v?"on":""}" data-act="setConf" data-v="${v}">${l}</button>`).join("")}</div>
   <div class="small muted" style="margin-top:12px">Think first: hide the answers until I tap (not in timed modes)</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.think===true)===!!v?"on":""}" data-act="setThink" data-v="${v}">${l}</button>`).join("")}</div>
+  <div class="small muted" style="margin-top:12px">Calculator button (only in subjects whose exams allow one)</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.calc!==false)===!!v?"on":""}" data-act="setCalc" data-v="${v}">${l}</button>`).join("")}</div>
   <div class="small muted" style="margin-top:12px">Background pictures</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.bg!==false)===!!v?"on":""}" data-act="setBg" data-v="${v}">${l}</button>`).join("")}</div></div>
   <div class="card"><h3>Feedback and reports</h3><p class="muted small">Spotted a wrong answer, something unsuitable or a bug, or got an idea? Every question, key idea, topic, link and tip has a 🚩, and this sends anything else. It goes to whoever looks after Rep Max through your device's share menu.</p>
   <div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn" data-act="feedback">Send feedback</button>${(ST.reports||[]).length?`<button class="btn" data-act="reportsSend">Send my ${ST.reports.length} report${ST.reports.length===1?"":"s"} again</button>`:""}${Object.keys(ST.flags||{}).length?`<button class="btn" data-act="flagsClear">Put ${Object.keys(ST.flags).length} reported question${Object.keys(ST.flags).length===1?"":"s"} back</button>`:""}</div></div>
@@ -1075,6 +1178,7 @@ ACT.settings=()=>{
 };
 ACT.setConf=d=>{SET.conf=d.v==="1";lsSet("set",SET);ACT.settings();};
 ACT.setThink=d=>{SET.think=d.v==="1";lsSet("set",SET);ACT.settings();};
+ACT.setCalc=d=>{SET.calc=d.v==="1";lsSet("set",SET);ACT.settings();};
 ACT.setBg=d=>{SET.bg=d.v==="1";lsSet("set",SET);ACT.settings();};
 ACT.flagsSend=()=>{const ids=Object.keys(ST.flags||{}),qs=BANK.filter(q=>ids.includes(q.id));shareText(qs.map(q=>reportText(q)).join("\n\n"),"The list is ready to send.");};
 ACT.flagsClear=()=>{ST.flags={};saveST();toast("Put back");ACT.settings();};
@@ -1176,7 +1280,7 @@ function showQ(){
    <div class="hud"><span class="chip">${RUN.mode==="daily"?"Daily · ":""}Rep ${RUN.i+1}/${RUN.qs.length}</span>${RUN.combo>=2?`<span class="combo">🔥 x${RUN.combo}</span>`:""}</div>
    <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn" data-act="shareQ" aria-label="Share a link to this question">🔗</button><button class="icon-btn flagb" data-act="flagQ" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${timed?`<div class="timer" id="tm"><i></i><b></b></div>`:""}
-  <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span></div>
+  <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">${esc(tp.name)}</span>${calcOK(q.s)?`<span class="spacer"></span>${calcBtn(q.s)}`:""}</div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
    ${think?`<button class="btn block" id="showOpts" data-act="showOpts" style="margin-top:12px">Think of your answer, then show the options</button>`:""}
    <div class="opts${conf?" conf":""}${think?" hide":""}">${perm.map((k,i)=>conf?`<div class="orow"><button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button><button class="gq" data-act="pickGuess" data-i="${i}" data-silent="1" aria-label="Guess this answer">?</button></div>`:`<button class="opt o${i}" data-act="pickOpt" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
@@ -1807,7 +1911,7 @@ function plRenderQ(){
   render(`<div class="wrap">${plTop()}
   <div class="row"><span class="chip">Q ${PL.n+1}</span>${subjTag(q.s)}${lvTag(q.lv)}<span class="spacer"></span><button class="icon-btn flagb" data-act="flagPL" aria-label="Report this question">🚩</button><b id="plSec" style="font-size:22px"></b></div>
   <div class="timer" id="tm"><i></i><b></b></div>
-  <div class="qbox"><div class="small muted" style="margin-bottom:6px">${esc(q.t)}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
+  <div class="qbox"><div class="row" style="margin-bottom:6px"><span class="small muted">${esc(q.t)}</span>${calcOK(q.s)?`<span class="spacer"></span>${calcBtn(q.s)}`:""}</div><div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
   <div class="opts">${q.o.map((o,i)=>`<button class="opt o${i} ${PL.mine!=null?(PL.mine===i?"mine":"dim"):""}" data-act="plPick" data-i="${i}" data-silent="1" ${PL.mine!=null?"disabled":""}><span class="sh">${SHAPES[i]}</span><span>${tex(o)}</span></button>`).join("")}</div>
   <div id="plMsg" class="center muted" style="margin-top:12px">${PL.mine!=null?"🔒 Locked in. Waiting for the others…":""}</div></div></div>`,"play");
   tmSet($("#tm"),PL.dur*1000-(Date.now()-PL.start),PL.dur*1000);PL.timer=setInterval(()=>{const left=PL.dur*1000-(Date.now()-PL.start),el=$("#tm");if(!el)return clearInterval(PL.timer);tmSet(el,left,PL.dur*1000);const s=$("#plSec");if(s)s.textContent=Math.max(0,Math.ceil(left/1000));if(left<=0){clearInterval(PL.timer);if(PL.mine==null){document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;b.classList.add("dim");});const m=$("#plMsg");if(m)m.textContent="⏱ Time's up";}}},200);
@@ -1884,7 +1988,7 @@ function spNext(){
    <div class="hud"><span class="chip">⚡ ${SP.pts} pts</span><span class="chip">${SP.right} right</span></div>
    <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="icon-btn flagb" data-act="flagSP" aria-label="Report this question">🚩</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   <div class="timer" id="tm"><i></i><b></b></div>
-  <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">+${SP_PTS[q.lv]} pt${SP_PTS[q.lv]>1?"s":""}</span></div>
+  <div class="qbox"><div class="row" style="margin-bottom:10px">${subjTag(q.s)}${lvTag(q.lv)}<span class="small muted">+${SP_PTS[q.lv]} pt${SP_PTS[q.lv]>1?"s":""}</span>${calcOK(q.s)?`<span class="spacer"></span>${calcBtn(q.s)}`:""}</div>
    <div class="qtext">${tex(q.q)}</div>${codeHtml(q.code)}${figHtml(q.fig)}
    <div class="opts">${SP.perm.map((k,i)=>`<button class="opt o${i}" data-act="spPick" data-i="${i}" data-silent="1"><span class="sh">${SHAPES[i]}</span><span>${tex(q.o[k])}</span></button>`).join("")}</div>
    <div class="row" style="margin-top:12px"><span class="spacer"></span><button class="btn" data-act="spSkip">Skip (−${SP_SKIP} s)</button></div></div></div>`,"sprintq");
