@@ -328,7 +328,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.14";
+const VERSION="1.15";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -397,11 +397,15 @@ function tex(s){
 }
 window.addEventListener("katex-ready",()=>{document.querySelectorAll(".tex-raw").forEach(el=>{try{el.outerHTML=katex.renderToString(el.dataset.tex,{throwOnError:false,output:"html"});}catch(e){}});});
 let FIGN=0;
-function figNum(v){const r=Math.round(v*1e6)/1e6;return String(r).replace("-","−");}
+function figCat(x,y,t,two){let sp=t.indexOf(" "),a,b;if(sp>=0){a=t.slice(0,sp);b=t.slice(sp+1);}else{const h=t.search(/[-–]/);if(h>0){a=t.slice(0,h+1);b=t.slice(h+1);}}
+  if(!two)return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(t)}</text>`;
+  if(a==null)return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" style="font-size:10px">${esc(t)}</text>`;
+  return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" style="font-size:10px"><tspan x="${x.toFixed(1)}">${esc(a)}</tspan><tspan x="${x.toFixed(1)}" dy="11">${esc(b)}</tspan></text>`;}
+function figNum(v){const r=Math.round(v*1e6)/1e6;if(Math.abs(r*1000-Math.round(r*1000))>1e-6){for(let d=2;d<=12;d++){const n=Math.round(r*d);if(Math.abs(n/d-r)<1e-6)return (n<0?"−":"")+Math.abs(n)+"/"+d;}return String(Math.round(r*1000)/1000).replace("-","−");}return String(r).replace("-","−");}
 function figHtml(f){
   try{
   if(!f||typeof f!=="object")return"";
-  const W=340,H=236,R=12,B=40,cid="fclip"+(++FIGN);let L=46,T=12,pw=W-L-R,ph=H-T-B;
+  const W=340,R=12,B=40,cid="fclip"+(++FIGN);let H=236,L=46,T=12,pw=W-L-R,ph=H-T-B;
   const num=v=>typeof v==="number"&&isFinite(v);
   let out=[],x0,x1,y0,y1,xs,ys,sx,sy;
   const yr=f.y||[0,1];y0=+yr[0];y1=+yr[1];if(f.equal&&f.type!=="bar"&&f.x&&+f.x[1]>+f.x[0]&&y1>y0){const ux=pw/(+f.x[1]-+f.x[0]),uy=ph/(y1-y0),u=Math.min(ux,uy);const nw=(+f.x[1]-+f.x[0])*u,nh=(y1-y0)*u;L+=(pw-nw)/2;T+=(ph-nh)/2;pw=nw;ph=nh;}ys=+f.ystep||((y1-y0)/5);if(!(y1>y0)||!(ys>0))return"";
@@ -413,10 +417,10 @@ function figHtml(f){
     if(f.ynums!==false&&i%yEvery===0)out.push(txt(L-5,y+4,figNum(v),"end"));});
   if(f.type==="bar"){
     const cats=f.cats||[],vals=f.vals||[],n=cats.length;if(!n||vals.length!==n)return"";
-    const bw=pw/n;
+    const bw=pw/n;if(n>4)H+=10;
     cats.forEach((c,i)=>{const v=+vals[i];if(!num(v))return;const x=L+bw*i+bw*.18,top=sy(Math.min(Math.max(v,y0),y1));
       out.push(`<rect class="fbar" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${(sy(Math.max(y0,0))-top).toFixed(1)}"/>`);
-      out.push(txt(L+bw*i+bw/2,T+ph+15,String(c).slice(0,14)));});
+      out.push(figCat(L+bw*i+bw/2,T+ph+14,String(c).slice(0,18),n>4));});
   }else{
     const xr=f.x||[0,1];x0=+xr[0];x1=+xr[1];xs=+f.xstep||((x1-x0)/5);if(!(x1>x0)||!(xs>0))return"";
     sx=v=>L+(v-x0)/(x1-x0)*pw;
@@ -429,14 +433,14 @@ function figHtml(f){
     const cls=["fl0","fl1","fl2","fl3"];
     const placed=[],spot=(x,y,w)=>{for(let k=0;k<6;k++){const hit=placed.some(b=>Math.abs(b[0]-x)<(b[2]+w)/2+4&&Math.abs(b[1]-y)<13);if(!hit)break;y=y+14>T+ph-2?y-28:y+14;}placed.push([x,y,w]);return y;};
     const labs=[];
-    (f.lines||[]).slice(0,8).forEach((ln,j)=>{const ci=Number.isInteger(ln.c)?((ln.c%4)+4)%4:j%4;const P=(ln.pts||[]).filter(p=>Array.isArray(p)&&num(+p[0])&&num(+p[1])).map(p=>[+p[0],+p[1]]);if(!P.length)return;
+    (f.lines||[]).slice(0,12).forEach((ln,j)=>{const ci=Number.isInteger(ln.c)?((ln.c%4)+4)%4:j%4;const P=(ln.pts||[]).filter(p=>Array.isArray(p)&&num(+p[0])&&num(+p[1])).map(p=>[+p[0],+p[1]]);if(!P.length)return;
       if(ln.dots)P.forEach(p=>{if(p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1)out.push(`<circle class="fd ${cls[ci]}" cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}" r="3.6"/>`);});
       else out.push(`<polyline class="fln ${cls[ci]}${ln.dash?" fdash":""}" clip-path="url(#${cid})" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
-      if(ln.label){const vis=P.filter(p=>p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1),e=vis[vis.length-1]||P[P.length-1],t=String(ln.label).slice(0,12),w=t.length*7+4;
+      if(ln.label){const vis=P.filter(p=>p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1),e=vis[vis.length-1]||P[P.length-1],t=String(ln.label).slice(0,18),w=t.length*7+4;
         const x=Math.min(Math.max(sx(e[0]),L+14),L+pw-4),y=Math.min(Math.max(sy(e[1])-6,T+11),T+ph-4);labs.push([x-w/2,y,w,t,"end",` class="flab ${cls[ci]}"`,x]);}});
-    (f.points||[]).slice(0,4).forEach(pt=>{const a=pt&&pt.at;if(!a||!num(+a[0])||!num(+a[1]))return;const x=sx(+a[0]),y=sy(+a[1]);
+    (f.points||[]).slice(0,6).forEach(pt=>{const a=pt&&pt.at;if(!a||!num(+a[0])||!num(+a[1]))return;const x=sx(+a[0]),y=sy(+a[1]);
       out.push(`<circle class="fpt" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4"/>`);
-      if(pt.label){const t=String(pt.label).slice(0,12),w=t.length*7+4,right=x+7>L+pw-30,lx=right?x-7:x+7,ly=y-7<T+10?y+17:y-7;placed.push([right?lx-w/2:lx+w/2,ly,w]);out.push(txt(lx,ly,t,right?"end":"start",' class="fplab"'));}});
+      if(pt.label){const t=String(pt.label).slice(0,18),w=t.length*7+4,right=x+7+w>W-4,lx=right?x-7:x+7,ly=y-7<T+10?y+17:y-7;placed.push([right?lx-w/2:lx+w/2,ly,w]);out.push(txt(lx,ly,t,right?"end":"start",' class="fplab"'));}});
     labs.forEach(l=>{const y=spot(l[0],l[1],l[2]);out.push(txt(l[6],y,l[3],l[4],l[5]));});
   }
   out.push(`<rect class="fax" x="${L}" y="${T}" width="${pw}" height="${ph}"/>`);
@@ -879,7 +883,7 @@ function lessonMC(id,m,head){const a=LSN.ans[id];const done=a!=null;
   ${done?`<div class="lfb"><b>${a===m.a?"Right.":"Not quite."}</b> ${ltx(lfb(m.f[a]))}${a!==m.a?`<div style="margin-top:6px"><b>The right answer:</b> ${ltx(m.o[m.a])}. ${ltx(lfb(m.f[m.a]))}</div>`:""}</div>`:""}`;}
 function lessonDraw(){const ov=document.querySelector(".lessonov");if(!ov||!LSN)return;const {l,t,sc,i}=LSN,cur=sc[i];let body="",canNext=true,nextLbl="Next";
   if(cur.k==="hook"){body=lessonMC("hook",l.hook,"Have a go first");canNext=LSN.ans.hook!=null;}
-  else if(cur.k==="chunk"){const c=l.chunks[cur.i];body=`${cur.i===0&&!l.hook?`<div class="lkind">${esc(LKIND[l.kind]||"Learn")}</div>`:""}<h2>${ltx(c.h)}</h2><div>${ltx(c.b)}</div>`;}
+  else if(cur.k==="chunk"){const c=l.chunks[cur.i];body=`${cur.i===0&&!l.hook?`<div class="lkind">${esc(LKIND[l.kind]||"Learn")}</div>`:""}<h2>${ltx(c.h)}</h2><div>${ltx(c.b)}</div>${figHtml(c.fig)}`;}
   else if(cur.k==="example"){const e=l.example,n=e.steps.length,shown=Math.min(LSN.shown,n);
     body=`<div class="lkind">${l.kind==="writing"?"Model answer":"Worked example"}</div><div class="ltask">${ltx(e.task)}</div>${figHtml(e.fig)}
     ${e.steps.slice(0,shown).map((st,j)=>`<div class="lstep"><div>${l.kind==="writing"?"":`<b>Step ${j+1}.</b> `}${ltx(st.do)}</div>${st.why?`<div class="lwhy">${ltx(st.why)}</div>`:""}</div>`).join("")}
