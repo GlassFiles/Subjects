@@ -115,6 +115,13 @@ h3{font-size:calc(16px*var(--fs,1));font-weight:800}
 .fig .fln{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}.fig .fdash{stroke-dasharray:6 4}
 .fig .fl0{stroke:#1f5fd1;fill:#1f5fd1}.fig .fl1{stroke:#d1452c;fill:#d1452c}.fig .fl2{stroke:#1d8a4c;fill:#1d8a4c}.fig .fl3{stroke:#8a3fc7;fill:#8a3fc7}
 .fig .fln.fl0,.fig .fln.fl1,.fig .fln.fl2,.fig .fln.fl3{fill:none}.fig .fd{stroke:none}.fig .flab{stroke:#f7f8fa;stroke-width:3px;paint-order:stroke;font-weight:700;font-size:12px}
+.fig rect.fb0{fill:#1f5fd1}.fig rect.fb1{fill:#d1452c}.fig rect.fb2{fill:#1d8a4c}.fig rect.fb3{fill:#8a3fc7}.fig rect.fgr{fill:#b9c1cd}.fig .fvl{font-size:10.5px;font-weight:700;fill:#1d2430}
+.fig .mat{font:700 15px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#141a24;stroke:#f7f8fa;stroke-width:4px;paint-order:stroke}.fig .mch{font:700 11px system-ui,sans-serif;fill:#141a24}
+.fig .mbd{stroke:#2a313d;stroke-width:1.8;stroke-linecap:round}.fig .mbd.fdash{stroke-dasharray:4 3}.fig .mlp{fill:#141a24}.fig .marr{fill:none;stroke:#d1452c;stroke-width:1.8}.fig .mhd{fill:#d1452c}
+.fig .mtx{font:600 13px system-ui,sans-serif;fill:#141a24}.fig .msh{fill:none;stroke:#2a313d;stroke-width:1.6}.fig .mc1 .mat,.fig .mc1.mat{fill:#d1452c}.fig .mc2.mat{fill:#1f5fd1}.fig .mc3.mat{fill:#1d8a4c}
+.fig .fbx{fill:#fff;stroke:#525b6b;stroke-width:1.5}.fig .fmem{stroke:#7d8696;stroke-width:2;stroke-dasharray:5 4}.fig .fel{fill:#525b6b}.fig .fell{font:700 14px system-ui,sans-serif;fill:#fff}
+.fig .fp4{fill:#8b94a3}.fig .fpt2{font:700 8px system-ui,sans-serif;fill:#fff;text-anchor:middle}.fig .fleg{display:flex;flex-wrap:wrap;gap:4px 12px;padding:2px 8px 0;font-size:calc(13px*var(--fs,1));color:#1d2430}
+.fig .fleg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 .fig .fnew{animation:fnew .5s ease-out}@keyframes fnew{from{opacity:0}to{opacity:1}}
 .fig .fctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 4px 4px}
 .fig .fctl button{min-height:44px;min-width:44px;padding:0 14px;border-radius:12px;background:#fff;border:1px solid #c9d0db;color:#1d2430;font-weight:800;font-size:calc(15px*var(--fs,1))}
@@ -347,7 +354,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.18";
+const VERSION="1.19";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -424,6 +431,7 @@ function figNum(v){const r=Math.round(v*1e6)/1e6;if(Math.abs(r*1000-Math.round(r
 function figSvg(f){
   try{
   if(!f||typeof f!=="object")return"";
+  if(f.type==="mech")return mechSvg(f);
   const W=340,R=12,B=40,cid="fclip"+(++FIGN);let H=236,L=46,T=12,pw=W-L-R,ph=H-T-B;
   const num=v=>typeof v==="number"&&isFinite(v);
   let out=[],x0,x1,y0,y1,xs,ys,sx,sy;
@@ -436,10 +444,10 @@ function figSvg(f){
     if(f.ynums!==false&&i%yEvery===0)out.push(txt(L-5,y+4,figNum(v),"end"));});
   if(f.type==="bar"){
     const cats=f.cats||[],vals=f.vals||[],n=cats.length;if(!n||vals.length!==n)return"";
-    const bw=pw/n;if(n>4)H+=10;
-    cats.forEach((c,i)=>{const v=+vals[i];if(!num(v))return;const x=L+bw*i+bw*.18,top=sy(Math.min(Math.max(v,y0),y1));
-      out.push(`<rect class="fbar" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${(sy(Math.max(y0,0))-top).toFixed(1)}"/>`);
-      out.push(figCat(L+bw*i+bw/2,T+ph+14,String(c).slice(0,18),n>4));});
+    const bw=pw/n,two=n>4||cats.some(c=>String(c).slice(0,18).length*6.2>bw);if(two)H+=10;
+    cats.forEach((c,i)=>{out.push(figCat(L+bw*i+bw/2,T+ph+14,String(c).slice(0,18),two));const v=+vals[i];if(vals[i]==null||!num(v))return;const x=L+bw*i+bw*.18,top=sy(Math.min(Math.max(v,y0),y1));
+      const cc=Array.isArray(f.cc)?f.cc[i]:null;if(f.vlab)out.push(txt(x+bw*.32,v<0?top+12:top-4,figNum(v),"middle",' class="fvl"'));
+      out.push(`<rect class="fbar${Number.isInteger(cc)?(cc<0?" fgr":" fb"+(((cc%4)+4)%4)):""}${(f._newb||[]).includes(i)?" fnew":""}" x="${x.toFixed(1)}" y="${Math.min(top,sy(Math.min(Math.max(0,y0),y1))).toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${Math.abs(sy(Math.min(Math.max(0,y0),y1))-top).toFixed(1)}"/>`);});
   }else{
     const xr=f.x||[0,1];x0=+xr[0];x1=+xr[1];xs=+f.xstep||((x1-x0)/5);if(!(x1>x0)||!(xs>0))return"";
     sx=v=>L+(v-x0)/(x1-x0)*pw;
@@ -472,9 +480,11 @@ function figSvg(f){
 /* ---------- animated figures (v1.16) ---------- */
 const FIGA={};let FIGAN=0;
 const figInt=v=>Number.isInteger(v)&&v>0;
-function figKind(f){if(!f||typeof f!=="object"||f.type==="bar")return"";
-  if(f.anim==="steps"){const n=Array.isArray(f.steps)?f.steps.length:0;const has=[...(f.lines||[]),...(f.points||[])].some(x=>x&&figInt(x.step));return n>=2&&n<=12&&has?"steps":"";}
-  if(f.anim==="draw")return (f.lines||[]).length?"draw":"";
+function figKind(f){if(!f||typeof f!=="object")return"";
+  if(f.type==="box")return Array.isArray(f.sp)&&f.sp.length&&f.sp.length<=6?"box":"";
+  if(f.anim==="steps"){const n=Array.isArray(f.steps)?f.steps.length:0;const items=f.type==="bar"?(f.bstep||[]).map(s=>({step:s})):f.type==="mech"?[...(f.atoms||[]),...(f.bonds||[]),...(f.arrows||[]),...(f.text||[]),...(f.shapes||[])]:[...(f.lines||[]),...(f.points||[])];
+    const has=items.some(x=>x&&figInt(x.step));return n>=2&&n<=12&&has?"steps":"";}
+  if(f.anim==="draw")return f.type!=="bar"&&f.type!=="mech"&&(f.lines||[]).length?"draw":"";
   if(f.anim==="frames"){const n=Array.isArray(f.frames)?f.frames.length:0,c=f.ctl||{};return n>=2&&n<=61&&Array.isArray(c.vals)&&c.vals.length===n?"frames":"";}
   return"";}
 function figLen(P,f){const dx=(+f.x[1]-+f.x[0])||1,dy=(+(f.y||[0,1])[1]-+(f.y||[0,1])[0])||1,c=[0];for(let i=1;i<P.length;i++)c.push(c[i-1]+Math.hypot((P[i][0]-P[i-1][0])/dx,(P[i][1]-P[i-1][1])/dy));return c;}
@@ -483,8 +493,12 @@ function figCut(P,f,u){if(u>=1)return P;if(u<=0||P.length<2)return [P[0]];const 
 function figNumR(v,dp){const m=Math.pow(10,dp);return String(Math.round(v*m)/m).replace("-","−");}
 // the still fig for one state of an animated fig; A.k is the step or frame, A.t the drawing's progress (0 to 1)
 function figState(A){const f=A.f,k=A.k;
+  if(A.kind==="steps"&&f.type==="bar"){const bs=f.bstep||[];return {fig:{...f,vals:(f.vals||[]).map((v,i)=>figInt(bs[i])&&bs[i]>k?null:v),_newb:A.moved?bs.map((x,i)=>x===k?i:-1).filter(i=>i>=0):[]},cap:String(f.steps[k-1]||"")};}
+  if(A.kind==="steps"&&f.type==="mech"){const vis=x=>x&&!(figInt(x.step)&&x.step>k)&&!(figInt(x.until)&&k>=x.until),nw=x=>A.moved&&x.step===k?{...x,_new:1}:x;
+    const g={...f,_all:f};for(const K of ["atoms","bonds","arrows","text","shapes"])g[K]=(f[K]||[]).filter(vis).map(nw);return {fig:g,cap:String(f.steps[k-1]||"")};}
   if(A.kind==="steps"){const sel=a=>(a||[]).map((x,j)=>x&&a===f.lines&&!Number.isInteger(x.c)?{...x,c:j}:x).filter(x=>!(x&&figInt(x.step)&&x.step>k)).map(x=>x&&x.step===k&&A.moved?{...x,_new:1}:x);
     return {fig:{...f,lines:sel(f.lines),points:sel(f.points)},cap:String(f.steps[k-1]||"")};}
+  if(A.kind==="frames"&&f.type==="bar"){const fr=f.frames[k]||{};return {fig:{...f,vals:fr.vals||f.vals,cc:fr.cc||f.cc},cap:(Array.isArray(fr.read)?fr.read:[]).map(String).join("  ·  ")};}
   if(A.kind==="frames"){const fr=f.frames[k]||{};return {fig:{...f,lines:[...(f.lines||[]),...(fr.lines||[])],points:[...(f.points||[]),...(fr.points||[])]},cap:(Array.isArray(fr.read)?fr.read:[]).map(String).join("  ·  ")};}
   const lines=(f.lines||[]).map((l,j)=>({...l,c:Number.isInteger(l.c)?l.c:j})),ph=[...new Set(lines.map(l=>l.step).filter(figInt))].sort((a,b)=>a-b);
   const nP=ph.length||1,t=Math.max(0,Math.min(1,A.t)),p=Math.min(nP-1,Math.floor(t*nP)),u=t>=1?1:t*nP-p;
@@ -513,16 +527,18 @@ function figRun(id){const A=FIGA[id];if(!A)return;figStop(A);
     A.timer=setInterval(()=>{A.t=Math.min(1,(Date.now()-t0)/ms);if(A.t>=1)figStop(A);if(!figPaint(id))figStop(A);},40);figPaint(id);}
   else if(A.kind==="frames"){const n=A.f.frames.length,ms=Math.max(40,Math.min(1000,+A.f.ms||150));if(A.k>=n-1)A.k=0;
     A.timer=setInterval(()=>{A.k++;if(A.k>=n-1){A.k=n-1;figStop(A);}if(!figPaint(id))figStop(A);},ms);figPaint(id);}}
-function figAct(id,a){const A=FIGA[id];if(!A)return;
+function figAct(id,a){if(BOXA[id])return boxAct(id,a);const A=FIGA[id];if(!A)return;
   if(a==="prev"&&A.k>1){A.k--;A.moved=0;}else if(a==="next"&&A.k<A.f.steps.length){A.k++;A.moved=1;}
   else if(a==="draw"){figRun(id);return;}else if(a==="play"){if(A.timer){figStop(A);}else{figRun(id);return;}}
   figPaint(id);}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-fa]");if(!b)return;e.stopPropagation();if(b.tagName==="BUTTON"){e.preventDefault();figAct(b.dataset.id,b.dataset.fa);}},true);
-document.addEventListener("input",e=>{const b=e.target.closest&&e.target.closest("input[data-fa]");if(!b)return;e.stopPropagation();const A=FIGA[b.dataset.id];if(!A)return;figStop(A);A.k=Math.max(0,Math.min(A.f.frames.length-1,+b.value|0));figPaint(b.dataset.id);},true);
+document.addEventListener("input",e=>{const b=e.target.closest&&e.target.closest("input[data-fa]");if(!b)return;e.stopPropagation();if(BOXA[b.dataset.id]){boxParam(b.dataset.id,+b.value|0);return;}const A=FIGA[b.dataset.id];if(!A)return;figStop(A);A.k=Math.max(0,Math.min(A.f.frames.length-1,+b.value|0));figPaint(b.dataset.id);},true);
 ["pointerdown","touchstart","mousedown"].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest(".fctl"))e.stopPropagation();},true));
 function figHtml(f){
   try{
   const kind=figKind(f);
+  if(kind==="box")return boxHtml(f);
+  if(!kind&&f&&f.type==="bar"&&f.anim==="frames"&&Array.isArray(f.frames)&&f.frames.length){const fr=f.frames[Math.min(f.frames.length-1,Math.max(0,(f.ctl&&f.ctl.start)|0))]||{};const sv=figSvg({...f,vals:fr.vals||f.vals,cc:fr.cc||f.cc});return sv?`<div class="fig">${sv}</div>`:"";}
   if(!kind){if(f&&f.anim){const g={...f};if(f.anim==="frames"&&Array.isArray(f.frames)&&f.frames.length){const fr=f.frames[Math.min(f.frames.length-1,Math.max(0,(f.ctl&&f.ctl.start)|0))]||{};g.lines=[...(f.lines||[]),...(fr.lines||[])];g.points=[...(f.points||[]),...(fr.points||[])];}const s=figSvg(g);return s?`<div class="fig">${s}</div>`:"";}
     const s=figSvg(f);return s?`<div class="fig">${s}</div>`:"";}
   if(Object.keys(FIGA).length>60)for(const k of Object.keys(FIGA))if(!document.getElementById(k)){figStop(FIGA[k]);delete FIGA[k];}
@@ -533,6 +549,109 @@ function figHtml(f){
   return `<div class="fig fanim" id="${id}" data-kind="${kind}"><div class="fsv">${svg}</div><div class="fctl">${figCtl(id,A)}</div><div class="fcap" aria-live="polite">${esc(s.cap)}</div></div>`;
   }catch(e){return"";}
 }
+/* ---------- v1.19 reaction mechanisms and particle diagrams (type "mech") ---------- */
+function mechSvg(f){
+  const src=f._all||f,P={};(src.atoms||[]).forEach(a=>{if(a&&a.id!=null&&isFinite(+a.x)&&isFinite(+a.y))P[a.id]=a;});
+  const xs=[],ys=[];Object.values(P).forEach(a=>{xs.push(+a.x);ys.push(+a.y);});
+  (src.text||[]).forEach(t=>{if(isFinite(+t.x)&&isFinite(+t.y)){xs.push(+t.x);ys.push(+t.y);}});
+  (src.shapes||[]).forEach(s=>{const g=s.ring||s.arc;if(Array.isArray(g)&&g.length>=3){xs.push(+g[0]-+g[2],+g[0]+ +g[2]);ys.push(+g[1]-+g[2],+g[1]+ +g[2]);}});
+  if(!xs.length)return"";
+  const x0=Math.min(...xs)-.9,x1=Math.max(...xs)+.9,y0=Math.min(...ys)-.9,y1=Math.max(...ys)+.9,W=340;
+  let u=Math.min(W/(x1-x0),48);const H=Math.round(Math.max(110,Math.min(300,(y1-y0)*u)));u=Math.min(u,H/(y1-y0));
+  const ox=(W-(x1-x0)*u)/2,oy=(H-(y1-y0)*u)/2,X=x=>ox+(x-x0)*u,Y=y=>oy+(y1-y)*u,F=v=>v.toFixed(1),out=[];
+  const nw=x=>x&&x._new?" fnew":"";
+  (f.shapes||[]).forEach(s=>{if(Array.isArray(s.ring)&&s.ring.length>=3)out.push(`<circle class="msh${s.dash?" fdash":""}${nw(s)}" cx="${F(X(+s.ring[0]))}" cy="${F(Y(+s.ring[1]))}" r="${F(+s.ring[2]*u)}"/>`);
+    else if(Array.isArray(s.arc)&&s.arc.length>=5){const [cx,cy,r,a0,a1]=s.arc.map(Number),pa=a=>[X(cx+r*Math.cos(a*Math.PI/180)),Y(cy+r*Math.sin(a*Math.PI/180))],A0=pa(a0),A1=pa(a1),big=Math.abs(a1-a0)>180?1:0,sw=a1>a0?0:1;
+      out.push(`<path class="msh${s.dash?" fdash":""}${nw(s)}" d="M${F(A0[0])} ${F(A0[1])} A${F(r*u)} ${F(r*u)} 0 ${big} ${sw} ${F(A1[0])} ${F(A1[1])}"/>`);}});
+  (f.bonds||[]).forEach(b=>{const a=P[b.a],c=P[b.b];if(!a||!c)return;let ax=X(+a.x),ay=Y(+a.y),cx=X(+c.x),cy=Y(+c.y);const L=Math.hypot(cx-ax,cy-ay)||1,ux=(cx-ax)/L,uy=(cy-ay)/L;
+    const ta=a.t?9:0,tc=c.t?9:0;ax+=ux*ta;ay+=uy*ta;cx-=ux*tc;cy-=uy*tc;const o=Math.max(1,Math.min(3,+b.o||1)),offs=o===1?[0]:o===2?[-2.4,2.4]:[-3.6,0,3.6];
+    offs.forEach(d=>out.push(`<line class="mbd${b.dash?" fdash":""}${nw(b)}" x1="${F(ax-uy*d)}" y1="${F(ay+ux*d)}" x2="${F(cx-uy*d)}" y2="${F(cy+ux*d)}"/>`));});
+  (f.atoms||[]).forEach(a=>{if(!P[a.id])return;const x=X(+a.x),y=Y(+a.y),cl=Number.isInteger(a.c)&&a.c>0?" mc"+Math.min(3,a.c):"";
+    if(a.t)out.push(`<text class="mat${cl}${nw(a)}" x="${F(x)}" y="${F(y+5)}" text-anchor="middle">${esc(String(a.t).slice(0,4))}</text>`);
+    if(a.ch)out.push(`<text class="mch${nw(a)}" x="${F(x+10)}" y="${F(y-7)}">${esc(String(a.ch).slice(0,3))}</text>`);
+    const n=Math.max(0,Math.min(4,+a.lp|0)),ang=Array.isArray(a.lpa)&&a.lpa.length?a.lpa:[90,270,180,0];
+    for(let i=0;i<n;i++){const t=(+ang[i%ang.length])*Math.PI/180,px=x+Math.cos(t)*12,py=y-Math.sin(t)*12+(a.t?-1:0),qx=-Math.sin(t)*2.6,qy=-Math.cos(t)*2.6;
+      out.push(`<circle class="mlp${nw(a)}" cx="${F(px+qx)}" cy="${F(py+qy)}" r="1.6"/><circle class="mlp${nw(a)}" cx="${F(px-qx)}" cy="${F(py-qy)}" r="1.6"/>`);}});
+  const pt=(e,toward,end)=>{if(!e)return null;if(Array.isArray(e.at)&&e.at.length===2)return [X(+e.at[0]),Y(+e.at[1])];
+    if(Array.isArray(e.bond)&&P[e.bond[0]]&&P[e.bond[1]])return [(X(+P[e.bond[0]].x)+X(+P[e.bond[1]].x))/2,(Y(+P[e.bond[0]].y)+Y(+P[e.bond[1]].y))/2];
+    if(e.atom!=null&&P[e.atom]){const a=P[e.atom],x=X(+a.x),y=Y(+a.y);if(!toward)return [x,y];const L=Math.hypot(toward[0]-x,toward[1]-y)||1,d=end?14:11;return [x+(toward[0]-x)/L*d,y+(toward[1]-y)/L*d];}return null;};
+  (f.arrows||[]).forEach(r=>{const s0=pt(r.from),e0=pt(r.to);if(!s0||!e0)return;const s1=pt(r.from,e0),e1=pt(r.to,s0,true);const L=Math.hypot(e1[0]-s1[0],e1[1]-s1[1])||1;
+    const bd=isFinite(+r.bend)&&+r.bend!==0?+r.bend:1,mx=(s1[0]+e1[0])/2,my=(s1[1]+e1[1])/2,cx=mx-(e1[1]-s1[1])/L*bd*Math.min(28,L*.45),cy=my+(e1[0]-s1[0])/L*bd*Math.min(28,L*.45);
+    const dx=e1[0]-cx,dy=e1[1]-cy,dl=Math.hypot(dx,dy)||1,hx=dx/dl,hy=dy/dl;
+    out.push(`<path class="marr${nw(r)}" d="M${F(s1[0])} ${F(s1[1])} Q${F(cx)} ${F(cy)} ${F(e1[0]-hx*4)} ${F(e1[1]-hy*4)}"/>${r.half?`<path class="marr${nw(r)}" d="M${F(e1[0])} ${F(e1[1])} L${F(e1[0]-hx*8-hy*5)} ${F(e1[1]-hy*8+hx*5)}"/>`:`<path class="mhd${nw(r)}" d="M${F(e1[0])} ${F(e1[1])} L${F(e1[0]-hx*8-hy*4)} ${F(e1[1]-hy*8+hx*4)} L${F(e1[0]-hx*8+hy*4)} ${F(e1[1]-hy*8-hx*4)}Z"/>`}`);});
+  (f.text||[]).forEach(t=>{if(isFinite(+t.x)&&isFinite(+t.y))out.push(`<text class="mtx${nw(t)}" x="${F(X(+t.x))}" y="${F(Y(+t.y)+4)}" text-anchor="middle">${esc(String(t.t||"").slice(0,24))}</text>`);});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(f.alt?String(f.alt).slice(0,80):"Diagram")}">${out.join("")}</svg>`;
+}
+/* ---------- v1.19 particles in a box (type "box"): one fixed engine, run from the fig's numbers ---------- */
+const BOXA={};let BOXN=0;
+function boxRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
+function boxSp(B,name){return B.f.sp.findIndex(s=>s.name===name);}
+function boxSet(B,k){const f=B.f,P=f.param||{},n=(f.sp||[]).length;B.k=k;
+  B.mul=Array.isArray(P.v)&&isFinite(+P.v[k])?+P.v[k]:1;
+  B.mv=f.sp.map((s,i)=>P.move&&Array.isArray(P.move[s.name])?String(P.move[s.name][k]):String(s.move||"gas"));
+  B.cnt=f.sp.map((s,i)=>P.n&&Array.isArray(P.n[s.name])&&isFinite(+P.n[s.name][k])?Math.max(0,Math.min(60,+P.n[s.name][k]|0)):Math.max(0,Math.min(60,+s.n|0)));}
+function boxMake(B,i,home,zo){const s=B.f.sp[i],z=zo||(Array.isArray(s.zone)&&s.zone.length===4?s.zone.map(Number):[0,1,0,1]),r=Math.max(1.5,Math.min(8,+s.r||3)),R=B.rng,W=100,H=B.H;
+  const x=home?home[0]:(z[0]+(z[1]-z[0])*R())*(W-2*r)+r,y=home?home[1]:H-((z[2]+(z[3]-z[2])*R())*(H-2*r)+r),a=R()*Math.PI*2,sp=(.6+.8*R());
+  return {s:i,x,y,hx:x,hy:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,dead:false,stuck:false};}
+function boxPlace(B){const f=B.f;B.P=[];f.sp.forEach((s,i)=>{const n=B.cnt[i];if(B.mv[i]==="solid"){const z=Array.isArray(s.zone)&&s.zone.length===4?s.zone.map(Number):[0,1,0,1],r=Math.max(1.5,Math.min(8,+s.r||3)),g=2.5*r,
+    cols=Math.max(1,Math.floor(((z[1]-z[0])*100-2*r)/g)+1);for(let j=0;j<n;j++){const cx=z[0]*100+r+1+(j%cols)*g,cy=B.H*(1-z[2])-r-1-Math.floor(j/cols)*g;B.P.push(boxMake(B,i,[cx,cy]));}}
+    else if(Array.isArray(s.zones)&&!(B.f.param&&B.f.param.n&&B.f.param.n[s.name]))s.zones.forEach(z=>{if(Array.isArray(z)&&z.length===5)for(let j=0;j<Math.min(60,+z[4]|0);j++)B.P.push(boxMake(B,i,null,z.slice(0,4).map(Number)));});
+    else for(let j=0;j<n;j++)B.P.push(boxMake(B,i));});B.redraw=true;}
+function boxInit(f,id){const B={f,id,H:Math.max(30,Math.min(100,100*(+f.h||0.6))),rng:boxRng(+f.seed||7),tick:0,timer:null,ev:{hits:[],coll:[],succ:[]},pair:new Map(),redraw:true};
+  const P=f.param||{},nv=Array.isArray(P.vals)?P.vals.length:0;boxSet(B,nv?Math.max(0,Math.min(nv-1,+P.start|0)):0);boxPlace(B);return B;}
+function boxStep(B){const f=B.f,W=100,H=B.H,R=B.rng,P=B.P,wall=f.wall,wx=wall&&isFinite(+wall.x)?+wall.x*100:null,pass=wall&&Array.isArray(wall.pass)?wall.pass:[];B.tick++;
+  for(const p of P){if(p.dead||p.stuck)continue;const s=f.sp[p.s],r=Math.max(1.5,Math.min(8,+s.r||3)),v=Math.max(0,Math.min(3,isFinite(+s.v)?+s.v:1))*B.mul*.55,mv=B.mv[p.s];
+    if(mv==="still")continue;
+    if(mv==="solid"){const a=.12*v*r;p.x=p.hx+(R()-.5)*a;p.y=p.hy+(R()-.5)*a;continue;}
+    if(mv==="liquid"){const t=(R()-.5)*1.2,c=Math.cos(t),sn=Math.sin(t),vx=p.vx*c-p.vy*sn,vy=p.vx*sn+p.vy*c;p.vx=vx;p.vy=vy+.03;}
+    const k=mv==="liquid"?.6:1,ox=p.x;p.x+=p.vx*v*k;p.y+=p.vy*v*k;
+    if(Array.isArray(s.drift)){p.x+=(+s.drift[0]||0)*.5;p.y-=(+s.drift[1]||0)*.5;}
+    const xl=f.ends&&f.ends.left!=null?3.8:0,xr=f.ends&&f.ends.right!=null?3.8:0;let hit=false;if(p.x<xl+r){p.x=xl+r;p.vx=Math.abs(p.vx);hit=true;if(s.stop==="left")p.stuck=true;}if(p.x>W-xr-r){p.x=W-xr-r;p.vx=-Math.abs(p.vx);hit=true;if(s.stop==="right")p.stuck=true;}
+    if(p.y<r){p.y=r;p.vy=Math.abs(p.vy);hit=true;if(s.stop==="top")p.stuck=true;}if(p.y>H-r){p.y=H-r;p.vy=-Math.abs(p.vy);hit=true;if(s.stop==="bottom")p.stuck=true;}
+    if(hit)B.ev.hits.push(B.tick);
+    if(wx!=null&&!pass.includes(s.name)&&((ox<wx)!==(p.x<wx)||Math.abs(p.x-wx)<r)){const left=ox<wx;p.x=left?wx-r:wx+r;p.vx=left?-Math.abs(p.vx):Math.abs(p.vx);}}
+  if(f.collide||f.react||(f.read||[]).some(t=>/\{(coll|succ)\}/.test(t))){const L=P.length,ea=isFinite(+f.ea)?+f.ea:null;
+    for(let i=0;i<L;i++){const a=P[i];if(a.dead||B.mv[a.s]==="solid")continue;const ra=Math.max(1.5,Math.min(8,+f.sp[a.s].r||3));
+      for(let j=i+1;j<L;j++){const b=P[j];if(b.dead||B.mv[b.s]==="solid")continue;const rb=Math.max(1.5,Math.min(8,+f.sp[b.s].r||3)),dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;
+        if(d2>(ra+rb)*(ra+rb))continue;const key=i*4096+j,last=B.pair.get(key)||-99;B.pair.set(key,B.tick);if(B.tick-last<8)continue;
+        B.ev.coll.push(B.tick);const e=Math.hypot(a.vx,a.vy)+Math.hypot(b.vx,b.vy),ok=ea==null||e*B.mul>=ea;if(ok)B.ev.succ.push(B.tick);
+        const d=Math.sqrt(d2)||1,nx=dx/d,ny=dy/d,pa=a.vx*nx+a.vy*ny,pb=b.vx*nx+b.vy*ny;if(pa-pb>0&&!a.stuck&&!b.stuck){a.vx+=(pb-pa)*nx;a.vy+=(pb-pa)*ny;b.vx+=(pa-pb)*nx;b.vy+=(pa-pb)*ny;}
+        for(const rx of (f.react||[])){const A=boxSp(B,rx.a),Bb=boxSp(B,rx.b);if(A<0||Bb<0)continue;const m=(a.s===A&&b.s===Bb)?[a,b]:(a.s===Bb&&b.s===A)?[b,a]:null;if(!m||!ok||R()>=(+rx.p||1))continue;
+          const to=Array.isArray(rx.to)?rx.to.map(n=>boxSp(B,n)):[];if(to[0]>=0)m[0].s=to[0];else m[0].dead=true;if(to[1]>=0)m[1].s=to[1];else m[1].dead=true;B.redraw=true;break;}}}}
+  for(const ch of (f.change||[])){const A=boxSp(B,ch.from),T=ch.to!=null?boxSp(B,ch.to):-1,pr=Math.max(0,Math.min(1,+ch.p||0));if(A<0)continue;
+    for(const p of P)if(!p.dead&&p.s===A&&R()<pr){if(T>=0)p.s=T;else p.dead=true;B.redraw=true;}}
+  const cut=B.tick-60;for(const k of ["hits","coll","succ"])while(B.ev[k].length&&B.ev[k][0]<cut)B.ev[k].shift();}
+function boxRead(B){const f=B.f,live=B.P.filter(p=>!p.dead),wx=f.wall&&isFinite(+f.wall.x)?+f.wall.x*100:50;
+  return (f.read||[]).slice(0,3).map(t=>String(t).replace(/\{(n|left|right|stuck):([^}]+)\}/g,(m,k,n)=>{const i=boxSp(B,n);if(i<0)return"?";const ps=live.filter(p=>p.s===i);return String(k==="n"?ps.length:k==="stuck"?ps.filter(p=>p.stuck).length:k==="left"?ps.filter(p=>p.x<wx).length:ps.filter(p=>p.x>=wx).length);})
+    .replace(/\{(hits|coll|succ)\}/g,(m,k)=>String(Math.round(B.ev[k].length/2))).replace(/\{t\}/g,String(Math.round(B.tick/30)))).join("  ·  ");}
+function boxSvg(B){const f=B.f,s=3.4,W=340,H=B.H*s,o=[`<rect class="fbx" x="1" y="1" width="${W-2}" height="${(H-2).toFixed(1)}" rx="4"/>`];
+  if(f.ends){if(f.ends.left!=null)o.push(`<rect class="fel" x="1" y="1" width="12" height="${(H-2).toFixed(1)}"/><text class="fell" x="7" y="${(H/2+5).toFixed(1)}" text-anchor="middle">${esc(String(f.ends.left).slice(0,1))}</text>`);
+    if(f.ends.right!=null)o.push(`<rect class="fel" x="${W-13}" y="1" width="12" height="${(H-2).toFixed(1)}"/><text class="fell" x="${W-7}" y="${(H/2+5).toFixed(1)}" text-anchor="middle">${esc(String(f.ends.right).slice(0,1))}</text>`);}
+  if(f.wall&&isFinite(+f.wall.x))o.push(`<line class="fmem" x1="${(+f.wall.x*W).toFixed(1)}" x2="${(+f.wall.x*W).toFixed(1)}" y1="2" y2="${(H-2).toFixed(1)}"/>`);
+  B.P.forEach((p,i)=>{if(p.dead)return;const sp=f.sp[p.s],r=Math.max(1.5,Math.min(8,+sp.r||3))*s,c=Number.isInteger(sp.c)&&sp.c>=0&&sp.c<=3?"fl"+sp.c:"fp4";
+    o.push(`<g data-p="${i}" transform="translate(${(p.x*s).toFixed(1)} ${(p.y*s).toFixed(1)})"><circle class="fd ${c}" r="${r.toFixed(1)}"/>${sp.t?`<text class="fpt2" y="3">${esc(String(sp.t).slice(0,2))}</text>`:""}</g>`);});
+  return `<svg viewBox="0 0 ${W} ${H.toFixed(1)}" role="img" aria-label="${esc(f.alt?String(f.alt).slice(0,80):"Particles moving in a box")}">${o.join("")}</svg>`;}
+function boxCtl(B){const f=B.f,P=f.param,id=B.id;let h=`<button data-fa="bplay" data-id="${id}">${B.timer?"❚❚ Pause":"▶ Play"}</button><button data-fa="breset" data-id="${id}" aria-label="Start again">↺</button>`;
+  if(P&&Array.isArray(P.vals)&&P.vals.length>=2)h+=`<input type="range" data-fa="bsl" data-id="${id}" min="0" max="${P.vals.length-1}" step="1" value="${B.k}" aria-label="${esc(String(P.label||P.name||"value"))}"><span class="fpos">${esc(String(P.label||P.name||""))}: ${esc(String(P.vals[B.k]))}</span>`;
+  return h;}
+function boxLegend(f){return `<div class="fleg">${f.sp.filter(s=>s.name&&!s.hide).map(s=>`<span><i style="background:${["#1f5fd1","#d1452c","#1d8a4c","#8a3fc7"][s.c]||"#8b94a3"}"></i>${esc(String(s.name).slice(0,24))}</span>`).join("")}</div>`;}
+function boxPaint(B){const el=document.getElementById(B.id);if(!el){boxStop(B);delete BOXA[B.id];return false;}const v=el.querySelector(".fsv");
+  if(B.redraw||!B.nodes){v.innerHTML=boxSvg(B);B.nodes=[...v.querySelectorAll("g[data-p]")];B.redraw=false;}
+  else{const s=3.4;for(const g of B.nodes){const p=B.P[+g.dataset.p];if(p)g.setAttribute("transform",`translate(${(p.x*s).toFixed(1)} ${(p.y*s).toFixed(1)})`);}}
+  if(B.tick%6===0||!B.timer){const c=el.querySelector(".fcap");if(c)c.textContent=boxRead(B);}return true;}
+function boxStop(B){if(B&&B.timer){clearInterval(B.timer);B.timer=null;}}
+function boxRun(B){boxStop(B);B.timer=setInterval(()=>{if(document.hidden)return;boxStep(B);if(!boxPaint(B))return;if(B.tick>=2700){boxStop(B);boxCtlPaint(B);}},33);boxCtlPaint(B);}
+function boxCtlPaint(B){const el=document.getElementById(B.id);if(!el)return;const b=el.querySelector("[data-fa=bplay]");if(b)b.textContent=B.timer?"❚❚ Pause":"▶ Play";const l=el.querySelector(".fpos"),P=B.f.param;if(l&&P)l.textContent=`${P.label||P.name||""}: ${P.vals[B.k]}`;const r=el.querySelector("input[type=range]");if(r&&document.activeElement!==r)r.value=B.k;}
+function boxAct(id,a){const B=BOXA[id];if(!B)return;if(a==="bplay"){if(B.timer){boxStop(B);boxCtlPaint(B);}else boxRun(B);}
+  else if(a==="breset"){const run=!!B.timer;boxStop(B);const k=B.k;Object.assign(B,{rng:boxRng(+B.f.seed||7),tick:0,ev:{hits:[],coll:[],succ:[]},pair:new Map()});boxSet(B,k);boxPlace(B);boxPaint(B);if(run||!REDUCED)boxRun(B);else boxCtlPaint(B);}}
+function boxParam(id,k){const B=BOXA[id];if(!B)return;const P=B.f.param||{},n=Array.isArray(P.vals)?P.vals.length:0;k=Math.max(0,Math.min(n-1,k));const old=B.mul,oldMv=B.mv.slice(),oldCnt=B.cnt.slice();boxSet(B,k);
+  B.f.sp.forEach((s,i)=>{if(B.mv[i]!==oldMv[i]){B.P.filter(p=>p.s===i&&!p.dead).forEach(p=>{if(B.mv[i]==="solid"){p.x=p.hx;p.y=p.hy;}else{const a=B.rng()*Math.PI*2;p.vx=Math.cos(a)*(.6+.8*B.rng());p.vy=Math.sin(a)*(.6+.8*B.rng());}});B.redraw=true;}
+    const have=B.P.filter(p=>p.s===i&&!p.dead);if(B.cnt[i]>have.length){for(let j=have.length;j<B.cnt[i];j++)B.P.push(boxMake(B,i));B.redraw=true;}else if(B.cnt[i]<have.length){have.slice(B.cnt[i]).forEach(p=>p.dead=true);B.redraw=true;}});
+  B.ev={hits:[],coll:[],succ:[]};boxPaint(B);boxCtlPaint(B);if(!B.timer&&!REDUCED)boxRun(B);}
+function boxHtml(f){try{if(Object.keys(BOXA).length>20)for(const k of Object.keys(BOXA))if(!document.getElementById(k)){boxStop(BOXA[k]);delete BOXA[k];}
+  const id="fb"+(++BOXN),B=boxInit(f,id);BOXA[id]=B;
+  if(!REDUCED)setTimeout(()=>{if(document.getElementById(id)&&!B.timer)boxRun(B);},300);
+  return `<div class="fig fanim fbox" id="${id}" data-kind="box"><div class="fsv">${boxSvg(B)}</div>${boxLegend(f)}<div class="fctl">${boxCtl(B)}</div><div class="fcap" aria-live="off">${esc(boxRead(B))}</div></div>`;}catch(e){return"";}}
 function codeHtml(c){if(!c)return"";return '<pre class="code">'+String(c).replace(/\t/g,"    ").split("\n").map(l=>"<span>"+(esc(l)||" ")+"</span>").join("")+"</pre>";}
 
 /* ---------- the question bank ----------
