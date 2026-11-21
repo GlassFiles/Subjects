@@ -328,7 +328,7 @@ window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.ban
    Everything runs in the browser. Progress is saved on this device only.
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
-const VERSION="1.13";
+const VERSION="1.13.1";
 const LAUNCH="2026-11-14";                 // daily challenge #1
 /* The two courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
 const PROFILES={
@@ -396,14 +396,15 @@ function tex(s){
   }).join("");
 }
 window.addEventListener("katex-ready",()=>{document.querySelectorAll(".tex-raw").forEach(el=>{try{el.outerHTML=katex.renderToString(el.dataset.tex,{throwOnError:false,output:"html"});}catch(e){}});});
+let FIGN=0;
 function figNum(v){const r=Math.round(v*1e6)/1e6;return String(r).replace("-","−");}
 function figHtml(f){
   try{
   if(!f||typeof f!=="object")return"";
-  const W=340,H=236,L=46,R=12,T=12,B=40,pw=W-L-R,ph=H-T-B;
+  const W=340,H=236,R=12,B=40,cid="fclip"+(++FIGN);let L=46,T=12,pw=W-L-R,ph=H-T-B;
   const num=v=>typeof v==="number"&&isFinite(v);
   let out=[],x0,x1,y0,y1,xs,ys,sx,sy;
-  const yr=f.y||[0,1];y0=+yr[0];y1=+yr[1];ys=+f.ystep||((y1-y0)/5);if(!(y1>y0)||!(ys>0))return"";
+  const yr=f.y||[0,1];y0=+yr[0];y1=+yr[1];if(f.equal&&f.type!=="bar"&&f.x&&+f.x[1]>+f.x[0]&&y1>y0){const ux=pw/(+f.x[1]-+f.x[0]),uy=ph/(y1-y0),u=Math.min(ux,uy);const nw=(+f.x[1]-+f.x[0])*u,nh=(y1-y0)*u;L+=(pw-nw)/2;T+=(ph-nh)/2;pw=nw;ph=nh;}ys=+f.ystep||((y1-y0)/5);if(!(y1>y0)||!(ys>0))return"";
   sy=v=>T+ph-(v-y0)/(y1-y0)*ph;
   const ylines=[];for(let v=y0,i=0;v<=y1+1e-9&&i<41;v=y0+ys*++i)ylines.push(v);
   const yEvery=ylines.length>11?2:1;
@@ -430,7 +431,7 @@ function figHtml(f){
     const labs=[];
     (f.lines||[]).slice(0,8).forEach((ln,j)=>{const ci=Number.isInteger(ln.c)?((ln.c%4)+4)%4:j%4;const P=(ln.pts||[]).filter(p=>Array.isArray(p)&&num(+p[0])&&num(+p[1])).map(p=>[+p[0],+p[1]]);if(!P.length)return;
       if(ln.dots)P.forEach(p=>{if(p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1)out.push(`<circle class="fd ${cls[ci]}" cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}" r="3.6"/>`);});
-      else out.push(`<polyline class="fln ${cls[ci]}${ln.dash?" fdash":""}" clip-path="url(#fclip)" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
+      else out.push(`<polyline class="fln ${cls[ci]}${ln.dash?" fdash":""}" clip-path="url(#${cid})" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
       if(ln.label){const vis=P.filter(p=>p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1),e=vis[vis.length-1]||P[P.length-1],t=String(ln.label).slice(0,12),w=t.length*7+4;
         const x=Math.min(Math.max(sx(e[0]),L+14),L+pw-4),y=Math.min(Math.max(sy(e[1])-6,T+11),T+ph-4);labs.push([x-w/2,y,w,t,"end",` class="flab ${cls[ci]}"`,x]);}});
     (f.points||[]).slice(0,4).forEach(pt=>{const a=pt&&pt.at;if(!a||!num(+a[0])||!num(+a[1]))return;const x=sx(+a[0]),y=sy(+a[1]);
@@ -442,7 +443,7 @@ function figHtml(f){
   if(f.xlabel)out.push(txt(L+pw/2,H-6,String(f.xlabel).slice(0,40),"middle",' class="faxl"'));
   if(f.ylabel)out.push(`<text class="faxl" text-anchor="middle" transform="translate(11 ${(T+ph/2).toFixed(1)}) rotate(-90)">${esc(String(f.ylabel).slice(0,40))}</text>`);
   const desc="Graph"+(f.ylabel?" of "+f.ylabel:"")+(f.xlabel?" against "+f.xlabel:"");
-  return `<div class="fig"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}"><defs><clipPath id="fclip"><rect x="${L}" y="${T}" width="${pw}" height="${ph}"/></clipPath></defs>${out.join("")}</svg></div>`;
+  return `<div class="fig"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}"><defs><clipPath id="${cid}"><rect x="${L}" y="${T}" width="${pw}" height="${ph}"/></clipPath></defs>${out.join("")}</svg></div>`;
   }catch(e){return"";}
 }
 function codeHtml(c){if(!c)return"";return '<pre class="code">'+String(c).replace(/\t/g,"    ").split("\n").map(l=>"<span>"+(esc(l)||" ")+"</span>").join("")+"</pre>";}
