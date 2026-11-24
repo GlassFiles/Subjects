@@ -427,6 +427,9 @@ html[data-look="ink"] .gcard .ghome{background:radial-gradient(closest-side,var(
 .gcard.gflip{flex-direction:row-reverse;padding:0 2px 0 12px}.gcard.gflip .ghome{margin:calc(-44px*var(--fs,1)) -4px -2px 0}
 .gcard.gflip .gbub:before{left:auto;right:-8px;transform:translateY(-50%) rotate(225deg)}
 .gcard .gbtn{background:var(--holo-panel);color:var(--holo-text)}
+.thsub{margin:18px 2px 8px;display:flex;flex-direction:column;gap:2px}.thsub small{font-weight:600;color:var(--mute);font-size:calc(13px*var(--fs,1))}
+#mapstrip .thsub{margin:6px 2px 0;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-size:calc(11px*var(--fs,1))}
+.thsub:not(#mapstrip .thsub){background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px;align-self:flex-start}
 </style>
 </head>
 <body><div style="background:#ffd23f;color:#111;font:700 13px/1.3 system-ui,sans-serif;text-align:center;padding:calc(6px + env(safe-area-inset-top)) 10px 6px">TEST VERSION: progress, scores and quiz rooms here are separate from the real Mikonomics</div>
@@ -1239,6 +1242,9 @@ ACT.shareWeek=()=>{const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay(
    down into them"). A skin with "themes" opens the map on its themes, each a card with its friend, title, sections and progress;
    a theme opens its sections; a section opens its topics (secView). Rep Max has no themes and keeps its rings. ---------- */
 let THEME_CUR=null;
+// micro and macro stay apart (Guy 24 Nov 00:24, "one requirement for this was to split it by microeconomics and macroeconomics"):
+// each subject in course order, with the themes whose sections belong to it (Economics A: micro 1 and 3, macro 2 and 4)
+const thBySubj=keys=>SKEYS.map(s=>({s,ths:keys.filter(th=>themeGroups(th).some(x=>x.s===s))})).filter(x=>x.ths.length);
 const thOf=g=>String(g.ref||((g.topics[0]||{}).id)||"").split(".")[0];
 function themeGroups(th){const out=[];for(const s of SKEYS)((SPEC[s]||{}).groups||[]).forEach((g,gi)=>{if(thOf(g)===th)out.push({s,gi,g});});return out;}
 function themeStats(th){const ix=tIndex();let n=0,m=0,st=0;for(const {s,g} of themeGroups(th))for(const t of g.topics){const x=tState(ix,s,t);n++;if(x.st>=2)m++;else if(x.st===1)st++;}return {n,m,st};}
@@ -1246,10 +1252,10 @@ const thPic=th=>{const c=castOf("",{t:th+".1"});return c&&c.pics?(c.pics.explain
 const thBar=(m,st,n)=>`<span class="thbar"><i style="width:${(m/(n||1)*100).toFixed(1)}%"></i><i class="ths" style="width:${(st/(n||1)*100).toFixed(1)}%"></i></span>`;
 function themeMap(){setWide(false);THEME_CUR=null;const T=CFG.skin.themes,keys=Object.keys(T);let N=0,M=0;
   const cards=keys.map(th=>{const tm=T[th],S=themeStats(th),gs=themeGroups(th),pic=thPic(th),c=castOf("",{t:th+".1"});N+=S.n;M+=S.m;
-    return `<button class="thcard" data-act="mapTh" data-th="${esc(th)}" style="--thc:${(CFG.skin.theme_colours||{})[th]||"var(--accent)"}">${pic?`<img class="thpic" src="${pic}" alt="" aria-hidden="true" decoding="async">`:""}<span class="thtext"><small>Theme ${esc(th)} · ${esc(tm.paper||"")}</small><b>${esc(tm.name)}</b><span class="thsecs">${gs.map(x=>esc(x.g.name)).join(" · ")}</span>${thBar(S.m,S.st,S.n)}<span class="thnum">${S.m} of ${S.n} topics mastered${S.st?` · ${S.st} started`:""}${c?` · with ${esc(c.who)}`:""}</span></span></button>`;}).join("");
+    return `<button class="thcard" data-act="mapTh" data-th="${esc(th)}" style="--thc:${(CFG.skin.theme_colours||{})[th]||"var(--accent)"}">${pic?`<img class="thpic" src="${pic}" alt="" aria-hidden="true" decoding="async">`:""}<span class="thtext"><small>Theme ${esc(th)} · ${esc(tm.paper||"")}</small><b>${esc(tm.name)}</b><span class="thsecs">${gs.map(x=>esc(x.g.name)).join(" · ")}</span>${thBar(S.m,S.st,S.n)}<span class="thnum">${S.m} of ${S.n} topics mastered${S.st?` · ${S.st} started`:""}${c?` · with ${esc(c.who)}`:""}</span></span></button>`;});
   render(`<div class="wrap">${topBar("Your course","home")}
-  <div class="card"><b style="font-size:calc(18px*var(--fs,1))">${esc(PRO.label||APP)}</b><div class="small muted">${M} of ${N} topics mastered · ${keys.length} themes · tap a theme to open it</div>${thBar(M,0,N)}</div>
-  <div class="list thlist">${cards}</div></div>`,"map");}
+  <div class="card"><b style="font-size:calc(18px*var(--fs,1))">${esc(PRO.label||APP)}</b><div class="small muted">${M} of ${N} topics mastered · ${thBySubj(keys).map(x=>esc(SUBJ[x.s].short||SUBJ[x.s].name)).join(" and ")} · tap a theme to open it</div>${thBar(M,0,N)}</div>
+  ${thBySubj(keys).map(({s,ths})=>{const st=ths.map(themeStats),m=st.reduce((a,x)=>a+x.m,0),n=st.reduce((a,x)=>a+x.n,0);return `<h3 class="thsub">${esc(SUBJ[s].name)}<small>Theme${ths.length>1?"s":""} ${ths.map(esc).join(" and ")} · ${m} of ${n} mastered</small></h3><div class="list thlist">${ths.map(th=>cards[keys.indexOf(th)]).join("")}</div>`;}).join("")}</div>`,"map");}
 function themeView(th){setWide(false);const T=CFG.skin.themes,tm=T&&T[th];if(!tm)return themeMap();THEME_CUR=th;const ix=tIndex(),gs=themeGroups(th),S=themeStats(th),pic=thPic(th),c=castOf("",{t:th+".1"}),col=(CFG.skin.theme_colours||{})[th]||"var(--accent)";
   if(gs[0])MAPS=gs[0].s;
   const secs=gs.map(({s,gi,g})=>{const X=g.topics.map(t=>tState(ix,s,t)),n=X.length,m=X.filter(x=>x.st>=2).length,st=X.filter(x=>x.st===1).length;
@@ -1261,9 +1267,9 @@ function themeView(th){setWide(false);const T=CFG.skin.themes,tm=T&&T[th];if(!tm
 ACT.mapTh=d=>{const th=(d&&d.th)||THEME_CUR;th?themeView(th):themeMap();};
 ACT.mapThGo=d=>{const ks=themeGroups(d.th).flatMap(({s,g})=>g.topics.filter(t=>mapCounts(s,t)).map(t=>s+"|"+t.id));const all=themeGroups(d.th).flatMap(({s,g})=>g.topics.map(t=>s+"|"+t.id));mapRun(BANK.some(q=>ks.includes(keyOf(q)))?ks:all,"Theme "+d.th+": "+CFG.skin.themes[d.th].name,"th"+d.th);};
 // the home page's map card, by theme: one row a theme with its colour, short title and progress; tapping opens that theme
-function themeStrip(){const T=CFG.skin.themes;let N=0,M=0;const rows=Object.keys(T).map(th=>{const S=themeStats(th);N+=S.n;M+=S.m;const col=(CFG.skin.theme_colours||{})[th]||"var(--accent)";
-    return `<button class="throw" data-act="mapTh" data-th="${esc(th)}" style="--thc:${col}"><span class="thn">${esc(th)}</span><span class="thtext"><b>${esc(T[th].short||T[th].name)}</b>${thBar(S.m,S.st,S.n)}</span><small>${S.m}/${S.n}</small></button>`;}).join("");
-  return `<div class="card" id="mapstrip"><div class="row"><b style="font-size:calc(17px*var(--fs,1))">${icn("🗺️",1)}Your course</b><span class="spacer"></span><span class="small muted">${M} of ${N} mastered</span></div><div class="list" style="gap:6px;margin-top:8px">${rows}</div>
+function themeStrip(){const T=CFG.skin.themes,keys=Object.keys(T);let N=0,M=0;const rows=keys.map(th=>{const S=themeStats(th);N+=S.n;M+=S.m;const col=(CFG.skin.theme_colours||{})[th]||"var(--accent)";
+    return `<button class="throw" data-act="mapTh" data-th="${esc(th)}" style="--thc:${col}"><span class="thn">${esc(th)}</span><span class="thtext"><b>${esc(T[th].short||T[th].name)}</b>${thBar(S.m,S.st,S.n)}</span><small>${S.m}/${S.n}</small></button>`;});
+  return `<div class="card" id="mapstrip"><div class="row"><b style="font-size:calc(17px*var(--fs,1))">${icn("🗺️",1)}Your course</b><span class="spacer"></span><span class="small muted">${M} of ${N} mastered</span></div><div class="list" style="gap:6px;margin-top:8px">${thBySubj(keys).map(({s,ths})=>`<span class="thsub small">${esc(SUBJ[s].name)}</span>${ths.map(th=>rows[keys.indexOf(th)]).join("")}`).join("")}</div>
   <button class="linkb small" data-act="map" style="margin-top:6px">See every theme and section →</button></div>`;}
 /* ---------- v1.11 reports and feedback: a 🚩 wherever a question or other content shows ---------- */
 const RPT_WHY={q:[["wrong","The marked answer is wrong"],["inapp","Not appropriate"],["unclear","Confusing or badly worded"],["other","Something else"]],
