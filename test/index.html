@@ -27,7 +27,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rep Max">
 <style>
-:root{--bg:#0d0f13;--panel:#1b212b;--panel2:#29313f;--line:#3b4456;--text:#f3f5f9;--mute:#9aa3b2;--accent:#c6ff3d;--accent2:#a5e400;--orange:#ff7a2f;--red:#ff4d5e;--green:#2fd27a;
+:root{--splash-bg:var(--bg);--holo-bg:var(--panel);--holo-panel:var(--panel2);--holo-line:var(--line);--holo-text:var(--text);--holo-mute:var(--mute);--guide-accent:var(--accent);--thc:var(--accent);--heat:0;--fire1:#c6ff3d;--fire2:#ff9a1f;--fire3:rgba(255,220,90,.5);--guide-glow:rgba(80,210,230,.5);--guide-halo:rgba(200,240,250,.42);--guide-halo2:rgba(200,240,250,.14);--guide-halo0:rgba(225,248,255,0);--bg:#0d0f13;--panel:#1b212b;--panel2:#29313f;--line:#3b4456;--text:#f3f5f9;--mute:#9aa3b2;--accent:#c6ff3d;--accent2:#a5e400;--orange:#ff7a2f;--red:#ff4d5e;--green:#2fd27a;
 --maths:#4da3ff;--further:#b27cff;--chem:#33d17a;--cs:#ff9f1c;--t0:#e5484d;--t1:#3e7bff;--t2:#e8a317;--t3:#2a9d5c}
 /* FNF-91 step 3 (22 Nov 2026): every colour the engine draws with, by its job. A new skin gives each one a value. */
 /* figures in questions and lessons */
@@ -154,6 +154,12 @@ pre.code span::before{counter-increment:ln;content:counter(ln);position:absolute
 .opt.mine{border-color:var(--ui-white)}
 .opt .mark{margin-left:auto;font-size:calc(22px*var(--fs,1))}
 .opt .katex{color:var(--ui-white)}
+/* calm answers (FNF-106, 23 Nov 2026; skin.json "answers":"calm"): white cards with ink text, the shape in a small coloured square, so quiz nights still match by colour and shape */
+.ans-calm .opt.o0,.ans-calm .opt.o1,.ans-calm .opt.o2,.ans-calm .opt.o3{background:var(--panel);color:var(--text);border-color:var(--line)}
+.ans-calm .opt .katex{color:var(--text)}
+.ans-calm .opt .sh{width:calc(30px*var(--fs,1));height:calc(30px*var(--fs,1));border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ui-white);font-size:calc(15px*var(--fs,1));opacity:1}
+.ans-calm .opt.o0 .sh{background:var(--t0)}.ans-calm .opt.o1 .sh{background:var(--t1)}.ans-calm .opt.o2 .sh{background:var(--t2)}.ans-calm .opt.o3 .sh{background:var(--t3)}
+.ans-calm .opt.mine{border-color:var(--accent)}
 .feedback{margin-top:12px;padding:14px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);font-size:calc(16px*var(--fs,1));line-height:1.45}
 .feedback.ok{border-color:var(--ui-ok-line);background:var(--ui-ok-bg)}
 .feedback.no{border-color:var(--ui-no-line);background:var(--ui-no-bg)}
@@ -242,6 +248,12 @@ details .inner{padding:0 12px 12px}
 .topic:has(>.desc){flex-wrap:wrap}
 .topic>.desc{flex-basis:100%;font-size:calc(13px*var(--fs,1));color:var(--ui-desc);line-height:1.4;margin:-4px 0 0;padding-left:42px}
 
+
+/* economics diagrams (FNF-108): shaded areas, guide lines to the axes, shift arrows */
+.fig .farea{stroke:none;fill-opacity:.22}.fig .fa0{fill:var(--fig-c0)}.fig .fa1{fill:var(--fig-c1)}.fig .fa2{fill:var(--fig-c2)}.fig .fa3{fill:var(--fig-c3)}
+.fig .falab{font-weight:700;font-size:12px;stroke:var(--fig-paper);stroke-width:3px;paint-order:stroke}
+.fig .fgd{fill:none;stroke:var(--fig-axis);stroke-width:1;stroke-dasharray:4 3}.fig .fgl{font-size:11.5px;font-weight:700;fill:var(--fig-axis-label)}
+.fig .farr line{stroke-width:2.2;stroke-linecap:round}.fig .farr polygon{stroke:none}
 @font-face{font-family:"RM Lexend";src:url(../lib/fonts/rm-lexend.woff2) format("woff2");font-weight:100 900;font-display:swap}
 @font-face{font-family:"RM OpenDyslexic";src:url(../lib/fonts/rm-opendyslexic.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"RM OpenDyslexic";src:url(../lib/fonts/rm-opendyslexic-bold.woff2) format("woff2");font-weight:700 900;font-display:swap}
@@ -330,6 +342,90 @@ body.f-dys .tbar h2{font-family:"RM OpenDyslexic",system-ui,-apple-system,"Segoe
 .rptbox{max-width:440px;width:100%}.rptbox textarea{width:100%;min-height:70px;margin-top:10px;font-size:16px}
 .rr.on{border-color:var(--accent);background:var(--accent-a12)}
 .lrow{display:flex;gap:6px;align-items:stretch}.lrow .big{flex:1;min-width:0}.lrow .flagb{align-self:center}
+
+/* the guide (FNF-111): splash and answer-box reactions; only drawn when a skin has a guide */
+#splash{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .35s ease}
+#splash.out{opacity:0;pointer-events:none}
+#splash .spl-in{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px;animation:splIn .5s ease-out both}
+#splash .spl-pic{height:min(58vh,440px);width:auto;filter:drop-shadow(0 0 18px var(--guide-glow))}
+#splash .spl-name{font:900 calc(30px*var(--fs,1))/1.1 var(--display,inherit);letter-spacing:.06em;color:var(--text);text-transform:uppercase}
+#splash .spl-credit{font-size:11.5px;color:var(--mute);text-align:center;max-width:320px}#splash .spl-credit a{color:var(--mute)}
+@keyframes splIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.feedback.has-guide{overflow:hidden}
+.feedback .gfb{float:right;height:calc(118px*var(--fs,1));width:auto;margin:-8px -6px 2px 10px;shape-outside:margin-box}
+.feedback.ok.has-guide{border-width:2px;border-left:6px solid var(--green);animation:fbPop .38s cubic-bezier(.2,1.4,.4,1) both}
+.feedback.ok.has-guide.onfire{animation:fbPop .38s cubic-bezier(.2,1.4,.4,1) both,fireGlow .24s steps(2) .38s infinite}
+.feedback.ok.has-guide>b{color:var(--green);font-size:calc(22px*var(--fs,1))}
+.feedback.ok.has-guide .gfb{animation:gUp .45s ease-out both}
+@keyframes fbPop{from{transform:scale(.96)}to{transform:none}}@keyframes gUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+html[data-look="ink"] .feedback .gfb{background:radial-gradient(closest-side,var(--guide-halo),var(--guide-halo2) 60%,var(--guide-halo0))}
+@media (prefers-reduced-motion:reduce){#splash,#splash .spl-in,.feedback.ok.has-guide,.feedback.ok.has-guide .gfb{animation:none;transition:none}}
+.gcard{display:flex;align-items:flex-end;gap:6px;padding:0 12px 0 2px;margin-top:34px;overflow:visible;position:relative}
+.gcard .ghome{height:calc(178px*var(--fs,1));width:auto;flex:none;margin:calc(-44px*var(--fs,1)) 0 -2px -4px;filter:drop-shadow(0 0 8px var(--guide-glow))}
+.gcard .gbub{position:relative;align-self:center;flex:1;min-width:0;background:var(--panel2);border:2px solid var(--guide-accent);border-radius:18px;padding:10px 12px 12px;font-size:calc(15px*var(--fs,1));line-height:1.35;display:flex;flex-direction:column;gap:4px;margin:14px 0 16px}
+.gcard .gbub>b{font-size:calc(17px*var(--fs,1))}
+.gcard .gbtn{align-self:flex-start;margin-top:6px;min-height:44px;padding:0 14px;border-color:var(--guide-accent)}
+.gcard .gbub:before{content:"";position:absolute;left:-8px;top:50%;width:13px;height:13px;background:inherit;border-left:2px solid var(--guide-accent);border-bottom:2px solid var(--guide-accent);transform:translateY(-50%) rotate(45deg)}
+html[data-look="ink"] .gcard .ghome{background:radial-gradient(closest-side,var(--guide-halo),var(--guide-halo2) 60%,var(--guide-halo0))}
+.grun{position:fixed;left:100%;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;pointer-events:none;background-repeat:no-repeat;background-position:0 0;
+  filter:drop-shadow(0 0 6px var(--guide-glow));animation-name:grunX,grunF,grunFl;animation-timing-function:steps(6,jump-none),steps(6),ease-out;
+  animation-iteration-count:1,1,6;animation-fill-mode:both,none,none}
+/* anime flash-steps (Guy 23 Nov 21:07): she does not glide; she blinks from spot to spot, one pose per spot */
+@keyframes grunX{from{transform:translateX(0)}to{transform:translateX(calc(-100vw - 100%))}}
+@keyframes grunFl{0%{opacity:0;filter:drop-shadow(0 0 14px var(--guide-glow)) brightness(2.2)}22%{opacity:1}100%{opacity:1;filter:drop-shadow(0 0 6px var(--guide-glow))}}
+@keyframes grunF{to{background-position:120% 0}}   /* 6 frames: 0%, 20% ... 100% */
+@media (prefers-reduced-motion:reduce){.grun{display:none}}
+.gcred{display:inline-flex;align-items:center;min-height:44px;min-width:44px;padding:0 4px}
+/* fire on a run (FNF-111; Guy 23 Nov 19:15 "the more right the more the fire grows and engulf the answer box", 19:19 "depending on
+   the skin", 21:08 "holographic fire"): flames along the edges of a right-answer box from a streak of 2, growing with the streak
+   (--heat 0 to 1); colours from the skin (--fire1..3); a skin turns it on with "fire": true */
+.feedback.onfire{position:relative;z-index:0;overflow:visible;display:flow-root;border-color:var(--fire1)}
+.feedback.onfire{box-shadow:0 0 calc(6px + 16px*var(--heat)) calc(1px + 5px*var(--heat)) var(--fire1),0 0 calc(14px + 34px*var(--heat)) calc(2px + 10px*var(--heat)) var(--fire3);animation:fireGlow .24s steps(2) infinite}
+@keyframes fireGlow{50%{box-shadow:0 0 calc(4px + 12px*var(--heat)) calc(1px + 3px*var(--heat)) var(--fire2),0 0 calc(10px + 26px*var(--heat)) calc(1px + 7px*var(--heat)) var(--fire3)}}
+.feedback.onfire::after{content:"";position:absolute;z-index:-1;left:4%;right:4%;top:calc(-14px - 46px*var(--heat));height:calc(14px + 46px*var(--heat));pointer-events:none;
+  background:radial-gradient(ellipse 50% 100% at 50% 100%,var(--fire2),transparent 72%) 0 100%/34px 100% repeat-x,
+             radial-gradient(ellipse 50% 100% at 50% 100%,var(--fire1),transparent 70%) 17px 100%/34px 80% repeat-x,
+             repeating-linear-gradient(0deg,transparent 0 3px,var(--fire3) 3px 4px);
+  -webkit-mask:linear-gradient(to top,var(--fire1) 30%,transparent);mask:linear-gradient(to top,var(--fire1) 30%,transparent);
+  opacity:calc(.5 + .5*var(--heat));transform-origin:50% 100%;animation:fireLick .5s ease-in-out infinite alternate,fireDrift 1.6s linear infinite}
+@keyframes fireLick{from{transform:scaleY(.82)}to{transform:scaleY(1.08)}}@keyframes fireDrift{to{background-position:34px 100%,-17px 100%,0 8px}}
+@media (prefers-reduced-motion:reduce){.feedback.onfire,.feedback.onfire::after{animation:none}}
+.mth .mz2,.mth .mz3{fill:var(--thc)}.msec.mth{border-left:5px solid var(--thc)}.msec.mth .mnum{background:var(--thc);color:var(--ui-white)}
+@media (max-width:360px){.gcard .ghome{height:calc(146px*var(--fs,1));margin-top:calc(-36px*var(--fs,1))}.gcard .gbub{font-size:calc(14px*var(--fs,1))}}
+.lrot{display:grid}.lrot>.lr{grid-area:1/1;display:block;animation:lrot 9s ease-in-out infinite}.lrot>.lr2{opacity:0;animation-delay:-4.5s}
+@keyframes lrot{0%,42%{opacity:1}50%,92%{opacity:0}100%{opacity:1}}
+.lwhy{margin:4px 0 10px;color:var(--mute);font-size:calc(15px*var(--fs,1))}
+.logo[data-act="lookFlip"]{cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:48px}
+/* the course by theme (FNF-115) */
+.thlist{gap:12px}.thcard{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 14px 12px 4px;border-radius:18px;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--thc);color:var(--text);font:inherit;cursor:pointer;min-height:44px}
+.thpic{height:calc(112px*var(--fs,1));width:auto;flex:none;filter:drop-shadow(0 0 6px var(--guide-glow))}
+.thtext{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}.thtext small{font-size:calc(11.5px*var(--fs,1));letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--thc)}
+.thtext b{font-size:calc(17px*var(--fs,1));line-height:1.25}.thsecs{font-size:calc(13px*var(--fs,1));color:var(--mute);line-height:1.35}.thnum{font-size:calc(12.5px*var(--fs,1));color:var(--mute)}
+.thbar{display:flex;height:8px;border-radius:5px;background:var(--panel2);overflow:hidden;margin-top:2px}.thbar i{display:block;height:100%;background:var(--thc)}.thbar i.ths{background:var(--map-started)}
+.thhead{display:flex;align-items:center;gap:10px;border-left:6px solid var(--thc);padding-left:4px}
+.throw{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:6px 10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--thc);color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.throw .thn{width:26px;height:26px;border-radius:50%;background:var(--thc);color:var(--ui-white);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}.throw .thtext b{font-size:calc(14.5px*var(--fs,1))}.throw small{color:var(--mute);flex:none}
+/* cards that hold a hologram stay dark on every look (Guy 23 Nov 23:06), so the figures glow; the host swaps sides */
+.gcard,.thcard,.thhead{background:var(--holo-bg);border-color:var(--holo-line);color:var(--holo-text)}
+.gcard .gbub{background:var(--holo-panel);color:var(--holo-text)}.thcard .thsecs,.thcard .thnum,.thhead .thnum{color:var(--holo-mute)}.thcard .thbar,.thhead .thbar{background:var(--holo-panel)}
+.gcard.gflip{flex-direction:row-reverse;padding:0 2px 0 12px}.gcard.gflip .ghome{margin:calc(-44px*var(--fs,1)) -4px -2px 0}
+.gcard.gflip .gbub:before{left:auto;right:-8px;transform:translateY(-50%) rotate(225deg)}
+.gcard .gbtn{background:var(--holo-panel);color:var(--holo-text)}
+.thsub{margin:18px 2px 8px;display:flex;flex-direction:column;gap:2px}.thsub small{font-weight:600;color:var(--mute);font-size:calc(13px*var(--fs,1))}
+#mapstrip .thsub{margin:6px 2px 0;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;font-size:calc(11px*var(--fs,1))}
+.thsub:not(#mapstrip .thsub){background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px;align-self:flex-start}
+.thhalf{opacity:.13}.thhl{font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase}.thdiv{stroke:var(--line);stroke-dasharray:4 4}
+.thsp{stroke-width:2.5;opacity:.7}.thnd{fill:var(--panel);stroke-width:2;opacity:.9}.tharc{fill:none;stroke-width:5}
+.thsub:not(#mapstrip .thsub){width:fit-content}
+/* the guide's moves go either way (FNF-111, 24 Nov): the strip is drawn facing left, so going right it is mirrored */
+.grun{animation-name:grunX,grunF,grunFl}.grun.grunR{left:auto;right:100%;animation-name:grunXR,grunF,grunFl}
+@keyframes grunXR{from{transform:translateX(0) scaleX(-1)}to{transform:translateX(calc(100vw + 100%)) scaleX(-1)}}
+@keyframes grunF{to{background-position:var(--gend,120%) 0}}
+.gspirit{display:block;margin-bottom:2px}
+.spl-tag{margin:8px auto 0;max-width:300px;text-align:center;font-size:calc(13px*var(--fs,1));font-weight:700;letter-spacing:.03em;opacity:.85}
+/* the splash is always black, on every look (Guy 24 Nov 10:56 "pls make the splash screen always black") */
+#splash{background:var(--splash-bg)}#splash .spl-name{color:var(--tie,var(--holo-text))}#splash .spl-tag{color:var(--holo-text)}#splash .spl-credit,#splash .spl-credit a{color:var(--holo-mute)}
+/* a warm accent a skin may give one look (FNF-90 palette "skin tone"; Guy 24 Nov 10:56 "id like to expierment using that fawn colour") */
 </style>
 </head>
 <body><div style="background:#ffd23f;color:#111;font:700 13px/1.3 system-ui,sans-serif;text-align:center;padding:calc(6px + env(safe-area-inset-top)) 10px 6px">TEST VERSION: progress, scores and quiz rooms here are separate from the real Rep Max</div>
@@ -428,6 +524,7 @@ const APP=CFG.skin.name;                 // the app's name, on screen and in sha
 const LOGO=CFG.skin.words.logo, LOGO_ICON=CFG.skin.words.logo_icon;   // the word mark: LOGO[0] <b>LOGO[1]</b>
 const WL=CFG.skin.words.labels;          // the skin's labels (the solo gym, workouts, rep counter, praise)
 const PIC=CFG.skin.pictures;             // the skin's pictures: background pattern, default, per subject
+const LOOKS=CFG.skin.looks||[];          // the skin's looks to choose between in Settings (FNF-90); none for one look
 const PROFILE=window.RM.profile;                     // null until a course is chosen
 const PRO=PROFILES[PROFILE]||{label:"",tag:"",quiz:false,subj:{}};
 const COURSES=Object.keys(PROFILES);                 // the edition's courses, in its order (the first is the default)
@@ -496,7 +593,7 @@ function figSvg(f){
   const ylines=[];for(let v=y0,i=0;v<=y1+1e-9&&i<41;v=y0+ys*++i)ylines.push(v);
   const yEvery=ylines.length>11?2:1;
   const txt=(x,y,t,a,extra)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a||"middle"}"${extra||""}>${esc(String(t))}</text>`;
-  ylines.forEach((v,i)=>{const y=sy(v);out.push(`<line class="fg" x1="${L}" x2="${L+pw}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`);
+  ylines.forEach((v,i)=>{const y=sy(v);if(f.grid!==false)out.push(`<line class="fg" x1="${L}" x2="${L+pw}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`);
     if(f.ynums!==false&&i%yEvery===0)out.push(txt(L-5,y+4,figNum(v),"end"));});
   if(f.type==="bar"){
     const cats=f.cats||[],vals=f.vals||[],n=cats.length;if(!n||vals.length!==n)return"";
@@ -509,24 +606,33 @@ function figSvg(f){
     sx=v=>L+(v-x0)/(x1-x0)*pw;
     const xlines=[];for(let v=x0,i=0;v<=x1+1e-9&&i<41;v=x0+xs*++i)xlines.push(v);
     const xEvery=xlines.length>9?2:1;
-    xlines.forEach((v,i)=>{const x=sx(v);out.push(`<line class="fg" y1="${T}" y2="${T+ph}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"/>`);
+    xlines.forEach((v,i)=>{const x=sx(v);if(f.grid!==false)out.push(`<line class="fg" y1="${T}" y2="${T+ph}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"/>`);
       if(f.xnums!==false&&i%xEvery===0){const t=figNum(v),hw=t.length*3.4;out.push(x+hw>W-1?txt(W-1,T+ph+15,t,"end"):txt(x,T+ph+15,t));}});
     if(x0<0&&x1>0)out.push(`<line class="fz" y1="${T}" y2="${T+ph}" x1="${sx(0).toFixed(1)}" x2="${sx(0).toFixed(1)}"/>`);
     if(y0<0&&y1>0)out.push(`<line class="fz" x1="${L}" x2="${L+pw}" y1="${sy(0).toFixed(1)}" y2="${sy(0).toFixed(1)}"/>`);
     const cls=["fl0","fl1","fl2","fl3"];
     const placed=[],spot=(x,y,w)=>{for(let k=0;k<6;k++){const hit=placed.some(b=>Math.abs(b[0]-x)<(b[2]+w)/2+4&&Math.abs(b[1]-y)<13);if(!hit)break;y=y+14>T+ph-2?y-28:y+14;}placed.push([x,y,w]);return y;};
     const labs=[];
+    (f.areas||[]).slice(0,6).forEach((ar,j)=>{const ci=Number.isInteger(ar.c)?((ar.c%4)+4)%4:j%4;const P=(ar.pts||[]).filter(p=>Array.isArray(p)&&num(+p[0])&&num(+p[1])).map(p=>[+p[0],+p[1]]);if(P.length<3)return;
+      out.push(`<polygon class="farea fa${ci}${ar._new?" fnew":""}" clip-path="url(#${cid})" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
+      if(ar.label){const cx=P.reduce((a,p)=>a+p[0],0)/P.length,cy=P.reduce((a,p)=>a+p[1],0)/P.length,at=Array.isArray(ar.at)&&num(+ar.at[0])&&num(+ar.at[1])?[+ar.at[0],+ar.at[1]]:[cx,cy];out.push(txt(sx(at[0]),sy(at[1])+4,String(ar.label).slice(0,14),"middle",` class="falab fl${ci}"`));}});
     (f.lines||[]).slice(0,12).forEach((ln,j)=>{const ci=Number.isInteger(ln.c)?((ln.c%4)+4)%4:j%4;const P=(ln.pts||[]).filter(p=>Array.isArray(p)&&num(+p[0])&&num(+p[1])).map(p=>[+p[0],+p[1]]);if(!P.length)return;
       if(ln.dots)P.forEach(p=>{if(p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1)out.push(`<circle class="fd ${cls[ci]}${ln._new?" fnew":""}" cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}" r="3.6"/>`);});
       else out.push(`<polyline class="fln ${cls[ci]}${ln.dash?" fdash":""}${ln._new?" fnew":""}" clip-path="url(#${cid})" points="${P.map(p=>sx(p[0]).toFixed(1)+","+sy(p[1]).toFixed(1)).join(" ")}"/>`);
       if(ln.label){const vis=P.filter(p=>p[0]>=x0&&p[0]<=x1&&p[1]>=y0&&p[1]<=y1),e=vis[vis.length-1]||P[P.length-1],t=String(ln.label).slice(0,18),w=t.length*7+4;
         const x=Math.min(Math.max(sx(e[0]),L+14),L+pw-4),y=Math.min(Math.max(sy(e[1])-6,T+11),T+ph-4);labs.push([x-w/2,y,w,t,"end",` class="flab ${cls[ci]}"`,x]);}});
+    (f.arrows||[]).slice(0,6).forEach((ar,j)=>{const a=ar&&ar.from,b=ar&&ar.to;if(!a||!b||![a[0],a[1],b[0],b[1]].every(v=>num(+v)))return;const ci=Number.isInteger(ar.c)?((ar.c%4)+4)%4:3;
+      const x1=sx(+a[0]),y1=sy(+a[1]),x2=sx(+b[0]),y2=sy(+b[1]),d=Math.hypot(x2-x1,y2-y1);if(d<6)return;const ux=(x2-x1)/d,uy=(y2-y1)/d,hx=x2-ux*9,hy=y2-uy*9;
+      out.push(`<g class="farr fl${ci}${ar._new?" fnew":""}"><line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}"/><polygon points="${x2.toFixed(1)},${y2.toFixed(1)} ${(hx-uy*5).toFixed(1)},${(hy+ux*5).toFixed(1)} ${(hx+uy*5).toFixed(1)},${(hy-ux*5).toFixed(1)}"/></g>`);});
     (f.points||[]).slice(0,6).forEach(pt=>{const a=pt&&pt.at;if(!a||!num(+a[0])||!num(+a[1]))return;const x=sx(+a[0]),y=sy(+a[1]);
+      if(pt.guides){const g=Array.isArray(pt.guides)?pt.guides:[];out.push(`<polyline class="fgd${pt._new?" fnew":""}" points="${x.toFixed(1)},${(T+ph).toFixed(1)} ${x.toFixed(1)},${y.toFixed(1)} ${L},${y.toFixed(1)}"/>`);
+        if(g[0])out.push(txt(x,T+ph+(f.xnums===false?15:28),String(g[0]).slice(0,8),"middle",' class="fgl"'));if(g[1])out.push(txt(L-5,y+4,String(g[1]).slice(0,8),"end",' class="fgl"'));}
       out.push(`<circle class="fpt${pt._new?" fnew":""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4"/>`);
       if(pt.label){const t=String(pt.label).slice(0,18),w=t.length*7+4,right=x+7+w>W-4,lx=right?x-7:x+7,ly=y-7<T+10?y+17:y-7;const cy=spot(right?lx-w/2:lx+w/2,ly,w);out.push(txt(lx,cy,t,right?"end":"start",' class="fplab"'));}});
     labs.forEach(l=>{const y=spot(l[0],l[1],l[2]);out.push(txt(l[6],y,l[3],l[4],l[5]));});
   }
-  out.push(`<rect class="fax" x="${L}" y="${T}" width="${pw}" height="${ph}"/>`);
+  if(f.grid===false&&f.type!=="bar")out.push(`<polyline class="fax" points="${L},${T} ${L},${(T+ph).toFixed(1)} ${(L+pw).toFixed(1)},${(T+ph).toFixed(1)}"/>`);
+  else out.push(`<rect class="fax" x="${L}" y="${T}" width="${pw}" height="${ph}"/>`);
   if(f.xlabel)out.push(txt(L+pw/2,H-6,String(f.xlabel).slice(0,40),"middle",' class="faxl"'));
   if(f.ylabel)out.push(`<text class="faxl" text-anchor="middle" transform="translate(11 ${(T+ph/2).toFixed(1)}) rotate(-90)">${esc(String(f.ylabel).slice(0,40))}</text>`);
   const desc="Graph"+(f.ylabel?" of "+f.ylabel:"")+(f.xlabel?" against "+f.xlabel:"");
@@ -538,7 +644,7 @@ const FIGA={};let FIGAN=0;
 const figInt=v=>Number.isInteger(v)&&v>0;
 function figKind(f){if(!f||typeof f!=="object")return"";
   if(f.type==="box")return Array.isArray(f.sp)&&f.sp.length&&f.sp.length<=6?"box":"";
-  if(f.anim==="steps"){const n=Array.isArray(f.steps)?f.steps.length:0;const items=f.type==="bar"?(f.bstep||[]).map(s=>({step:s})):f.type==="mech"?[...(f.atoms||[]),...(f.bonds||[]),...(f.arrows||[]),...(f.text||[]),...(f.shapes||[])]:[...(f.lines||[]),...(f.points||[])];
+  if(f.anim==="steps"){const n=Array.isArray(f.steps)?f.steps.length:0;const items=f.type==="bar"?(f.bstep||[]).map(s=>({step:s})):f.type==="mech"?[...(f.atoms||[]),...(f.bonds||[]),...(f.arrows||[]),...(f.text||[]),...(f.shapes||[])]:[...(f.lines||[]),...(f.points||[]),...(f.areas||[]),...(f.arrows||[])];
     const has=items.some(x=>x&&figInt(x.step));return n>=2&&n<=12&&has?"steps":"";}
   if(f.anim==="draw")return f.type!=="bar"&&f.type!=="mech"&&(f.lines||[]).length?"draw":"";
   if(f.anim==="frames"){const n=Array.isArray(f.frames)?f.frames.length:0,c=f.ctl||{};return n>=2&&n<=61&&Array.isArray(c.vals)&&c.vals.length===n?"frames":"";}
@@ -553,9 +659,9 @@ function figState(A){const f=A.f,k=A.k;
   if(A.kind==="steps"&&f.type==="mech"){const vis=x=>x&&!(figInt(x.step)&&x.step>k)&&!(figInt(x.until)&&k>=x.until),nw=x=>A.moved&&x.step===k?{...x,_new:1}:x;
     const g={...f,_all:f};for(const K of ["atoms","bonds","arrows","text","shapes"])g[K]=(f[K]||[]).filter(vis).map(nw);return {fig:g,cap:String(f.steps[k-1]||"")};}
   if(A.kind==="steps"){const sel=a=>(a||[]).map((x,j)=>x&&a===f.lines&&!Number.isInteger(x.c)?{...x,c:j}:x).filter(x=>!(x&&figInt(x.step)&&x.step>k)).map(x=>x&&x.step===k&&A.moved?{...x,_new:1}:x);
-    return {fig:{...f,lines:sel(f.lines),points:sel(f.points)},cap:String(f.steps[k-1]||"")};}
+    return {fig:{...f,lines:sel(f.lines),points:sel(f.points),areas:sel(f.areas),arrows:sel(f.arrows)},cap:String(f.steps[k-1]||"")};}
   if(A.kind==="frames"&&f.type==="bar"){const fr=f.frames[k]||{};return {fig:{...f,vals:fr.vals||f.vals,cc:fr.cc||f.cc},cap:(Array.isArray(fr.read)?fr.read:[]).map(String).join("  ·  ")};}
-  if(A.kind==="frames"){const fr=f.frames[k]||{};return {fig:{...f,lines:[...(f.lines||[]),...(fr.lines||[])],points:[...(f.points||[]),...(fr.points||[])]},cap:(Array.isArray(fr.read)?fr.read:[]).map(String).join("  ·  ")};}
+  if(A.kind==="frames"){const fr=f.frames[k]||{};return {fig:{...f,lines:[...(f.lines||[]),...(fr.lines||[])],points:[...(f.points||[]),...(fr.points||[])],areas:[...(f.areas||[]),...(fr.areas||[])],arrows:[...(f.arrows||[]),...(fr.arrows||[])]},cap:(Array.isArray(fr.read)?fr.read:[]).map(String).join("  ·  ")};}
   const lines=(f.lines||[]).map((l,j)=>({...l,c:Number.isInteger(l.c)?l.c:j})),ph=[...new Set(lines.map(l=>l.step).filter(figInt))].sort((a,b)=>a-b);
   const nP=ph.length||1,t=Math.max(0,Math.min(1,A.t)),p=Math.min(nP-1,Math.floor(t*nP)),u=t>=1?1:t*nP-p;
   let tip=null;const outL=[];
@@ -566,7 +672,8 @@ function figState(A){const f=A.f,k=A.k;
   const pts=(f.points||[]).filter(pt=>{if(t>=1)return true;const q=pt&&figInt(pt.step)?ph.indexOf(pt.step):-1;return q>=0&&q<p;});
   if(f.pen&&tip&&t<1)pts.push({at:tip});
   const rd=Array.isArray(f.read)&&f.read.length===2&&tip&&t<1?`${f.read[0]} = ${figNumR(tip[0],+f.dp>=0?+f.dp:1)},  ${f.read[1]} = ${figNumR(tip[1],+f.dp>=0?+f.dp:1)}`:"";
-  return {fig:{...f,lines:outL,points:pts},cap:rd||(t>=1?String(f.cap||""):"")};}
+  const late=x=>t>=1||!(x&&figInt(x.step)&&!(ph.indexOf(x.step)>=0&&ph.indexOf(x.step)<p));
+  return {fig:{...f,lines:outL,points:pts,areas:(f.areas||[]).filter(late),arrows:(f.arrows||[]).filter(late)},cap:rd||(t>=1?String(f.cap||""):"")};}
 function figCtl(id,A){const n=A.kind==="steps"?A.f.steps.length:A.kind==="frames"?A.f.frames.length:0;
   if(A.kind==="steps")return `<button data-fa="prev" data-id="${id}" aria-label="Back a step"${A.k<=1?" disabled":""}>◀</button><span class="fpos">Step ${A.k} of ${n}</span><button data-fa="next" data-id="${id}"${A.k>=n?" disabled":""}>Next step ▶</button>`;
   if(A.kind==="draw")return `<button data-fa="draw" data-id="${id}">${A.timer?"Drawing…":"↻ Replay"}</button>`;
@@ -768,6 +875,7 @@ if(!Array.isArray(ST.days))ST.days=[];
 let TAUGHT=lsGet("taught",{});
 let NOTYET=lsGet("notyet",{});
 const ICP={
+tie:'<path d="M9.6 3h4.8l-1.4 3.4h-2z"/><path d="M11 6.4 8.6 16.8 12 20.6l3.4-3.8L13 6.4"/>',
 sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
 dumbbell:'<path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/>',
 bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
@@ -797,16 +905,18 @@ shuffle:'<path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>',
 repeat:'<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
 medal:'<circle cx="12" cy="15" r="6"/><path d="M8.5 10 6 2h4l2 5 2-5h4l-2.5 8"/><path d="m12 12 1 2h2l-1.5 1.5.5 2-2-1-2 1 .5-2L9 14h2z"/>',
 link:'<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'};
-const EMI={"☀️":"sun","🏋️":"dumbbell","⚡":"bolt","📺":"host","📱":"join","🗺️":"map","📍":"pin","🎓":"cap","📚":"books","⏱️":"watch","🤸":"warm","🔥":"flame","🎯":"target","🛠️":"wrench","∑":"sigma","∫":"integral","⚗️":"flask","💻":"code","📖":"pen","🎭":"book","🧬":"dna","⚛️":"atom","🕊️":"talk","🏰":"tower","💼":"chart","🎲":"shuffle","🏆":"cap","🔁":"repeat","🏅":"medal","🔗":"link"};
+const EMI={"☀️":"sun","🏋️":"dumbbell","⚡":"bolt","📺":"host","📱":"join","🗺️":"map","📍":"pin","🎓":"cap","📚":"books","⏱️":"watch","🤸":"warm","🔥":"flame","🎯":"target","🛠️":"wrench","∑":"sigma","∫":"integral","⚗️":"flask","💻":"code","📖":"pen","🎭":"book","🧬":"dna","⚛️":"atom","🕊️":"talk","🏰":"tower","👔":"tie","💼":"chart","🎲":"shuffle","🏆":"cap","🔁":"repeat","🏅":"medal","🔗":"link"};
 function icn(em,small){const n=EMI[em];return n?`<svg class="ic${small?" sm":""}" viewBox="0 0 24 24" aria-hidden="true">${ICP[n]}</svg>`:(small?esc(em)+" ":esc(em));}
 let MUTED=lsGet("muted",true);
 let SET=Object.assign({auto:true,size:1,font:"plain"},(SETUP&&SETUP.defaults)||{},lsGet("set",{}));   // engine base, then the setup's defaults, then the person's own
 const REDUCED=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
-function applySet(){document.documentElement.style.setProperty("--fs",SET.size||1);document.body.classList.toggle("f-lexend",SET.font==="lexend");document.body.classList.toggle("f-dys",SET.font==="dys");}
+/* a skin may offer several looks (skin.json "looks", the first is the default): the chosen one is html[data-look] (FNF-90) */
+const LOOK=()=>LOOKS.length?(LOOKS.some(x=>x.id===SET.look)?SET.look:LOOKS[0].id):"";
+function applySet(){if(LOOKS.length)document.documentElement.dataset.look=LOOK();document.body.classList.toggle("ans-calm",CFG.skin.answers==="calm");document.documentElement.style.setProperty("--fs",SET.size||1);document.body.classList.toggle("f-lexend",SET.font==="lexend");document.body.classList.toggle("f-dys",SET.font==="dys");}
 if(document.body)applySet();else addEventListener("DOMContentLoaded",applySet);
 const saveST=()=>lsSet("stats",ST);
 function rankOf(xp){let i=0;for(let k=0;k<RANKS.length;k++)if(xp>=RANKS[k][0])i=k;return{lvl:i+1,at:RANKS[i][0],name:RANKS[i][1],next:RANKS[i+1]||null};}
-function addXP(n){const before=rankOf(ST.xp).lvl;ST.xp+=Math.max(0,Math.round(n));saveST();const after=rankOf(ST.xp);if(after.lvl>before){setTimeout(()=>{toast("Level "+after.lvl+": "+after.name);SFX.fanfare();},600);}}
+function addXP(n){const before=rankOf(ST.xp).lvl;ST.xp+=Math.max(0,Math.round(n));saveST();const after=rankOf(ST.xp);if(after.lvl>before){setTimeout(()=>{toast("Level "+after.lvl+": "+after.name);if(!(typeof gSound==="function"&&gSound("levelup")))SFX.fanfare();},600);}}
 function markDay(){const d=londonDate();if(!ST.days.includes(d)){ST.days.push(d);ST.days=ST.days.slice(-120);}ST.lastDay=d;}
 function weekDays(){const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay()+6)%7,mon=addDays(d,-dow);return ST.days.filter(x=>x>=mon&&x<=d).length;}
 function recordAnswer(q,ok,o){o=o||{};const r=ST.q[q.id]||{n:0,c:0,box:0,last:0},today=londonDate();r.n++;
@@ -879,14 +989,16 @@ function tmSet(el,left,total){if(!el)return;el.querySelector("i").style.width=Ma
 function topBar(title,back="home"){return `<div class="top ttop tbar"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
 function setWide(on){document.body.classList.toggle("wide",!!on);}
 let VIEW="home";
-function render(html,view){if(view&&!['run','sprintq','play','host'].includes(view))calcClose();VIEW=view||VIEW;app.innerHTML=html;window.scrollTo(0,0);navSync();bgSync();}
+function render(html,view){if(view&&!['run','sprintq','play','host'].includes(view))calcClose();VIEW=view||VIEW;app.innerHTML=html;if(view&&['run','sprintq','play','host'].includes(view))document.querySelectorAll('.grun').forEach(e=>e.remove());window.scrollTo(0,0);navSync();bgSync();}
 const BG_OF=PIC.background_alias;   // subjects that share another's picture (the skin's "pictures")
 let BGK=null;
 function bgSync(){const el=document.getElementById("bgart");if(!el)return;
-  const k=busyView()||SET.bg===false?"":(VIEW==="map"||VIEW==="sec")&&MAPS?PIC.background_subject.replace("{s}",BG_OF[MAPS]||MAPS):PIC.background_default;
-  if(k===BGK)return;BGK=k;el.classList.remove("on");if(k)bgLoad(el,k,k);}
-function bgLoad(el,k,f){const img=new Image();img.onload=()=>{if(BGK!==k)return;el.style.backgroundImage="url("+PIC.background.replace("{name}",f)+")";el.classList.add("on");};
-  img.onerror=()=>{if(BGK===k&&f!==PIC.background_default)bgLoad(el,k,PIC.background_default);};img.src=PIC.background.replace("{name}",f);}
+  const k=busyView()||SET.bg===false?"":(VIEW==="map"||VIEW==="sec")&&MAPS?PIC.background_subject.replace("{s}",BG_OF[MAPS]||MAPS):PIC.background_default;   // the file name; the look is part of the address (picUrl)
+  const kl=k&&LOOKS.length?LOOK()+"/"+k:k;   // a change of look reloads the picture
+  if(kl===BGK)return;BGK=kl;el.classList.remove("on");if(k)bgLoad(el,kl,k);}
+const picUrl=f=>PIC.background.replace("{name}",f).replace("{look}",LOOK());
+function bgLoad(el,k,f){const img=new Image();img.onload=()=>{if(BGK!==k)return;el.style.backgroundImage="url("+picUrl(f)+")";el.classList.add("on");};
+  img.onerror=()=>{if(BGK===k&&f!==PIC.background_default)bgLoad(el,k,PIC.background_default);};img.src=picUrl(f);}
 let NAV_IN=false,NAV_SKIP=false;
 function navSync(){try{const atHome=VIEW==="home"||VIEW==="chooser";if(!atHome&&!NAV_IN){history.pushState({rm:1},"",location.href);NAV_IN=true;}else if(atHome&&NAV_IN){NAV_IN=false;NAV_SKIP=true;history.back();}}catch(e){}}
 function busyView(){return (VIEW==="run"&&!!RUN)||(VIEW==="sprintq"&&!!SP)||(VIEW==="host"&&typeof H!=="undefined"&&!!H)||VIEW==="play";}
@@ -906,6 +1018,52 @@ ACT.review=()=>{const n=dueLeft();if(!n){toast("Nothing due right now");return;}
 ACT.closeRoom=()=>{if(typeof H!=="undefined"&&H&&H.players&&H.players.size)askEnd("Close the room?","Everyone in the room is sent home.",()=>ACT.home());else ACT.home();};
 ACT.mute=(d,b)=>{MUTED=!MUTED;lsSet("muted",MUTED);b.textContent=MUTED?"🔇":"🔊";};
 
+
+/* ---------- the guide (FNF-111, 23 Nov 2026): a skin's character pictures, from skin.json "guide". A splash when the app
+   opens (once per visit; tap to skip) and a reaction picture in the answer box. A skin with no guide shows none of it. ---------- */
+const GUIDE=CFG.skin.guide||null;
+const gPic=k=>GUIDE&&GUIDE.pics&&GUIDE.pics[k]?GUIDE.pics[k]:"";
+const guideImg=(k,cls)=>{const p=gPic(k);return p?`<img class="gpic ${cls||""}" src="${p}" alt="" aria-hidden="true" decoding="async">`:"";};
+// a friend per section (FNF-113): skin.json guide.cast maps a mode ("daily", "sprint") or a theme (the topic id's first part, "1".."4")
+// to a friend with their own pics; a pose they do not have yet falls back to the host's
+function castOf(mode,q){const C=(GUIDE&&GUIDE.cast)||{};return C[mode]||(q&&C[String(q.t||"").split(".")[0]])||null;}
+// a reaction may be any of several poses the friend has (guide.alts: right -> right, peace, heart ...), one picked at random
+function guideImgFor(k,cls,mode,q){const c=castOf(mode,q),alts=[k,...(((GUIDE&&GUIDE.alts)||{})[k]||[])],have=c&&c.pics?alts.filter(x=>c.pics[x]):[];
+  const p=have.length?c.pics[have[Math.floor(Math.random()*have.length)]]:"";return p?`<img class="gpic ${cls||""}" src="${p}" alt="" aria-hidden="true" decoding="async">`:guideImg(k,cls);}
+const guideCredit=noSpirit=>GUIDE&&GUIDE.credit?`${GUIDE.spirit&&!noSpirit?`<span class="gspirit">${esc(GUIDE.spirit)}</span> `:""}${esc(GUIDE.credit)}${GUIDE.credit_link?` <a class="gcred" href="${esc(GUIDE.credit_link)}" target="_blank" rel="noopener">${esc(GUIDE.credit_licence||"licence")}</a>`:""}`:"";
+function guideSplash(){
+  if(!gPic("hello"))return;let force=false;try{force=new URLSearchParams(location.search).get("splash")==="1";}catch(e){}
+  if(!force&&navigator.webdriver)return;   // once per page load: guideSplash runs only at start
+  const el=document.createElement("div");el.id="splash";el.setAttribute("role","presentation");
+  el.innerHTML=`<div class="spl-in">${guideImg("hello","spl-pic")}<div class="spl-name">${esc(APP)}</div>${GUIDE.name_sub?`<div class="spl-sub">${esc(GUIDE.name_sub)}</div>`:""}${GUIDE.tagline?`<div class="spl-tag">${esc(GUIDE.tagline)}</div>`:""}<div class="spl-credit">${guideCredit(!!GUIDE.tagline)}</div></div>`;
+  let gone=false;const go=()=>{if(gone)return;gone=true;el.classList.add("out");setTimeout(()=>el.remove(),REDUCED?0:380);};
+  el.addEventListener("click",e=>{if(e.target.closest("a"))return;gSound("splash");go();});document.body.appendChild(el);setTimeout(go,1700);
+}
+let GHOME_I=-1;   // no random draw at load: the screenshot proof replays a fixed random sequence
+function guideHome(dueN,dd){   // the host on the home page (FNF-111/113): a pose that changes each visit, one line of what to do next and a button for it
+  const poses=(GUIDE&&GUIDE.home)||[];if(!poses.length)return"";GHOME_I=GHOME_I<0?Math.floor(Math.random()*poses.length):(GHOME_I+1)%poses.length;const img=guideImg(poses[GHOME_I],"ghome");if(!img)return"";
+  const [line,act,btn]=dueN?[`${dueN} ${dueN===1?"question is":"questions are"} due for review today.`,"review","Start review"]:FEAT("daily")&&!dd?["Today's daily challenge is ready when you are.","daily","Play today's"]:["Fancy a quick practice set?","gym","Practise"];
+  return `<div class="card gcard${Math.random()<.5?" gflip":""}">${img}<div class="gbub"><b>Hi ${esc(ME.name||"")}!</b><span>${line}</span><button class="btn gbtn" data-act="${act}">${btn} →</button></div></div>`;}
+let GRUN_AT=0;
+function guideRun(){   // the guide crosses the foot of the screen, flash-stepping (FNF-111): a move picked at random from the skin's
+  // guide.moves (run, skip, jump, cartwheel ...; or the one guide.run), either way across (Guy 24 Nov 10:46 "can the animation work in both directison")
+  const Ms=GUIDE&&(GUIDE.moves||(GUIDE.run?[GUIDE.run]:null));if(!Ms||!Ms.length||REDUCED)return;let force=false;try{force=new URLSearchParams(location.search).get("splash")==="1";}catch(e){}
+  if(!force&&navigator.webdriver)return;if(document.querySelector('.grun'))return;if(GRUN_AT&&Date.now()-GRUN_AT<25e3)return;GRUN_AT=Date.now();
+  const R=Ms[Math.floor(Math.random()*Ms.length)],K=R.spots||8,T=(R.secs||3.2)*K/6,D=document.getElementById("splash")?1.9:.3,right=Math.random()<.5;   // K spots, the first and last off screen; one pose per spot
+  const el=document.createElement("div");el.className="grun"+(right?" grunR":"");el.setAttribute("aria-hidden","true");
+  el.style.cssText=`width:${R.w}px;height:${R.h}px;background-image:url(${R.img});background-size:${R.w*R.n}px ${R.h}px;--gend:${(R.n/(R.n-1)*100).toFixed(2)}%;`+
+    `animation-duration:${T}s,${(T*R.n/K).toFixed(3)}s,${(T/K).toFixed(3)}s;animation-delay:${D}s,${D}s,${D}s;animation-timing-function:steps(${K},jump-none),steps(${R.n}),ease-out;animation-iteration-count:1,infinite,infinite`;
+  document.body.appendChild(el);el.addEventListener("animationend",e=>{if(e.animationName==="grunX"||e.animationName==="grunXR")el.remove();});
+  new MutationObserver((m,o)=>{if(!el.isConnected){GRUN_AT=0;o.disconnect();}}).observe(document.body,{childList:true});   // taken off early: its turn is not used up
+}
+// every 30 seconds on any screen that is not a lesson, a practice run, a sprint or a quiz (Guy 24 Nov 10:46 "cn it happen on any screen
+// that isnt a lesnring exercise or test every 30sec"); not while a sheet or lesson is open, nor when the page is hidden
+setInterval(()=>{if(!document.hidden&&!busyView()&&!document.querySelector(".modal"))guideRun();},30e3);
+// the word mark; a skin's words.logo_alt ([name, tag]) makes it take turns between two scripts, e.g. English and Japanese (FNF-113)
+function logoText(){const A=CFG.skin.words.logo_alt,one=`${esc(LOGO[0])} <b>${esc(LOGO[1])}</b><small>${esc(PRO.tag)}</small>`;
+  return A&&!REDUCED?`<div class="lrot"><span class="lr lr1">${one}</span><span class="lr lr2" aria-hidden="true">${esc(A[0])}<small>${esc(A[1])}</small></span></div>`:`<div>${one}</div>`;}
+// the skin's own jingles (FNF-114): guide.sounds {splash, streak, levelup}; only when sound is on; returns true if one played
+function gSound(k){const src=GUIDE&&GUIDE.sounds&&GUIDE.sounds[k];if(!src||MUTED)return false;try{const a=new Audio(src);a.volume=.8;const p=a.play();if(p&&p.catch)p.catch(()=>{});return true;}catch(e){return false;}}
 /* =====================================================================
    HOME
    ===================================================================== */
@@ -922,9 +1080,10 @@ function home(){
   const covStale=taughtOn()&&Date.now()-lsGet("covAt",Date.now())>7*864e5;
   const a2hs=!lsGet("a2hs",false)&&!isStandalone()&&!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
   render(`<div class="wrap">
-  <div class="top ttop"><div class="logo"><span class="lg">${icn(LOGO_ICON)}</span><div>${esc(LOGO[0])} <b>${esc(LOGO[1])}</b><small>${esc(PRO.tag)}</small></div></div>
+  <div class="top ttop"><div class="logo"${LOOKS.length>1?` data-act="lookFlip" role="button" tabindex="0" aria-label="Switch look (${LOOKS.map(x=>esc(x.name)).join(" / ")})"`:""}><span class="lg">${icn(LOGO_ICON)}</span>${logoText()}</div>
     <div class="row"><button class="chip" data-act="profile">${esc(ME.badge)} ${esc(ME.name)}</button><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div></div>
   ${courseSwitch()}
+  ${guideHome(dueN,dd)}${(setTimeout(guideRun,0),"")}
   ${LOAD_ERR.length?`<div class="card err">Couldn't load the ${esc(LOAD_ERR.join(", "))} questions. Open ${esc(APP)} from its web address: it can't read its question files from a file saved on this device.</div>`:""}
   <div class="card rankart"><div class="rank"><div class="badge" style="font-weight:900;font-size:26px">${r.lvl}</div><div style="flex:1">
     <div class="row"><b style="font-size:18px">${esc(r.name)}</b><span class="spacer"></span><span class="muted small">${fmt(ST.xp)} XP${r.next?" · next: "+esc(r.next[1])+" at "+fmt(r.next[0]):""}</span></div>
@@ -935,7 +1094,7 @@ function home(){
   <div class="list">
     ${dueN?`<button class="big hero" data-act="review"><span class="em">${icn("🔁")}</span><span><b>Today: ${dueN} due for review</b><span>Questions coming back at the right time, so they stick. About ${Math.max(1,Math.round(dueN*0.4))} min</span></span></button>`:todayGap()}
     ${FEAT("daily")?`<button class="big" data-act="daily"><span class="em">${icn("☀️")}</span><span><b>Daily challenge #${dn}</b><span>${dd?`Done today: ${dd.right}/${dd.n||10}. A new set tomorrow.`:"10 questions on what you've covered. No clock unless you want one."}</span></span></button>`:""}
-    <button class="big" data-act="gym"><span class="em">${icn("🏋️")}</span><span><b>${esc(WL.gym)}</b><span>${esc(WL.gym_blurb)}</span></span></button>
+    <button class="big" data-act="gym"><span class="em">${icn(LOGO_ICON)}</span><span><b>${esc(WL.gym)}</b><span>${esc(WL.gym_blurb)}</span></span></button>
     ${learnTile()}
     ${FEAT("sprint")?`<button class="big" data-act="sprint"><span class="em">${icn("⚡")}</span><span><b>Sprint</b><span>As many as you can before the clock runs out. Harder questions score more</span></span></button>`:""}
 ${FEAT("quiz")?`    <div class="grid2">
@@ -951,7 +1110,7 @@ ${FEAT("quiz")?`    <div class="grid2">
   <div class="foot">Questions: ${counts}${BAD.length?`<br><span class="err">${BAD.length} line${BAD.length===1?"":"s"} skipped: ${esc(BAD.slice(0,4).join("; "))}${BAD.length>4?"…":""}</span>`:""}<br>
   ${SKEYS.map(s=>esc(SUBJ[s].name+" "+((SPEC[s]||{}).board||"")+" "+((SPEC[s]||{}).code||"")).trim()).join(" · ")}<br>
   The questions were written and checked by AI, so a few may be wrong: use "Report a problem" under any question.<br>
-  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="resources">Study links</button>${FEAT("maker")?` · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button>`:""} · ${switchLink()} · v${VERSION}</div>
+  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="resources">Study links</button>${FEAT("maker")?` · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button>`:""}${switchLink()} · v${VERSION}</div>
   </div>`,"home");
 }
 /* ---------- v1.9 the progress map: drawn from this player's own answers ---------- */
@@ -973,6 +1132,7 @@ const mdefs=()=>`<svg width="0" height="0" style="position:absolute" aria-hidden
 const mkey=()=>`<div class="mkey"><span><i style="background:var(--map-not-started)"></i>Not started</span><span><i style="background:var(--map-started)"></i>Started</span><span><i style="background:var(--accent);box-shadow:0 0 6px var(--accent)"></i>Mastered</span><span><i style="background:var(--map-secure);box-shadow:0 0 8px var(--map-secure-shine)"></i>Secure 🔒</span><span><i style="background:var(--map-due);border-radius:2px;height:5px"></i>Review due</span></div><div class="small muted center">Each piece fills up as that topic gets stronger. Mastered: right on two different days. Secure: still right three weeks later.</div>`;
 /* the ring: inner ring a piece per section, lit from the middle by its share mastered; outer ring a piece per topic, filled as
    the topic gets stronger and glowing once mastered; an orange mark outside a topic with questions due for review */
+function thCol(s,gi){const T=CFG.skin.theme_colours;if(!T)return"";const g=(SPEC[s]||{groups:[]}).groups[gi],t=g&&g.topics[0];return t?(T[String(t.id).split(".")[0]]||""):"";}
 function ringSvg(s,P,big){const SL=big?secLabels(s):[],W=big?360:100,H=big?266:100,cx=W/2,cy=H/2,R=big?84:44,ci=big?.33:.42,i0=big?.36:.45,i1=big?.6:.62,o0=big?.63:.66,all=P.flat(),tot=all.length||1,gap=big?.6:.9;let a=0,out="";
   P.forEach((g,gi)=>{const span=360*g.length/tot,a0=a,mm=g.filter(x=>x.st>=2).length/(g.length||1),gr=SPEC[s].groups[gi];
     let p=`<path class="mz0" d="${marc(cx,cy,R*i0,R*i1,a0+gap,a0+span-gap)}"/>`;
@@ -985,13 +1145,13 @@ function ringSvg(s,P,big){const SL=big?secLabels(s):[],W=big?360:100,H=big?266:1
       if(P.length<=8){const [x1,y1]=mpol(cx,cy,R*1.14,mid),[x2,y2]=mpol(cx,cy,R*1.3,mid),right=x2>=cx-2,ls=mwrap(SL[gi],11,3);
         p+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="mzl"/>`+ls.map((l,i)=>`<text x="${(x2+(right?4:-4)).toFixed(1)}" y="${(y2+4+(i-(ls.length-1)/2)*12).toFixed(1)}" text-anchor="${right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("");}
       else{const [x2,y2]=mpol(cx,cy,R*1.26,mid);p+=`<circle cx="${x2}" cy="${y2}" r="10" class="mzn"/><text x="${x2}" y="${(y2+4).toFixed(1)}" text-anchor="middle" class="mzt mzb">${gi+1}</text>`;}
-      out+=`<g class="mzg" data-act="mapSec" data-s="${s}" data-g="${gi}" role="button" aria-label="${esc(gr.name)}">${p}</g>`;}
-    else out+=p;
+      out+=`<g class="mzg${thCol(s,gi)?" mth":""}"${thCol(s,gi)?` style="--thc:${thCol(s,gi)}"`:""} data-act="mapSec" data-s="${s}" data-g="${gi}" role="button" aria-label="${esc(gr.name)}">${p}</g>`;}
+    else out+=thCol(s,gi)?`<g class="mth" style="--thc:${thCol(s,gi)}">${p}</g>`:p;
     a+=span;});
   const pct=Math.round(100*all.filter(x=>x.st>=2).length/tot);
   out+=`<circle cx="${cx}" cy="${cy}" r="${R*ci}" class="mzc"/><text x="${cx}" y="${cy+(big?7:6)}" text-anchor="middle" class="mzp" style="font-size:${big?21:16}px">${pct}%</text>`;
   return `<svg viewBox="0 0 ${W} ${H}" class="${big?"mapbig":"mapmini"}"${big?"":' aria-hidden="true"'}>${out}</svg>`;}
-function mapStrip(){const ix=tIndex();let mt=0,tot=0;
+function mapStrip(){if(CFG.skin.themes)return themeStrip();const ix=tIndex();let mt=0,tot=0;
   const cells=SKEYS.map(s=>{const P=subjStates(ix,s),f=P.flat(),m=f.filter(x=>x.st>=2).length;mt+=m;tot+=f.length;
     return `<button class="mcell" data-act="map" data-s="${s}" aria-label="${esc(SUBJ[s].name)} map: ${m} of ${f.length} topics mastered">${ringSvg(s,P,false)}<span>${esc(SUBJ[s].short)}</span><small>${m}/${f.length}</small></button>`;}).join("");
   return `${mdefs()}<div class="card" id="mapstrip"><div class="row"><b style="font-size:calc(17px*var(--fs,1))">${icn("🗺️",1)}Your map</b><span class="spacer"></span><span class="small muted">${mt} of ${tot} mastered</span></div>
@@ -1015,7 +1175,7 @@ function mapView(s){setWide(false);if(!SUBJ[s])s=MAPS&&SUBJ[MAPS]?MAPS:SKEYS[0];
   </div>
   <h3 style="margin:18px 0 8px">Sections</h3>
   <div class="list">${P.map((g,gi)=>{const m=g.filter(x=>x.st>=2).length,st=g.filter(x=>x.st===1).length,n=g.length||1;
-    return `<button class="msec" data-act="mapSec" data-s="${s}" data-g="${gi}">${named?"":`<span class="mnum">${gi+1}</span>`}<span class="mname">${esc(sp.groups[gi].name)}<small>${m} of ${g.length} mastered${g.some(x=>x.st===3)?` · ${g.filter(x=>x.st===3).length} 🔒`:""}${st?` · ${st} started`:""}${g.some(x=>x.due)?" · review due":""}</small></span><span class="sbar"><i style="width:${(m/n*100).toFixed(1)}%;background:var(--accent)"></i><i style="width:${(st/n*100).toFixed(1)}%;background:var(--map-started)"></i></span></button>`;}).join("")}</div>
+    return `<button class="msec${thCol(s,gi)?" mth":""}"${thCol(s,gi)?` style="--thc:${thCol(s,gi)}"`:""} data-act="mapSec" data-s="${s}" data-g="${gi}">${named?"":`<span class="mnum">${gi+1}</span>`}<span class="mname">${esc(sp.groups[gi].name)}<small>${m} of ${g.length} mastered${g.some(x=>x.st===3)?` · ${g.filter(x=>x.st===3).length} 🔒`:""}${st?` · ${st} started`:""}${g.some(x=>x.due)?" · review due":""}</small></span><span class="sbar"><i style="width:${(m/n*100).toFixed(1)}%;background:${thCol(s,gi)||"var(--accent)"}"></i><i style="width:${(st/n*100).toFixed(1)}%;background:var(--map-started)"></i></span></button>`;}).join("")}</div>
   <p class="center" style="margin-top:16px"><button class="linkb" data-act="mapList" data-s="${s}">Course map: every topic in a list, and tick what you've had in class</button></p>
   </div>`,"map");try{mfit();}catch(e){}}
 function mnode(x,y,X){const r=17,c=2*Math.PI*r;let o=`<circle cx="${x}" cy="${y}" r="24" fill="transparent"/>`;
@@ -1045,12 +1205,12 @@ function secView(s,gi){setWide(false);const sp=SPEC[s],g=sp&&sp.groups[gi];if(!g
     X.forEach((x,i)=>{const y=8+rh/2+i*rh,k=s+"|"+x.t.id,ls=mwrap(x.t.name,30,2);
       o+=`<g class="mzg" data-act="mapT" data-k="${esc(k)}" role="button" aria-label="${esc(x.t.name)}: ${mstate(x)}"><rect x="0" y="${y-rh/2}" width="${W}" height="${rh}" fill="transparent"/><path d="M${sx+20} ${sy}C${sx+52} ${sy} ${nx-52} ${y} ${nx-17} ${y}" fill="none" class="msp${x.st}"/>${mnode(nx,y,x)}`+
         ls.map((l,j)=>`<text x="${nx+28}" y="${(y+5+(j-(ls.length-1)/2)*15).toFixed(1)}" class="mzt mzt2">${esc(l)}</text>`).join("")+`</g>`;});
-    o+=`<circle cx="${sx}" cy="${sy}" r="20" class="mzc2"/><text x="${sx}" y="${sy+5}" text-anchor="middle" class="mzh">${gi+1}</text>`;
+    o+=`<circle cx="${sx}" cy="${sy}" r="20" class="mzc2"/><text x="${sx}" y="${sy+5}" text-anchor="middle" class="mzh"${g.ref&&String(g.ref).length>2?' style="font-size:12px"':""}>${esc(String(g.ref||gi+1))}</text>`;
     svg=`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
   const can=X.some(x=>x.st>=0);
-  render(`<div class="wrap">${topBar(esc(SUBJ[s].name),"map")}${mdefs()}
+  render(`<div class="wrap">${topBar(CFG.skin.themes?"Theme "+esc(thOf(g)):esc(SUBJ[s].name),CFG.skin.themes?"mapTh":"map")}${mdefs()}
   <div class="card mapcard"><b style="font-size:calc(18px*var(--fs,1))">${esc(g.name)}</b><div class="small muted">${m} of ${n} topics mastered${msec?` · ${msec} secure 🔒`:""} · tap a topic to practise it</div>${svg}${mkey()}</div>
-  ${can?`<button class="big hero" data-act="mapGo" data-s="${s}" data-g="${gi}"><span class="em">${icn("🏋️")}</span><span><b>Practise this section</b><span>Up to 10 questions across its topics, the weakest first</span></span></button>`:""}
+  ${can?`<button class="big hero" data-act="mapGo" data-s="${s}" data-g="${gi}"><span class="em">${icn(LOGO_ICON)}</span><span><b>Practise this section</b><span>Up to 10 questions across its topics, the weakest first</span></span></button>`:""}
   ${radial?`<h3 style="margin:18px 0 8px">Topics</h3><div class="list">${X.map(x=>`<button class="msec" data-act="mapT" data-k="${esc(s+"|"+x.t.id)}"><span class="mdot md${x.st}">${x.st===3?"🔒":x.st===2?"✓":""}</span><span class="mname">${esc(x.t.name)}<small>${mstate(x)}${x.due?" · review due":""}</small></span>${x.st>=0?`<span class="mgo">Practise</span>`:""}</button>`).join("")}</div>`:""}
   </div>`,"sec");try{mfit();}catch(e){}}
 /* practise from the map: questions due or missed first, then new ones, then the rest, least recently seen first */
@@ -1060,7 +1220,7 @@ function mapRun(keys,label,key){const pool=BANK.filter(q=>keys.includes(keyOf(q)
   qs=(keys.length>1?mixTopics(qs):qs).map(q=>inst(q)).filter(Boolean);
   if(!qs.length){toast("No questions for this yet");return;}
   startRun({mode:"gym",qs,label,clock:false,key:"map|"+key});}
-ACT.map=d=>mapView(d&&d.s||MAPS);
+ACT.map=d=>CFG.skin.themes?themeMap():mapView(d&&d.s||MAPS);
 ACT.mapSec=d=>secView(d.s,+d.g);
 ACT.mapT=d=>{const t=TOPIC[d.k];if(t&&LESSONS[d.k]&&!topicMastered(t.s,t.id)){learnChoice(d.k);return;}mapRun([d.k],t?t.name:"Topic",d.k);};
 ACT.mapGo=d=>{const g=SPEC[d.s].groups[+d.g];let ks=g.topics.filter(t=>mapCounts(d.s,t)).map(t=>d.s+"|"+t.id);if(!BANK.some(q=>ks.includes(keyOf(q))))ks=g.topics.map(t=>d.s+"|"+t.id);mapRun(ks,g.name,d.s+"|g"+d.g);};
@@ -1078,6 +1238,62 @@ ACT.shareWeek=()=>{const d=londonDate(),dow=(new Date(d+"T12:00:00Z").getUTCDay(
   const ix=tIndex();let gap="";{let best=null;for(const s of SKEYS){const [gi,v]=gapOf(s,subjStates(ix,s));if(gi>=0&&(!best||v<best[2]))best=[s,gi,v];}if(best)gap=`\nBiggest gap: ${SUBJ[best[0]].name}, ${SPEC[best[0]].groups[best[1]].name}`;}
   const t=`${APP} this week (${PRO.tag}): ${weekDays()} study ${weekDays()===1?"day":"days"}, ${n} questions answered.\nTopics mastered: ${masteredCount()}. Topics secure 🔒: ${secureCount()}.${gap}`;
   shareText(t,"Your week is ready to send.");};
+
+/* ---------- the course by theme (FNF-115, Guy 23 Nov 23:04: "We need to have a proper grouping where you see things and you drill
+   down into them"). A skin with "themes" opens the map on its themes, each a card with its friend, title, sections and progress;
+   a theme opens its sections; a section opens its topics (secView). Rep Max has no themes and keeps its rings. ---------- */
+let THEME_CUR=null;
+// micro and macro stay apart (Guy 24 Nov 00:24, "one requirement for this was to split it by microeconomics and macroeconomics"):
+// each subject in course order, with the themes whose sections belong to it (Economics A: micro 1 and 3, macro 2 and 4)
+const thBySubj=keys=>SKEYS.map(s=>({s,ths:keys.filter(th=>themeGroups(th).some(x=>x.s===s))})).filter(x=>x.ths.length);
+const thOf=g=>String(g.ref||((g.topics[0]||{}).id)||"").split(".")[0];
+function themeGroups(th){const out=[];for(const s of SKEYS)((SPEC[s]||{}).groups||[]).forEach((g,gi)=>{if(thOf(g)===th)out.push({s,gi,g});});return out;}
+function themeStats(th){const ix=tIndex();let n=0,m=0,st=0;for(const {s,g} of themeGroups(th))for(const t of g.topics){const x=tState(ix,s,t);n++;if(x.st>=2)m++;else if(x.st===1)st++;}return {n,m,st};}
+const thPic=th=>{const c=castOf("",{t:th+".1"});return c&&c.pics?(c.pics.explain||c.pics.hello||""):"";};
+const thBar=(m,st,n)=>`<span class="thbar"><i style="width:${(m/(n||1)*100).toFixed(1)}%"></i><i class="ths" style="width:${(st/(n||1)*100).toFixed(1)}%"></i></span>`;
+
+/* the course as a mind map (Guy 24 Nov 00:28: "show ... the macro and the micro and the 2 colors in half" and "we need to be able
+   to read the next layer down, not have numbers"): each subject a half in its own colour, its themes on that side, named */
+function thNode(x,y,col,m,n){const r=20,c=2*Math.PI*r,f=n?m/n:0;return `<circle cx="${x}" cy="${y}" r="26" fill="transparent"/><circle cx="${x}" cy="${y}" r="${r}" class="thnd" style="stroke:${col}"/>`+
+  (f>0?`<circle cx="${x}" cy="${y}" r="${r}" class="tharc" style="stroke:${col}" stroke-dasharray="${(c*f).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${x} ${y})"/>`:"")+
+  `<circle cx="${x}" cy="${y}" r="7" style="fill:${col}"/>`;}
+function thLabel(x,y,cx,lines){const right=x>=cx+4,mid=Math.abs(x-cx)<4;return lines.map((l,j)=>`<text x="${(x+(mid?0:right?4:-4)).toFixed(1)}" y="${(y+4+(j-(lines.length-1)/2)*14).toFixed(1)}" text-anchor="${mid?"middle":right?"start":"end"}" class="mzt">${esc(l)}</text>`).join("");}
+function courseMind(keys){const W=390,H=330,cx=195,cy=172,R=86,T=CFG.skin.themes,G=thBySubj(keys);let o="";
+  const half=(i,s)=>{const left=i===0,col=SUBJ[s].col||"var(--accent)";return `<path d="M${cx} ${cy-150}A150 150 0 0 ${left?0:1} ${cx} ${cy+150}Z" class="thhalf" style="fill:${col}"/>`+
+    `<text x="${left?8:W-8}" y="18" text-anchor="${left?"start":"end"}" class="thhl" style="fill:${col}">${esc(SUBJ[s].name)}</text>`;};
+  G.slice(0,2).forEach((g,i)=>o+=half(i,g.s));
+  o+=`<line x1="${cx}" y1="${cy-150}" x2="${cx}" y2="${cy+150}" class="thdiv"/>`;
+  G.slice(0,2).forEach((g,i)=>{const k=g.ths.length;g.ths.forEach((th,j)=>{const a=i===0?360-(180*(j+1)/(k+1)):180*(j+1)/(k+1),[nx,ny]=mpol(cx,cy,R,a),[lx,ly]=mpol(cx,cy,R+30,a),S=themeStats(th),col=(CFG.skin.theme_colours||{})[th]||"var(--accent)";
+    o+=`<g class="mzg" data-act="mapTh" data-th="${esc(th)}" role="button" aria-label="${esc(T[th].name)}: ${S.m} of ${S.n} topics mastered"><line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" class="thsp" style="stroke:${col}"/>${thNode(nx,ny,col,S.m,S.n)}${thLabel(lx,ly,cx,mwrap(T[th].short||T[th].name,11,4))}</g>`;});});
+  o+=`<circle cx="${cx}" cy="${cy}" r="40" class="mzc2"/>`+mwrap(PRO.label||APP,10,3).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*15).toFixed(1)}" text-anchor="middle" class="mzh">${esc(l)}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`;}
+function themeMind(th,gs,col){const W=390,H=340,cx=195,cy=170,R=86,n=gs.length,ix=tIndex();let o="";
+  gs.forEach(({s,gi,g},i)=>{const a=i*360/n,[nx,ny]=mpol(cx,cy,R,a),[lx,ly]=mpol(cx,cy,R+32,a),X=g.topics.map(t=>tState(ix,s,t)),m=X.filter(x=>x.st>=2).length;
+    o+=`<g class="mzg" data-act="mapSec" data-s="${s}" data-g="${gi}" role="button" aria-label="${esc(g.name)}: ${m} of ${X.length} topics mastered"><line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" class="thsp" style="stroke:${col}"/>${thNode(nx,ny,col,m,X.length)}${thLabel(lx,ly+(Math.abs(lx-cx)<4?(ly<cy?-14:14):0),cx,mwrap(g.name,12,4))}</g>`;});
+  o+=`<circle cx="${cx}" cy="${cy}" r="44" class="mzc2"/>`+mwrap(CFG.skin.themes[th].short||CFG.skin.themes[th].name,11,4).map((l,j,a)=>`<text x="${cx}" y="${(cy+5+(j-(a.length-1)/2)*14).toFixed(1)}" text-anchor="middle" class="mzh"${a.length>3?' style="font-size:12px"':""}>${esc(l)}</text>`).join("");
+  return `<div class="card mapcard">${`<svg viewBox="0 0 ${W} ${H}" class="mapbig">${o}</svg>`}</div>`;}
+function themeMap(){setWide(false);THEME_CUR=null;const T=CFG.skin.themes,keys=Object.keys(T);let N=0,M=0;
+  const cards=keys.map(th=>{const tm=T[th],S=themeStats(th),gs=themeGroups(th),pic=thPic(th),c=castOf("",{t:th+".1"});N+=S.n;M+=S.m;
+    return `<button class="thcard" data-act="mapTh" data-th="${esc(th)}" style="--thc:${(CFG.skin.theme_colours||{})[th]||"var(--accent)"}">${pic?`<img class="thpic" src="${pic}" alt="" aria-hidden="true" decoding="async">`:""}<span class="thtext"><small>Theme ${esc(th)} · ${esc(tm.paper||"")}</small><b>${esc(tm.name)}</b><span class="thsecs">${gs.map(x=>esc(x.g.name)).join(" · ")}</span>${thBar(S.m,S.st,S.n)}<span class="thnum">${S.m} of ${S.n} topics mastered${S.st?` · ${S.st} started`:""}${c?` · with ${esc(c.who)}`:""}</span></span></button>`;});
+  render(`<div class="wrap">${topBar("Your course","home")}
+  <div class="card"><b style="font-size:calc(18px*var(--fs,1))">${esc(PRO.label||APP)}</b><div class="small muted">${M} of ${N} topics mastered · ${thBySubj(keys).map(x=>esc(SUBJ[x.s].short||SUBJ[x.s].name)).join(" and ")} · tap a theme or its card to open it</div>${thBar(M,0,N)}${courseMind(keys)}</div>
+  ${thBySubj(keys).map(({s,ths})=>{const st=ths.map(themeStats),m=st.reduce((a,x)=>a+x.m,0),n=st.reduce((a,x)=>a+x.n,0);return `<h3 class="thsub">${esc(SUBJ[s].name)}<small>Theme${ths.length>1?"s":""} ${ths.map(esc).join(" and ")} · ${m} of ${n} mastered</small></h3><div class="list thlist">${ths.map(th=>cards[keys.indexOf(th)]).join("")}</div>`;}).join("")}</div>`,"map");}
+function themeView(th){setWide(false);const T=CFG.skin.themes,tm=T&&T[th];if(!tm)return themeMap();THEME_CUR=th;const ix=tIndex(),gs=themeGroups(th),S=themeStats(th),pic=thPic(th),c=castOf("",{t:th+".1"}),col=(CFG.skin.theme_colours||{})[th]||"var(--accent)";
+  if(gs[0])MAPS=gs[0].s;
+  const secs=gs.map(({s,gi,g})=>{const X=g.topics.map(t=>tState(ix,s,t)),n=X.length,m=X.filter(x=>x.st>=2).length,st=X.filter(x=>x.st===1).length;
+    return `<button class="msec mth" style="--thc:${col}" data-act="mapSec" data-s="${s}" data-g="${gi}"><span class="mnum">${esc(String(g.ref||gi+1))}</span><span class="mname">${esc(g.name)}<small>${n} topic${n===1?"":"s"} · ${m} mastered${st?` · ${st} started`:""}${X.some(x=>x.due)?" · review due":""}</small></span><span class="sbar"><i style="width:${(m/n*100).toFixed(1)}%;background:${col}"></i><i style="width:${(st/n*100).toFixed(1)}%;background:var(--map-started)"></i></span></button>`;}).join("");
+  render(`<div class="wrap">${topBar("Theme "+esc(th),"map")}
+  <div class="card thhead" style="--thc:${col}">${pic?`<img class="thpic" src="${pic}" alt="" aria-hidden="true" decoding="async">`:""}<span class="thtext"><small>${esc(tm.paper||"")}${c?` · with ${esc(c.who)}`:""}</small><b>${esc(tm.name)}</b>${thBar(S.m,S.st,S.n)}<span class="thnum">${S.m} of ${S.n} topics mastered</span></span></div>
+  ${themeMind(th,gs,col)}
+  <button class="big hero" data-act="mapThGo" data-th="${esc(th)}"><span class="em">${icn(LOGO_ICON)}</span><span><b>Practise this theme</b><span>Up to 10 questions across its sections, the weakest first</span></span></button>
+  <h3 class="thsub">Sections</h3><div class="list">${secs}</div></div>`,"map");}
+ACT.mapTh=d=>{const th=(d&&d.th)||THEME_CUR;th?themeView(th):themeMap();};
+ACT.mapThGo=d=>{const ks=themeGroups(d.th).flatMap(({s,g})=>g.topics.filter(t=>mapCounts(s,t)).map(t=>s+"|"+t.id));const all=themeGroups(d.th).flatMap(({s,g})=>g.topics.map(t=>s+"|"+t.id));mapRun(BANK.some(q=>ks.includes(keyOf(q)))?ks:all,"Theme "+d.th+": "+CFG.skin.themes[d.th].name,"th"+d.th);};
+// the home page's map card, by theme: one row a theme with its colour, short title and progress; tapping opens that theme
+function themeStrip(){const T=CFG.skin.themes,keys=Object.keys(T);let N=0,M=0;const rows=keys.map(th=>{const S=themeStats(th);N+=S.n;M+=S.m;const col=(CFG.skin.theme_colours||{})[th]||"var(--accent)";
+    return `<button class="throw" data-act="mapTh" data-th="${esc(th)}" style="--thc:${col}"><span class="thn">${esc(th)}</span><span class="thtext"><b>${esc(T[th].short||T[th].name)}</b>${thBar(S.m,S.st,S.n)}</span><small>${S.m}/${S.n}</small></button>`;});
+  return `<div class="card" id="mapstrip"><div class="row"><b style="font-size:calc(17px*var(--fs,1))">${icn("🗺️",1)}Your course</b><span class="spacer"></span><span class="small muted">${M} of ${N} mastered</span></div><div class="list" style="gap:6px;margin-top:8px">${thBySubj(keys).map(({s,ths})=>`<span class="thsub small">${esc(SUBJ[s].name)}</span>${ths.map(th=>rows[keys.indexOf(th)]).join("")}`).join("")}</div>
+  <button class="linkb small" data-act="map" style="margin-top:6px">See every theme and section →</button></div>`;}
 /* ---------- v1.11 reports and feedback: a 🚩 wherever a question or other content shows ---------- */
 const RPT_WHY={q:[["wrong","The marked answer is wrong"],["inapp","Not appropriate"],["unclear","Confusing or badly worded"],["other","Something else"]],
   card:[["wrong","Wrong or misleading"],["inapp","Not appropriate"],["unclear","Confusing"],["other","Something else"]],
@@ -1221,14 +1437,14 @@ function lessonScreens(l){const sc=[];if(l.hook)sc.push({k:"hook"});l.chunks.for
 function openLesson(key,o){const l=LESSONS[key],t=TOPIC[key];if(!l||!t)return;o=o||{};const sc=lessonScreens(l);
   let i=0;if(o.start){const j=sc.findIndex(x=>x.k===o.start);if(j>=0)i=j;}
   LSN={key,l,t,sc,i,from:o.from||"",ans:{},shown:0,perm:{hook:shuffle([0,1,2,3]),selfx:shuffle([0,1,2,3]),faded:shuffle([0,1,2,3])}};
-  const ov=document.createElement("div");ov.className="modal lessonov";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");
+  document.querySelectorAll(".grun").forEach(e=>e.remove());const ov=document.createElement("div");ov.className="modal lessonov";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");
   ov.addEventListener("click",e=>{const b=e.target.closest("[data-la]");if(!b||b.disabled)return;const f=LACT[b.dataset.la];if(f)f(b.dataset,b);});
   document.body.appendChild(ov);lessonDraw();}
 function lessonMC(id,m,head){const a=LSN.ans[id];const done=a!=null;
   return `${head?`<div class="lkind">${esc(head)}</div>`:""}<h2>${ltx(m.q)}</h2><div>${LSN.perm[id].map(j=>`<button class="lopt ${done&&j===m.a?"right":""} ${done&&j===a&&a!==m.a?"mine":""}" data-la="pick" data-id="${id}" data-j="${j}" ${done?"disabled":""}>${ltx(m.o[j])}</button>`).join("")}</div>
   ${done?`<div class="lfb"><b>${a===m.a?"Right.":"Not quite."}</b> ${ltx(lfb(m.f[a]))}${a!==m.a?`<div style="margin-top:6px"><b>The right answer:</b> ${ltx(m.o[m.a])}. ${ltx(lfb(m.f[m.a]))}</div>`:""}</div>`:""}`;}
 function lessonDraw(){const ov=document.querySelector(".lessonov");if(!ov||!LSN)return;const {l,t,sc,i}=LSN,cur=sc[i];let body="",canNext=true,nextLbl="Next";
-  if(cur.k==="hook"){body=lessonMC("hook",l.hook,"Have a go first");canNext=LSN.ans.hook!=null;}
+  if(cur.k==="hook"){const W=CFG.skin.lesson_intro;body=(W?`<div class="lkind">Warm-up guess · no score · the lesson comes next</div>`:"")+lessonMC("hook",l.hook,W?"What do you think?":"Have a go first");canNext=LSN.ans.hook!=null||!!W;if(W&&LSN.ans.hook==null)nextLbl="Skip the guess";}   // FNF-113: a skin may label the hook and let it be skipped
   else if(cur.k==="chunk"){const c=l.chunks[cur.i];body=`${cur.i===0&&!l.hook?`<div class="lkind">${esc(LKIND[l.kind]||"Learn")}</div>`:""}<h2>${ltx(c.h)}</h2><div>${ltx(c.b)}</div>${figHtml(c.fig)}`;}
   else if(cur.k==="example"){const e=l.example,n=e.steps.length,shown=Math.min(LSN.shown,n);
     body=`<div class="lkind">${l.kind==="writing"?"Model answer":"Worked example"}</div><div class="ltask">${ltx(e.task)}</div>${figHtml(e.fig)}
@@ -1271,10 +1487,10 @@ function learnChoice(key){const t=TOPIC[key];if(document.querySelector(".modal")
   <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-c="no">Cancel</button></div></div>`;
   document.body.appendChild(o);o.addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b&&e.target!==o)return;o.remove();if(!b)return;
     if(b.dataset.c==="learn")openLesson(key,{from:"map"});else if(b.dataset.c==="go")mapRun([key],t.name,key);});}
-function courseSwitch(){return `<div class="cswitch" role="group" aria-label="Course">${COURSES.map(k=>k===PROFILE
+function courseSwitch(){if(COURSES.length<2)return "";return `<div class="cswitch" role="group" aria-label="Course">${COURSES.map(k=>k===PROFILE
   ?`<button class="on" aria-current="true" disabled>${esc(PROFILES[k].label)}</button>`
   :`<button data-act="switchCourse" data-p="${k}">${esc(PROFILES[k].label)}</button>`).join("")}</div>`;}
-function switchLink(){const o=COURSES.find(k=>k!==PROFILE);if(!o)return "";return `<button class="small" style="text-decoration:underline" data-act="switchCourse" data-p="${o}">Switch to ${esc(PROFILES[o].label)}</button>`;}
+function switchLink(){const o=COURSES.find(k=>k!==PROFILE);if(!o)return "";return ` · <button class="small" style="text-decoration:underline" data-act="switchCourse" data-p="${o}">Switch to ${esc(PROFILES[o].label)}</button>`;}
 function setCourse(p){STORE.set(STORE.PROFILE_KEY,p);location.replace(location.pathname);}
 ACT.switchCourse=d=>setCourse(d.p);
 ACT.pickCourse=d=>setCourse(d.p);
@@ -1305,7 +1521,7 @@ function homeMap(){
   <div class="card small muted">Quiz questions for these subjects haven't been written yet. For now this is your map of everything the courses cover.</div>
   <div class="foot">${SKEYS.map(s=>esc(SUBJ[s].name+" "+((SPEC[s]||{}).board||"")+" "+((SPEC[s]||{}).code||"")).trim()).join(" · ")}<br>
   The topic lines were written and checked by AI from the exam boards' specifications, so check anything that looks wrong with your teacher.<br>
-  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="resources">Study links</button>${FEAT("maker")?` · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button>`:""} · ${switchLink()} · v${VERSION}</div>
+  Progress is saved on this device only. <button class="small" style="text-decoration:underline" data-act="settings">Settings & backup</button> · <button class="small" style="text-decoration:underline" data-act="resources">Study links</button>${FEAT("maker")?` · <button class="small" style="text-decoration:underline" data-act="maker">Write a question</button>`:""}${switchLink()} · v${VERSION}</div>
   </div>`,"home");
 }
 ACT.covSame=()=>{lsSet("covAt",Date.now());home();};
@@ -1338,6 +1554,7 @@ ACT.settings=()=>{
   <div class="small muted" style="margin-top:12px">A <b>?</b> beside each answer, to mark a guess</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.conf!==false)===!!v?"on":""}" data-act="setConf" data-v="${v}">${l}</button>`).join("")}</div>
   <div class="small muted" style="margin-top:12px">Think first: hide the answers until I tap (not in timed modes)</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.think===true)===!!v?"on":""}" data-act="setThink" data-v="${v}">${l}</button>`).join("")}</div>
   <div class="small muted" style="margin-top:12px">Calculator button (only in subjects whose exams allow one)</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.calc!==false)===!!v?"on":""}" data-act="setCalc" data-v="${v}">${l}</button>`).join("")}</div>
+  ${LOOKS.length>1?`<div class="small muted" style="margin-top:12px">Look</div><div class="seg">${LOOKS.map(x=>`<button class="chip ${LOOK()===x.id?"on":""}" data-act="setLook" data-v="${esc(x.id)}">${esc(x.name)}</button>`).join("")}</div>`:""}
   <div class="small muted" style="margin-top:12px">Background pictures</div><div class="seg">${[[1,"On"],[0,"Off"]].map(([v,l])=>`<button class="chip ${(SET.bg!==false)===!!v?"on":""}" data-act="setBg" data-v="${v}">${l}</button>`).join("")}</div></div>
   <div class="card"><h3>Feedback and reports</h3><p class="muted small">Spotted a wrong answer, something unsuitable or a bug, or got an idea? Every question, key idea, topic, link and tip has a 🚩, and this sends anything else. It goes to whoever looks after ${esc(APP)} through your device's share menu.</p>
   <div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn" data-act="feedback">Send feedback</button>${(ST.reports||[]).length?`<button class="btn" data-act="reportsSend">Send my ${ST.reports.length} report${ST.reports.length===1?"":"s"} again</button>`:""}${Object.keys(ST.flags||{}).length?`<button class="btn" data-act="flagsClear">Put ${Object.keys(ST.flags).length} reported question${Object.keys(ST.flags).length===1?"":"s"} back</button>`:""}</div></div>
@@ -1348,12 +1565,13 @@ ACT.settings=()=>{
   <div class="row" style="margin-top:8px"><button class="btn" data-act="loadBk">Add this backup</button><span id="bkmsg" class="small muted"></span></div></div>
   <div class="card"><h3>Keep it on your home screen</h3><p class="muted small">iPhone: Share, then Add to Home Screen. Android: the ⋮ menu, then Add to Home screen. Devices can clear saved progress for websites you haven't opened for a while; the home-screen version keeps it.</p></div>
   <div class="card"><h3>Start again</h3><p class="muted small">Wipes your XP, stats and ticks on this device.</p><button class="btn warn" data-act="wipe1">Reset progress</button><span id="wipe2"></span></div>
-  <div class="card small muted">Quiz nights send your nickname and answers through public relay servers (MQTT). Nothing else leaves this device. ${esc(APP)} ${VERSION}.</div></div>`,"settings");
+  <div class="card small muted">Quiz nights send your nickname and answers through public relay servers (MQTT). Nothing else leaves this device. ${esc(APP)} ${VERSION}.${GUIDE&&GUIDE.credit?`<div style="margin-top:6px">${guideCredit()}</div>`:""}</div></div>`,"settings");
 };
 ACT.setConf=d=>{SET.conf=d.v==="1";lsSet("set",SET);ACT.settings();};
 ACT.setThink=d=>{SET.think=d.v==="1";lsSet("set",SET);ACT.settings();};
 ACT.setCalc=d=>{SET.calc=d.v==="1";lsSet("set",SET);ACT.settings();};
 ACT.setBg=d=>{SET.bg=d.v==="1";lsSet("set",SET);ACT.settings();};
+ACT.setLook=d=>{if(!LOOKS.some(x=>x.id===d.v))return;SET.look=d.v;lsSet("set",SET);applySet();ACT.settings();};
 ACT.flagsSend=()=>{const ids=Object.keys(ST.flags||{}),qs=BANK.filter(q=>ids.includes(q.id));shareText(qs.map(q=>reportText(q)).join("\n\n"),"The list is ready to send.");};
 ACT.flagsClear=()=>{ST.flags={};saveST();toast("Put back");ACT.settings();};
 ACT.copyBk=()=>copyText($("#bk").textContent).then(()=>toast("Backup code copied"));
@@ -1378,6 +1596,8 @@ ACT.wipe2=()=>{ST={xp:0,reps:0,done:0,best:{},q:{},daily:{},days:[],streak:0,las
 function copyText(t){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t).catch(()=>fallbackCopy(t));return Promise.resolve(fallbackCopy(t));}
 function fallbackCopy(t){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");}catch(e){}a.remove();}
 
+
+ACT.lookFlip=()=>{if(LOOKS.length<2)return;const i=LOOKS.findIndex(x=>x.id===LOOK());SET.look=LOOKS[(i+1)%LOOKS.length].id;lsSet("set",SET);applySet();bgSync();toast(LOOKS.find(x=>x.id===SET.look).name+" look",1400);};   // FNF-113: tap the title to switch looks (Guy 23 Nov 22:38)
 /* =====================================================================
    SOLO GYM
    ===================================================================== */
@@ -1391,16 +1611,21 @@ const WORKOUTS={
 };
 for(const k in WORKOUTS)Object.assign(WORKOUTS[k],WL.workouts[k]);
 let GYM=Object.assign({s:"mix",w:"sets",clock:false,taught:false,topic:null},lsGet("gym",{}));
-if(GYM.s!=="mix"&&(!SUBJ[GYM.s]||(QSUBJ&&!QSUBJ.includes(GYM.s))))GYM.s="mix";if(GYM.topic&&!TOPIC[GYM.topic])GYM.topic=null;
+/* subjects are on/off toggles (FNF-110, 23 Nov 2026): GYM.s is "mix" (all on), one key, or keys joined by commas */
+const SPLAY=()=>SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s));
+const sOn=s=>GYM.s==="mix"||GYM.s.split(",").includes(s);
+const sName=()=>GYM.s==="mix"?"Mixed":GYM.s.split(",").map(k=>SUBJ[k].name).join(" + ");
+function sToggle(k){const on=SPLAY().filter(s=>s===k?!sOn(s):sOn(s));if(!on.length)return;GYM.s=on.length===SPLAY().length?"mix":on.join(",");if(GYM.topic&&!sOn(GYM.topic.split("|")[0]))GYM.topic=null;}
+function sChips(act){return SPLAY().map(s=>`<button class="chip ${sOn(s)?"on":""}" data-act="${act}" data-s="${s}" aria-pressed="${sOn(s)}">${icn(SUBJ[s].em,1)+esc(SUBJ[s].name)}</button>`).join("");}
+if(GYM.s!=="mix"&&GYM.s.split(",").some(k=>!SUBJ[k]||(QSUBJ&&!QSUBJ.includes(k))))GYM.s="mix";if(GYM.topic&&!TOPIC[GYM.topic])GYM.topic=null;
 if(!WORKOUTS[GYM.w])GYM.w="sets";
 ACT.gym=()=>gymSetup();
 function gymSetup(){
   setWide(false);
-  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="gS" data-s="${s}">${s==="mix"?icn("🎲",1)+"Mixed":icn(SUBJ[s].em,1)+esc(SUBJ[s].name)}</button>`).join("");
   const wBtns=Object.entries(WORKOUTS).map(([k,w])=>`<button class="big" data-act="gW" data-w="${k}" style="${GYM.w===k?"border-color:var(--accent)":""}"><span class="em">${icn(w.em)}</span><span><b>${esc(w.name)}</b><span>${esc(w.desc)}</span></span></button>`).join("");
   const tp=GYM.topic&&TOPIC[GYM.topic];
   render(`<div class="wrap">${topBar(WL.gym)}
-  <div class="card"><h3>Subject</h3><div class="pchips">${sChips}</div>
+  <div class="card"><h3>Subjects</h3><div class="pchips">${sChips("gS")}</div>
   ${tp?`<div class="row" style="margin-top:12px"><span class="chip on">Topic: ${esc(tp.name)}</span><button class="small" style="text-decoration:underline" data-act="gClearT">clear</button></div>`:""}</div>
   <div class="grid2">${wBtns}</div>
   <div class="card"><div class="row"><button class="tick ${GYM.clock?"on":""}" data-act="gClock" aria-label="Beat the clock">${GYM.clock?"✓":""}</button><div><b>Beat the clock</b><div class="small muted">${esc(WL.clock_hint)}</div></div></div>
@@ -1408,14 +1633,14 @@ function gymSetup(){
   <button class="btn go block" data-act="gStart" style="font-size:18px;padding:16px">${esc(WL.start)}</button>
   <p class="small muted center" id="gmsg"></p></div>`,"gym");
 }
-ACT.gS=d=>{GYM.s=d.s;if(GYM.topic&&!GYM.topic.startsWith(d.s+"|"))GYM.topic=null;lsSet("gym",GYM);gymSetup();};
+ACT.gS=d=>{sToggle(d.s);lsSet("gym",GYM);gymSetup();};
 ACT.gW=d=>{GYM.w=d.w;lsSet("gym",GYM);gymSetup();};
 ACT.gClock=()=>{GYM.clock=!GYM.clock;lsSet("gym",GYM);gymSetup();};
 ACT.gTaught=()=>{GYM.taught=!GYM.taught;lsSet("gym",GYM);gymSetup();};
 ACT.gClearT=()=>{GYM.topic=null;lsSet("gym",GYM);gymSetup();};
 ACT.gStart=()=>{
   const w=WORKOUTS[GYM.w];
-  let pool=BANK.filter(q=>(GYM.s==="mix"||q.s===GYM.s));
+  let pool=BANK.filter(q=>sOn(q.s));
   if(GYM.topic)pool=pool.filter(q=>keyOf(q)===GYM.topic);   // one topic chosen in the tracker: ask it whatever the ticks say
   else pool=playable(pool,GYM.taught);
   let qs;
@@ -1435,7 +1660,7 @@ ACT.gStart=()=>{
   }
   qs=qs.map(q=>inst(q)).filter(Boolean);
   if(!qs.length){$("#gmsg").textContent=WL.no_match;return;}
-  const label=w.name+" · "+(GYM.topic?TOPIC[GYM.topic].name:GYM.s==="mix"?"Mixed":SUBJ[GYM.s].name);
+  const label=w.name+" · "+(GYM.topic?TOPIC[GYM.topic].name:sName());
   startRun({mode:"gym",qs,label,clock:GYM.clock,key:GYM.w+"|"+(GYM.topic||GYM.s)});
 };
 
@@ -1489,12 +1714,14 @@ function answer(di,guess){
   RUN.res.push({id:q.id,ok,di,secs,timeout:di<0,guess});
   document.querySelectorAll(".gq").forEach(b=>{b.disabled=true;});const oh=document.querySelector(".opts.hide");if(oh)oh.classList.remove("hide");const sb=$("#showOpts");if(sb)sb.remove();
   document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i===right){b.classList.add("right");b.insertAdjacentHTML("beforeend",'<span class="mark">✓</span>');}else b.classList.add("dim");if(i===di&&!ok){b.classList.add("mine");b.insertAdjacentHTML("beforeend",'<span class="mark">✗</span>');}});
-  if(ok){SFX.correct();if(RUN.combo>=3)SFX.combo();if(!REDUCED)popText("+"+xp+" XP");}else SFX.wrong();
+  if(ok){SFX.correct();if(RUN.combo>=3&&!([3,5,8,12].includes(RUN.combo)&&gSound("streak")))SFX.combo();if(!REDUCED)popText("+"+xp+" XP");}else SFX.wrong();
   const last=RUN.i===RUN.qs.length-1,card=CARDS[keyOf(q)];
   const head=ok&&guess?"Right.":ok?(RUN.combo>=3?"🔥 Combo x"+RUN.combo:pick(WL.praise)):di<0?"Out of time.":pick(["Not this one.","Missed."]);
   const auto=ok&&!guess&&SET.auto!==false&&!REDUCED,iNow=RUN.i,why=!ok&&di>=0&&q.w?q.w[perm[di]]:"";
   let twin=false;if(!ok&&(RUN.mode==="gym"||RUN.mode==="review")&&(RUN.twins||0)<2){const cand=BANK.filter(x=>keyOf(x)===keyOf(q)&&x.id!==q.id&&!RUN.qs.some(y=>y.id===x.id));const tw=inst(cand.length?cand[Math.floor(Math.random()*cand.length)]:q);if(tw){const at=Math.min(RUN.qs.length,RUN.i+3);RUN.qs.splice(at,0,tw);RUN.perms.splice(at,0,shuffle([0,1,2,3]));RUN.twins=(RUN.twins||0)+1;twin=true;}}
-  $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}" data-act="nextQ" data-silent="1"><b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div>${why?`<div class="why"><b>Why not your answer:</b> ${tex(why)}</div>`:""}${twin?`<div class="small muted" style="margin-top:6px">A similar question comes back in a moment.</div>`:""}${ok&&guess?`<div class="small" style="margin-top:6px">You weren't sure, so it comes back tomorrow to make it stick.</div>`:""}${!ok&&sure?`<div class="small" style="margin-top:6px">You were sure of that one, so it's worth a second look: it comes back tomorrow.</div>`:""}<span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
+  const gk=ok?(RUN.combo>=3?"cheer":"right"):di<0?"think":"wrong",gi=guideImgFor(gk,"gfb",RUN.mode,q);
+  const fire=ok&&CFG.skin.fire&&RUN.combo>=2?Math.min(1,(RUN.combo-1)/7):-1;
+  $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}${gi?" has-guide":""}${fire>=0?" onfire":""}"${fire>=0?` style="--heat:${fire.toFixed(2)}"`:""} data-act="nextQ" data-silent="1">${gi}<b>${head}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}<div style="margin-top:6px">${tex(q.x||"")}</div>${why?`<div class="why"><b>Why not your answer:</b> ${tex(why)}</div>`:""}${twin?`<div class="small muted" style="margin-top:6px">A similar question comes back in a moment.</div>`:""}${ok&&guess?`<div class="small" style="margin-top:6px">You weren't sure, so it comes back tomorrow to make it stick.</div>`:""}${!ok&&sure?`<div class="small" style="margin-top:6px">You were sure of that one, so it's worth a second look: it comes back tomorrow.</div>`:""}<span class="tapon">${auto?"Moving on…":"Tap here or the button to carry on"}</span></div>
    ${card&&!ok?cardHtml(card):""}<div id="cardBox"></div>
    <div class="row small" style="margin-top:10px;gap:16px;flex-wrap:wrap">${!ok&&LESSONS[keyOf(q)]&&!topicMastered(q.s,q.t)?`<button class="linkb" data-act="lessonEx" data-k="${esc(keyOf(q))}">📖 See a worked example</button>`:""}${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
    <div class="small muted" style="margin-top:8px">${esc(specRef(q))}</div><div class="footpad"></div><div class="footbar"><button class="btn go block" data-act="nextQ">${last?"Finish":esc(WL.next_rep)}</button></div>`;
@@ -2128,22 +2355,21 @@ let SP=null,SPT=null;
 const SP_PTS={1:1,2:2,3:3},SP_WRONG=3,SP_SKIP=2;
 ACT.sprint=()=>{
   setWide(false);
-  const sChips=["mix",...SKEYS.filter(s=>!QSUBJ||QSUBJ.includes(s))].map(s=>`<button class="chip ${GYM.s===s?"on":""}" data-act="spS" data-s="${s}">${s==="mix"?icn("🎲",1)+"Mixed":icn(SUBJ[s].em,1)+esc(SUBJ[s].name)}</button>`).join("");
   const lens=SPRINT_LENS.map(l=>`<button class="chip ${SPS.len===l?"on":""}" data-act="spL" data-l="${l}">${l<120?l+" s":l/60+" min"}</button>`).join("");
   const best=ST.best["sprint|"+SPS.len+"|"+GYM.s];
   render(`<div class="wrap">${topBar("Sprint")}
   <div class="card"><b style="font-size:18px">⚡ As many as you can</b><p class="small muted" style="margin:6px 0 0">One clock for the whole sprint. Level 1 questions score 1 point, level 2 score 2, level 3 score 3. A wrong answer costs ${SP_WRONG} seconds; Skip costs ${SP_SKIP}. Sprint uses questions you have already got right, topped up with ${esc(WL.warmups)}, so it is fast recall, not new learning.</p></div>
-  <div class="card"><h3>Subject</h3><div class="pchips">${sChips}</div></div>
+  <div class="card"><h3>Subjects</h3><div class="pchips">${sChips("spS")}</div></div>
   <div class="card"><h3>Length</h3><div class="pchips">${lens}</div>
   <div class="small muted" style="margin-top:8px">Your best here: ${best?best+" points":"none yet"}</div></div>
   <div class="card">${coverRow("spTaught",GYM.taught,"sprint")}</div>
   <button class="btn go block" data-act="spGo" style="font-size:18px;padding:16px">Start sprint</button>
   <p class="small muted center" id="spmsg"></p></div>`,"sprint");
 };
-ACT.spS=d=>{GYM.s=d.s;GYM.topic=null;lsSet("gym",GYM);ACT.sprint();};
+ACT.spS=d=>{sToggle(d.s);GYM.topic=null;lsSet("gym",GYM);ACT.sprint();};
 ACT.spL=d=>{SPS.len=+d.l;lsSet("sprint",SPS);ACT.sprint();};
 ACT.spTaught=()=>{GYM.taught=!GYM.taught;lsSet("gym",GYM);ACT.sprint();};
-function spPool(){const all=playable(BANK.filter(q=>GYM.s==="mix"||q.s===GYM.s),GYM.taught);const known=all.filter(q=>((ST.q[q.id]||{}).c||0)>=1);if(known.length>=20)return known;const warm=all.filter(q=>q.lv===1&&!known.includes(q));return known.concat(warm.length?warm:all.filter(q=>!known.includes(q)));}
+function spPool(){const all=playable(BANK.filter(q=>sOn(q.s)),GYM.taught);const known=all.filter(q=>((ST.q[q.id]||{}).c||0)>=1);if(known.length>=20)return known;const warm=all.filter(q=>q.lv===1&&!known.includes(q));return known.concat(warm.length?warm:all.filter(q=>!known.includes(q)));}
 ACT.spGo=()=>{
   const pool=spPool();
   if(!pool.length){$("#spmsg").textContent="No questions match those settings yet. Try another subject, or check what you've covered.";return;}
@@ -2241,6 +2467,7 @@ function route(){
 }
 let READY=false;   // a join link opened while the questions are still loading is handled once they are in
 window.addEventListener("hashchange",()=>{if(READY)route();});
+guideSplash();
 loadAll().catch(e=>console.error(e)).then(()=>{READY=true;route();});
 </script>
 </body>
