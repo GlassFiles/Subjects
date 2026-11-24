@@ -353,6 +353,151 @@ html:not([data-look="ink"]) .rankart .badge{background:#a87a69;color:#ffffff;bor
 html:not([data-look="ink"]) .rankart .bar i{background:#bf907f}
 html:not([data-look="ink"]) .rankart .stat{background:#f8f0eb}
 html:not([data-look="ink"]) button.big:not(.hero) .em{background:#f3e5de;color:#7a4f40;border-color:#dcc0b4}
+
+/* the Japanese title draws itself in one of five styles (FNF-117; Guy 24 Nov 13:44 and 13:53: neon only occasionally). The engine picks the
+   style by the weights in skin.json words.logo_styles and gives each letter --d. Keyed to the engine's 9 s title cycle: the Japanese half
+   is fully shown from about 4.5 s to 8.3 s; a letter's clock runs --d behind it, so every letter is reset before the half comes back. */
+.ttop .logo .jt{display:inline-block;white-space:nowrap}
+.jt .nl{font-style:normal;display:inline-block;position:relative;animation:9s linear infinite;animation-delay:calc(var(--d) - 9s)}
+.ttop .logo .ntag{display:inline-block;animation:tagFade 9s linear infinite;animation-delay:-9s}
+@keyframes tagFade{0%,58%{opacity:0}62%,100%{opacity:1}}
+
+/* neon: tubes light in a random order, one sparks a firework, one fizzles out; 経済学 in pink */
+.jt-neon .nl{color:rgba(127,233,223,.14);text-shadow:none;animation-name:neonOn}
+.jt-neon .nl.nfz{animation-name:neonFz}
+.jt-neon .nl.nsp{animation-name:neonSp}
+.jt-neon .nl.nsp::after{content:"";position:absolute;left:50%;top:45%;width:3px;height:3px;margin:-1.5px 0 0 -1.5px;border-radius:50%;background:#fff;opacity:0;pointer-events:none;
+  box-shadow:0 -13px #ffd36e,9px -9px #ff7ad9,13px 0 #8be9ff,9px 9px #ffd36e,0 13px #ff7ad9,-9px 9px #8be9ff,-13px 0 #ffd36e,-9px -9px #ff7ad9,0 -7px #fff,7px 0 #fff,0 7px #fff,-7px 0 #fff;
+  animation:neonBurst 9s ease-out infinite;animation-delay:calc(var(--d) - 9s)}
+.jt-neon+.ntag{animation-name:neonTag;color:rgba(247,184,255,.18);text-shadow:none}
+@keyframes neonOn{0%,48.5%{color:rgba(127,233,223,.14);text-shadow:none}
+  49%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb}49.6%{color:rgba(127,233,223,.2);text-shadow:none}
+  50.4%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb}51%{color:rgba(200,255,250,.5);text-shadow:0 0 4px rgba(57,197,187,.5)}
+  52%,100%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb,0 0 28px rgba(57,197,187,.8)}}
+@keyframes neonSp{0%,48.5%{color:rgba(127,233,223,.14);text-shadow:none}
+  49%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb}49.6%{color:rgba(127,233,223,.2);text-shadow:none}
+  50.4%,64%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb,0 0 28px rgba(57,197,187,.8)}
+  65%{color:#fff;text-shadow:0 0 4px #fff,0 0 12px #ffd36e,0 0 24px #ff7ad9,0 0 40px #8be9ff}
+  70%,100%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb,0 0 28px rgba(57,197,187,.8)}}
+@keyframes neonFz{0%,48.5%{color:rgba(127,233,223,.14);text-shadow:none}
+  49%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb}49.6%{color:rgba(127,233,223,.2);text-shadow:none}
+  50.4%,73%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb,0 0 15px #39c5bb,0 0 28px rgba(57,197,187,.8)}
+  73.6%{color:rgba(127,233,223,.2);text-shadow:none}74.3%{color:#effffd;text-shadow:0 0 2px #fff,0 0 7px #39c5bb}
+  75%{color:rgba(127,233,223,.2);text-shadow:none}75.4%{color:rgba(200,255,250,.6);text-shadow:0 0 4px rgba(57,197,187,.5)}
+  76.2%,100%{color:rgba(127,233,223,.14);text-shadow:none}}
+@keyframes neonBurst{0%,64.5%{opacity:0;transform:scale(.2)}65.2%{opacity:1;transform:scale(.5)}69.5%{opacity:.9;transform:scale(1.9)}73%,100%{opacity:0;transform:scale(2.4)}}
+@keyframes neonTag{0%,59%{color:rgba(247,184,255,.18);text-shadow:none}
+  59.5%{color:#ffe9ff;text-shadow:0 0 6px #c86bff,0 0 14px #c86bff}60.2%{color:rgba(247,184,255,.25);text-shadow:none}
+  61%,100%{color:#ffe9ff;text-shadow:0 0 2px #fff,0 0 6px #e07ad9,0 0 14px #c86bff}}
+
+/* ink: white ink brushed on left to right, a little bleed, then a red seal stamp thuds round 経済学 */
+.jt-ink .nl{color:#f4f1ea;text-shadow:0 0 1px rgba(255,255,255,.5);animation-name:inkOn}
+@keyframes inkOn{0%,48%{clip-path:inset(0 100% 0 0);filter:blur(2px);opacity:0}48.5%{opacity:1}
+  52%{clip-path:inset(0 0 0 0);filter:blur(1.2px)}55%,100%{clip-path:inset(0 0 0 0);filter:blur(0);opacity:1}}
+.jt-ink+.ntag{animation-name:stampOn;color:#ff6b74;border:1.5px solid #d8333f;border-radius:4px;padding:1px 4px 0;text-shadow:none;transform-origin:30% 50%}
+@keyframes stampOn{0%,60%{opacity:0;transform:scale(1.7) rotate(-8deg)}62%{opacity:1;transform:scale(.94) rotate(-4deg)}63.5%,100%{opacity:.95;transform:scale(1) rotate(-4deg)}}
+
+/* spray: each letter sprayed on in a random order, fuzzy, then sharp, in her violet and pink, protest-art style */
+.jt-spray .nl{color:#f0a6ff;text-shadow:1px 1px 0 rgba(255,122,217,.35),-1px 1px 0 rgba(201,167,240,.35),0 0 6px rgba(200,107,255,.5);animation-name:sprayOn}
+@keyframes sprayOn{0%,48%{opacity:0;filter:blur(6px);transform:scale(1.15)}50%{opacity:.6;filter:blur(3px)}53%,100%{opacity:1;filter:blur(0);transform:scale(1)}}
+
+/* holo: letters glitch in as a hologram, colour split and jitter, then hold in teal */
+.jt-holo .nl{color:#7fe9df;text-shadow:0 0 10px rgba(57,197,187,.6);animation-name:holoOn}
+@keyframes holoOn{0%,48%{opacity:0;transform:translateX(0)}
+  48.6%{opacity:1;transform:translateX(-3px) skewX(-12deg);text-shadow:-3px 0 #ff4f7a,3px 0 #4ff3ff}49.2%{opacity:.2}
+  49.8%{opacity:1;transform:translateX(2px);text-shadow:2px 0 #ff4f7a,-2px 0 #4ff3ff}50.6%{opacity:.5;transform:translateX(0)}
+  51.5%,100%{opacity:1;transform:none;text-shadow:0 0 10px rgba(57,197,187,.6)}}
+
+/* sketch: outlines drawn left to right, then filled in like a pen going over them */
+.jt-sketch .nl{color:transparent;-webkit-text-stroke:1px #f1eff2;animation-name:sketchOn}
+@keyframes sketchOn{0%,48%{opacity:0;clip-path:inset(0 0 100% 0)}50%{opacity:1;clip-path:inset(0 0 0 0)}
+  57%{color:transparent}61%,100%{opacity:1;clip-path:inset(0 0 0 0);color:#f1eff2}}
+
+/* ---------- touches (FNF-116/118/119, Guy 24 Nov 2026): the look of the engine's 26_touches.js and 27_tour.js ---------- */
+.opt{position:relative}
+/* spray-paint stencil X over a wrong choice: two strokes, fuzzy edged, in a spray pink */
+.fx-spray{position:absolute;inset:4px 10px;pointer-events:none}
+.fx-spray svg{width:100%;height:100%;overflow:visible}
+.fx-sx{fill:none;stroke:#ff3d8b;stroke-width:9;stroke-linecap:round;opacity:.82;filter:drop-shadow(0 0 2px rgba(255,61,139,.9)) drop-shadow(1px 1px 0 rgba(255,61,139,.4));
+  stroke-dasharray:130;stroke-dashoffset:130;animation:fxDraw .26s ease-out forwards}
+.fx-sx2{animation-delay:.24s}
+@keyframes fxDraw{to{stroke-dashoffset:0}}
+/* a brush tick on the right answer, in ink */
+.fx-brush{position:absolute;right:10px;top:50%;width:54px;height:34px;margin-top:-17px;pointer-events:none}
+.fx-brush svg{width:100%;height:100%;overflow:visible}
+.fx-brush path{fill:none;stroke:#1d7f4e;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:120;stroke-dashoffset:120;animation:fxDraw .38s cubic-bezier(.5,0,.3,1) forwards;filter:drop-shadow(0 0 1px rgba(29,127,78,.6))}
+html[data-look="ink"] .fx-brush path{stroke:#5fd4a0}
+.opt.right .mark{opacity:0}
+/* cherry blossom */
+.fx-petal{position:fixed;top:-24px;left:var(--x);width:12px;height:10px;background:#ffc2da;border-radius:80% 0 80% 0;box-shadow:inset -2px -2px 0 rgba(255,140,185,.5);opacity:.92;pointer-events:none;z-index:9000;
+  animation:fxPetal var(--t) linear forwards;animation-delay:var(--w)}
+@keyframes fxPetal{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(calc(var(--dx)*.5 + 4vw),55vh) rotate(260deg)}100%{transform:translate(var(--dx),110vh) rotate(540deg)}}
+/* the seal stamp on the finished daily challenge */
+.card.fx-stamped{position:relative}
+.fx-hanko{position:absolute;right:14px;top:12px;width:52px;height:52px;display:grid;place-items:center;border:3px solid #d8333f;border-radius:10px;color:#d8333f;
+  font-family:"Mikonomics Rounded",serif;font-size:30px;font-weight:800;line-height:1;transform:rotate(-12deg);opacity:.88;mix-blend-mode:multiply;animation:fxStamp .5s cubic-bezier(.3,1.6,.5,1) both;animation-delay:.3s}
+html[data-look="ink"] .fx-hanko{mix-blend-mode:normal;color:#ff6b74;border-color:#ff6b74}
+@keyframes fxStamp{0%{transform:rotate(-20deg) scale(2.4);opacity:0}60%{transform:rotate(-12deg) scale(.92);opacity:.95}100%{transform:rotate(-12deg) scale(1);opacity:.88}}
+/* stickers */
+.fx-stk{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:94px;height:94px;padding:8px 6px;border-radius:50%;
+  background:var(--c);color:#fff;border:4px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.28);transform:rotate(var(--r));font-size:10.5px;font-weight:700;line-height:1.15;overflow:hidden;word-break:break-word}
+.fx-stk small{display:block;font-size:9px;opacity:.85;margin-bottom:2px;letter-spacing:.04em}
+.fx-stk.fx-empty{background:transparent;color:var(--mute);border:2px dashed var(--line);box-shadow:none;transform:none;font-size:18px}
+.fx-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px;max-height:56vh;overflow:auto;padding:6px 2px}
+.fx-book .mbox{max-width:520px;width:calc(100% - 24px)}
+.fx-sbbtn{display:block;margin:10px auto 4px}
+.fx-slap{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:9500}
+.fx-slapin{display:flex;flex-direction:column;align-items:center;gap:10px;animation:fxSlap 2.6s ease-in-out both}
+.fx-slapin b{font-family:"Mikonomics Rounded",system-ui,sans-serif;font-size:20px;color:#fff;background:#2a282a;padding:4px 12px;border-radius:999px}
+.fx-stk.big{width:160px;height:160px;font-size:16px}
+.fx-stk.big small{font-size:13px}
+@keyframes fxSlap{0%{transform:scale(2.2) rotate(-14deg);opacity:0}14%{transform:scale(.94) rotate(4deg);opacity:1}20%{transform:scale(1) rotate(0)}72%{transform:scale(1);opacity:1}100%{transform:translate(38vw,-44vh) scale(.2) rotate(30deg);opacity:0}}
+/* graffiti: the economics joke sprayed onto the foot of home, and the loading line */
+.fx-wall{display:flex;align-items:center;justify-content:center;gap:12px;margin:22px 0 6px;padding:18px 14px;border-radius:14px;border:1px solid var(--line);
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0 21px,rgba(120,110,125,.16) 21px 22px),repeating-linear-gradient(90deg,rgba(0,0,0,0) 0 43px,rgba(120,110,125,.12) 43px 44px),var(--panel)}
+.fx-graf{font-family:"Mikonomics Rounded",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:800;font-size:calc(19px*var(--fs,1));letter-spacing:.02em;color:#e0368f;transform:rotate(-3deg);display:inline-block;text-align:center;line-height:1.15}
+html[data-look="ink"] .fx-graf{color:#ff7ad9}
+.fx-graf i{font-style:normal;display:inline-block;text-shadow:1px 1px 0 rgba(224,54,143,.35),-1px 1px 0 rgba(109,74,147,.3),0 0 5px rgba(224,54,143,.45);animation:fxGraf .32s ease-out both;animation-delay:calc(var(--i)*45ms + .2s)}
+@keyframes fxGraf{0%{opacity:0;filter:blur(5px);transform:scale(1.4)}60%{opacity:.7;filter:blur(2px)}100%{opacity:1;filter:blur(0);transform:none}}
+.fx-doodle{width:46px;height:46px;flex:none;fill:none;stroke:var(--text);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.75;transform:rotate(6deg)}
+.fx-load{text-align:center;margin-top:30vh}
+.fx-load .fx-graf{font-size:22px}
+/* night: candlelight on Paper, a dim warm edge on Ink, and a bat once a visit */
+html[data-night] body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:8000;
+  background:radial-gradient(ellipse at 50% 108%,rgba(255,170,60,.22) 0%,rgba(255,150,50,.09) 38%,rgba(60,30,10,.16) 68%,rgba(25,12,5,.46) 100%);animation:fxCandle 3.2s ease-in-out infinite alternate}
+html[data-night][data-look="ink"] body::after{background:radial-gradient(ellipse at 50% 108%,rgba(255,160,60,.10) 0%,rgba(0,0,0,0) 45%,rgba(0,0,0,.30) 100%)}
+@keyframes fxCandle{0%{opacity:.85}40%{opacity:1}70%{opacity:.9}100%{opacity:1}}
+.fx-bat{position:fixed;top:12vh;left:-80px;width:68px;height:44px;z-index:9100;pointer-events:none;animation:fxBat 4s linear forwards}
+.fx-bat svg{width:100%;height:100%;fill:#1b1420;animation:fxFlap .18s ease-in-out infinite alternate}
+html[data-look="ink"] .fx-bat svg{fill:#0a080c;filter:drop-shadow(0 0 3px rgba(190,140,255,.7))}
+@keyframes fxBat{0%{transform:translate(0,0)}25%{transform:translate(30vw,-6vh)}50%{transform:translate(55vw,4vh)}75%{transform:translate(80vw,-4vh)}100%{transform:translate(calc(100vw + 120px),2vh)}}
+@keyframes fxFlap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
+/* the guide spins when the logo is tapped five times */
+.fx-spin{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:9600}
+.fx-spin img,.fx-spin .fx-spinpic{max-width:62vw;max-height:56vh;animation:fxSpin 2.2s ease-in-out both;filter:drop-shadow(0 0 18px rgba(57,197,187,.8))}
+@keyframes fxSpin{0%{transform:scale(.2) rotateY(0);opacity:0}15%{transform:scale(1) rotateY(0);opacity:1}70%{transform:scale(1) rotateY(720deg);opacity:1}100%{transform:scale(1.1) rotateY(720deg);opacity:0}}
+/* the welcome tour */
+.fx-tour{position:fixed;inset:0;z-index:9700}
+.fx-tour.fx-dim{background:rgba(10,8,12,.62)}
+.fx-ring{position:fixed;border-radius:16px;border:3px solid #39c5bb;box-shadow:0 0 0 9999px rgba(10,8,12,.62),0 0 16px rgba(57,197,187,.9);pointer-events:none;animation:fxRing 1.4s ease-in-out infinite alternate}
+@keyframes fxRing{from{box-shadow:0 0 0 9999px rgba(10,8,12,.62),0 0 8px rgba(57,197,187,.6)}to{box-shadow:0 0 0 9999px rgba(10,8,12,.62),0 0 22px rgba(57,197,187,1)}}
+.fx-tcard{position:fixed;left:12px;right:12px;max-width:460px;margin:0 auto;background:#141218;color:#f1eff2;border:1px solid #3a3442;border-radius:20px;padding:16px 16px 14px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;animation:fxCard .28s ease-out both}
+.fx-tcard.fx-tmid{top:50%;transform:translateY(-50%)}
+.fx-tcard.fx-tbot{bottom:calc(16px + env(safe-area-inset-bottom))}
+.fx-tcard.fx-ttop{top:calc(16px + env(safe-area-inset-top))}
+.fx-tcard .fx-tpic{width:86px;height:auto;max-height:120px;object-fit:contain;grid-row:1}
+.fx-tbody{grid-column:auto}
+.fx-tcard:not(:has(.fx-tpic)) .fx-tbody{grid-column:1 / -1}
+.fx-tbody b{font-family:"Mikonomics Rounded",system-ui,sans-serif;font-size:calc(18px*var(--fs,1));color:#7fe9df}
+.fx-tbody p{margin:6px 0 0;font-size:calc(15px*var(--fs,1));line-height:1.4;color:#f1eff2}
+.fx-tdots{grid-column:1 / -1;display:flex;gap:6px;justify-content:center;margin-top:10px}
+.fx-tdots i{width:7px;height:7px;border-radius:50%;background:#4a4250}.fx-tdots i.on{background:#39c5bb}
+.fx-trow{grid-column:1 / -1;display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+.fx-trow .btn{min-height:48px;min-width:96px;background:#24212a;color:#f1eff2;border:1px solid #4a4250}
+.fx-trow .btn.go{background:#39c5bb;color:#0d1f1e;border-color:#39c5bb}
+@keyframes fxCard{from{opacity:0;margin-top:10px}to{opacity:1;margin-top:0}}
+@media (prefers-reduced-motion:reduce){.fx-sx,.fx-brush path{animation:none;stroke-dashoffset:0}.fx-graf i,.fx-hanko,.fx-slapin,.fx-tcard,.fx-ring,html[data-night] body::after{animation:none}}
 /* v1.10 */
 .orow{display:flex;gap:6px;align-items:stretch}.orow .opt{flex:1;min-width:0}
 .gq{flex:none;width:46px;border-radius:14px;border:2px solid var(--line);background:var(--ui-panel-90);color:var(--mute);font-size:calc(20px*var(--fs,1));font-weight:900;transition:transform .08s,border-color .15s}
@@ -457,7 +602,7 @@ html[data-look="ink"] .gcard .ghome{background:radial-gradient(closest-side,var(
 /* data/<profile>/spec.js calls RM.setSpec, data/<profile>/generators.js calls RM.gen; the questions are in data/<profile>/*.jsonl */
 window.RM={banks:{},spec:null,gens:[],profile:null,quiz:null,add(s,qs){(this.banks[s]=this.banks[s]||[]).push(...qs);},setSpec(x){this.spec=x;},gen(g){this.gens.push(g);}};
 </script>
-<div id="bgart" aria-hidden="true"></div><div id="app"><div class="wrap"><p class="muted">Loading Mikonomics…</p></div></div>
+<div id="bgart" aria-hidden="true"></div><div id="app"><div class="wrap"><p class="fx-load"><span class="fx-graf" id="fxLoad">Loading Mikonomics…</span></p><script>(function(){var J=["Clearing the market…","Adjusting for inflation…","Shifting the demand curve…","Finding equilibrium…","Asking the invisible hand…","Counting the opportunity cost…","Printing money (responsibly)…"],t=J[Math.floor(Math.random()*J.length)],el=document.getElementById("fxLoad");if(el)el.innerHTML=t.split("").map(function(c,i){return '<i style="--i:'+i+'">'+(c===" "?"&nbsp;":c)+"</i>";}).join("");})();</script></div></div>
 <script>
 /* store: MADE BY tools/assemble.py from src/editions/econ/edition.json "store" -> "live". Edit that, never this. */
 window.RM_STORE={"prefix":"sd_","course_prefix":{},"profile_key":"sd_profile","relay_root":"sd-relay-v1/","client_prefix":"sd_","stage":"live"};
@@ -531,7 +676,7 @@ window.STORE=(function(C){
    Live games travel through public MQTT relays (no accounts): use nicknames.
    ===================================================================== */
 /* config.js: MADE BY tools/assemble.py from src/editions/econ/edition.json and src/skins/econ/skin.json. Edit those, never this. */
-const CFG={"edition":"econ","skin":{"skin":"econ","name":"Mikonomics","words":{"levels":{"1":"Sketch","2":"Study","3":"Masterpiece"},"ranks":[[0,"Price Taker"],[150,"Window Shopper"],[400,"Small Trader"],[900,"Stallholder"],[1800,"Entrepreneur"],[3200,"Price Setter"],[5200,"Oligopolist"],[8000,"Shadow Chancellor"],[12000,"Market Maker"]],"shapes":["▲","◆","●","■"],"badges":["🦇","🌙","🕯️","🗝️","🖤","🥀","🌸","⭐","🔮","📜","🎭","🪙","📈","📉","⚖️","🏛️","🧾","🕸️","🐈‍⬛","🌀"],"nickA":["Velvet","Midnight","Silver","Ink","Gothic","Lunar","Violet","Shadow","Crimson","Iron","Hollow","Starlit","Rogue","Quiet","Wild","Thorned"],"nickB":["Raven","Moth","Lantern","Fox","Bat","Rose","Comet","Wraith","Sparrow","Cat","Owl","Thistle","Ember","Spectre","Willow","Crow"],"logo":["MIKONOMICS",""],"logo_icon":"👔","labels":{"gym":"Practice","gym_blurb":"Quick 5, first sketches, full studies, masterpieces and weak spots","chooser_offer":"Course map, practice, daily challenge and quiz nights.","tagline":"REVISION","workouts":{"quick":{"name":"Quick 5","em":"⏱️","desc":"Levels 1–2 · 5 questions"},"warm":{"name":"First sketch","em":"🎭","desc":"Level 1 · 10 questions"},"sets":{"name":"Full study","em":"📖","desc":"Levels 1–2 · 10 questions"},"max":{"name":"Masterpiece","em":"🔥","desc":"Hardest only · 5 questions"},"weak":{"name":"Weak spots","em":"🎯","desc":"Your misses and reviews due · 10 questions"}},"clock_hint":"30 s a question (60 s for a Masterpiece), bonus XP for speed","start":"Start practice","end_q":"End this practice?","back":"Back to your practice","back_line":"Back to your practice: the questions are what make it stick.","no_match":"No questions match those settings yet. Try another subject or practice, or check what you've covered.","rep":"Q","next_rep":"Next question →","praise":["Spot on.","Nailed it.","Sharp.","Market cleared."],"done":"Practice done","workouts_lc":"practice runs","workouts_cap":"Practice runs","warmups":"first sketches"},"logo_alt":["ミコノミクス","経済学"]},"pictures":{"background":"lib/bg/{look}/{name}.jpg","background_default":"study","background_subject":"s_{s}","background_alias":{}},"looks":[{"id":"paper","name":"Paper"},{"id":"ink","name":"Ink"}],"answers":"calm","guide":{"pics":{"hello":"lib/guide/miku/hello.webp","right":"lib/guide/miku/right.webp","wrong":"lib/guide/miku/wrong.webp","think":"lib/guide/miku/think.webp","cheer":"lib/guide/miku/cheer.webp","explain":"lib/guide/miku/explain.webp","chart":"lib/guide/miku/chart.webp","read":"lib/guide/miku/read.webp"},"credit":"Hatsune Miku, Kagamine Rin, Kagamine Len, Megurine Luka, MEIKO and KAITO, © Crypton Future Media, Inc., licensed under","credit_licence":"CC BY-NC 3.0","credit_link":"https://creativecommons.org/licenses/by-nc/3.0/","home":["read","chart","explain","hello","cheer"],"run":{"img":"lib/guide/run.webp","n":6,"w":66,"h":70,"fps":11,"secs":3.2},"cast":{"1":{"who":"Kagamine Rin","id":"rin","pics":{"hello":"lib/guide/rin/hello.webp","right":"lib/guide/rin/right.webp","wrong":"lib/guide/rin/wrong.webp","think":"lib/guide/rin/think.webp","cheer":"lib/guide/rin/cheer.webp","explain":"lib/guide/rin/explain.webp","chart":"lib/guide/rin/chart.webp","read":"lib/guide/rin/read.webp"}},"2":{"who":"Kagamine Len","id":"len","pics":{"hello":"lib/guide/len/hello.webp","right":"lib/guide/len/right.webp","wrong":"lib/guide/len/wrong.webp","think":"lib/guide/len/think.webp","cheer":"lib/guide/len/cheer.webp","explain":"lib/guide/len/explain.webp","chart":"lib/guide/len/chart.webp","read":"lib/guide/len/read.webp"}},"3":{"who":"KAITO","id":"kaito","pics":{"hello":"lib/guide/kaito/hello.webp","right":"lib/guide/kaito/right.webp","wrong":"lib/guide/kaito/wrong.webp","think":"lib/guide/kaito/think.webp","cheer":"lib/guide/kaito/cheer.webp","explain":"lib/guide/kaito/explain.webp","chart":"lib/guide/kaito/chart.webp","read":"lib/guide/kaito/read.webp"}},"4":{"who":"Megurine Luka","id":"luka","pics":{"hello":"lib/guide/luka/hello.webp","right":"lib/guide/luka/right.webp","wrong":"lib/guide/luka/wrong.webp","think":"lib/guide/luka/think.webp","cheer":"lib/guide/luka/cheer.webp","explain":"lib/guide/luka/explain.webp","chart":"lib/guide/luka/chart.webp","read":"lib/guide/luka/read.webp"}},"daily":{"who":"MEIKO","id":"meiko","pics":{"hello":"lib/guide/meiko/hello.webp","right":"lib/guide/meiko/right.webp","wrong":"lib/guide/meiko/wrong.webp","think":"lib/guide/meiko/think.webp","cheer":"lib/guide/meiko/cheer.webp","explain":"lib/guide/meiko/explain.webp","chart":"lib/guide/meiko/chart.webp","read":"lib/guide/meiko/read.webp","stopwatch":"lib/guide/meiko/stopwatch.webp","sprint":"lib/guide/meiko/sprint.webp","trophy":"lib/guide/meiko/trophy.webp"}},"sprint":{"who":"MEIKO","id":"meiko","pics":{"hello":"lib/guide/meiko/hello.webp","right":"lib/guide/meiko/right.webp","wrong":"lib/guide/meiko/wrong.webp","think":"lib/guide/meiko/think.webp","cheer":"lib/guide/meiko/cheer.webp","explain":"lib/guide/meiko/explain.webp","chart":"lib/guide/meiko/chart.webp","read":"lib/guide/meiko/read.webp","stopwatch":"lib/guide/meiko/stopwatch.webp","sprint":"lib/guide/meiko/sprint.webp","trophy":"lib/guide/meiko/trophy.webp"}}},"cast_poses":["hello","right","wrong","think","cheer","explain","chart"],"alts":{"right":["peace","heart","fist"],"wrong":["anxious","shocked"],"cheer":["sparkle","trophy"],"think":["stopwatch"],"hello":["bow"]},"name_sub":"経済学","sounds":{"splash":"lib/sound/splash.mp3","streak":"lib/sound/streak.mp3","levelup":"lib/sound/levelup.mp3"},"moves":[{"img":"lib/guide/run.webp","n":6,"w":66,"h":70,"fps":11,"secs":3.2},{"img":"lib/guide/skip.webp","n":7,"w":50,"h":70,"secs":3.6},{"img":"lib/guide/jump.webp","n":5,"w":60,"h":70,"secs":4},{"img":"lib/guide/wheel.webp","n":5,"w":78,"h":70,"secs":3.4}],"spirit":"A free study tool, never sold, made in the spirit of the open source movement and of Miku's fan creators. Not made or endorsed by Crypton Future Media.","tagline":"Free and open, in the spirit of the open source movement"},"fire":true,"theme_colours":{"1":"var(--th1)","2":"var(--th2)","3":"var(--th3)","4":"var(--th4)"},"lesson_intro":true,"themes":{"1":{"name":"Introduction to markets and market failure","paper":"Papers 1 and 3","short":"Markets and market failure"},"2":{"name":"The UK economy – performance and policies","paper":"Papers 2 and 3","short":"The UK economy"},"3":{"name":"Business behaviour and the labour market","paper":"Papers 1 and 3","short":"Business and the labour market"},"4":{"name":"A global perspective","paper":"Papers 2 and 3","short":"A global perspective"}}},"version":"1.0","launch":"2026-11-23","xp_per_level":{"1":10,"2":20,"3":40},"courses":{"econ":{"label":"Economics A","tag":"A LEVEL · EDEXCEL","quiz":true,"subj":{"micro":{"name":"Microeconomics","short":"Micro","col":"var(--micro)","em":"💼","pre":"mi"},"macro":{"name":"Macroeconomics","short":"Macro","col":"var(--macro)","em":"🗺️","pre":"mx"}},"em":"🎓"}},"setups":{"econ":{"id":"econ-a","defaults":{"auto":true,"size":1,"font":"plain"},"features":{"daily":true,"sprint":true,"quiz":true,"maker":true,"share":true}}}};
+const CFG={"edition":"econ","skin":{"skin":"econ","name":"Mikonomics","words":{"levels":{"1":"Sketch","2":"Study","3":"Masterpiece"},"ranks":[[0,"Price Taker"],[150,"Window Shopper"],[400,"Small Trader"],[900,"Stallholder"],[1800,"Entrepreneur"],[3200,"Price Setter"],[5200,"Oligopolist"],[8000,"Shadow Chancellor"],[12000,"Market Maker"]],"shapes":["▲","◆","●","■"],"badges":["🦇","🌙","🕯️","🗝️","🖤","🥀","🌸","⭐","🔮","📜","🎭","🪙","📈","📉","⚖️","🏛️","🧾","🕸️","🐈‍⬛","🌀"],"nickA":["Velvet","Midnight","Silver","Ink","Gothic","Lunar","Violet","Shadow","Crimson","Iron","Hollow","Starlit","Rogue","Quiet","Wild","Thorned"],"nickB":["Raven","Moth","Lantern","Fox","Bat","Rose","Comet","Wraith","Sparrow","Cat","Owl","Thistle","Ember","Spectre","Willow","Crow"],"logo":["MIKONOMICS",""],"logo_icon":"👔","labels":{"gym":"Practice","gym_blurb":"Quick 5, first sketches, full studies, masterpieces and weak spots","chooser_offer":"Course map, practice, daily challenge and quiz nights.","tagline":"REVISION","workouts":{"quick":{"name":"Quick 5","em":"⏱️","desc":"Levels 1–2 · 5 questions"},"warm":{"name":"First sketch","em":"🎭","desc":"Level 1 · 10 questions"},"sets":{"name":"Full study","em":"📖","desc":"Levels 1–2 · 10 questions"},"max":{"name":"Masterpiece","em":"🔥","desc":"Hardest only · 5 questions"},"weak":{"name":"Weak spots","em":"🎯","desc":"Your misses and reviews due · 10 questions"}},"clock_hint":"30 s a question (60 s for a Masterpiece), bonus XP for speed","start":"Start practice","end_q":"End this practice?","back":"Back to your practice","back_line":"Back to your practice: the questions are what make it stick.","no_match":"No questions match those settings yet. Try another subject or practice, or check what you've covered.","rep":"Q","next_rep":"Next question →","praise":["Spot on.","Nailed it.","Sharp.","Market cleared."],"done":"Practice done","workouts_lc":"practice runs","workouts_cap":"Practice runs","warmups":"first sketches"},"logo_alt":["ミコノミクス","経済学"],"logo_styles":{"neon":2,"ink":3,"spray":3,"holo":3,"sketch":3}},"pictures":{"background":"lib/bg/{look}/{name}.jpg","background_default":"study","background_subject":"s_{s}","background_alias":{}},"looks":[{"id":"paper","name":"Paper"},{"id":"ink","name":"Ink"}],"answers":"calm","guide":{"pics":{"hello":"lib/guide/miku/hello.webp","right":"lib/guide/miku/right.webp","wrong":"lib/guide/miku/wrong.webp","think":"lib/guide/miku/think.webp","cheer":"lib/guide/miku/cheer.webp","explain":"lib/guide/miku/explain.webp","chart":"lib/guide/miku/chart.webp","read":"lib/guide/miku/read.webp"},"credit":"Hatsune Miku, Kagamine Rin, Kagamine Len, Megurine Luka, MEIKO and KAITO, © Crypton Future Media, Inc., licensed under","credit_licence":"CC BY-NC 3.0","credit_link":"https://creativecommons.org/licenses/by-nc/3.0/","home":["read","chart","explain","hello","cheer"],"run":{"img":"lib/guide/run.webp","n":6,"w":66,"h":70,"fps":11,"secs":3.2},"cast":{"1":{"who":"Kagamine Rin","id":"rin","pics":{"hello":"lib/guide/rin/hello.webp","right":"lib/guide/rin/right.webp","wrong":"lib/guide/rin/wrong.webp","think":"lib/guide/rin/think.webp","cheer":"lib/guide/rin/cheer.webp","explain":"lib/guide/rin/explain.webp","chart":"lib/guide/rin/chart.webp","read":"lib/guide/rin/read.webp"}},"2":{"who":"Kagamine Len","id":"len","pics":{"hello":"lib/guide/len/hello.webp","right":"lib/guide/len/right.webp","wrong":"lib/guide/len/wrong.webp","think":"lib/guide/len/think.webp","cheer":"lib/guide/len/cheer.webp","explain":"lib/guide/len/explain.webp","chart":"lib/guide/len/chart.webp","read":"lib/guide/len/read.webp"}},"3":{"who":"KAITO","id":"kaito","pics":{"hello":"lib/guide/kaito/hello.webp","right":"lib/guide/kaito/right.webp","wrong":"lib/guide/kaito/wrong.webp","think":"lib/guide/kaito/think.webp","cheer":"lib/guide/kaito/cheer.webp","explain":"lib/guide/kaito/explain.webp","chart":"lib/guide/kaito/chart.webp","read":"lib/guide/kaito/read.webp"}},"4":{"who":"Megurine Luka","id":"luka","pics":{"hello":"lib/guide/luka/hello.webp","right":"lib/guide/luka/right.webp","wrong":"lib/guide/luka/wrong.webp","think":"lib/guide/luka/think.webp","cheer":"lib/guide/luka/cheer.webp","explain":"lib/guide/luka/explain.webp","chart":"lib/guide/luka/chart.webp","read":"lib/guide/luka/read.webp"}},"daily":{"who":"MEIKO","id":"meiko","pics":{"hello":"lib/guide/meiko/hello.webp","right":"lib/guide/meiko/right.webp","wrong":"lib/guide/meiko/wrong.webp","think":"lib/guide/meiko/think.webp","cheer":"lib/guide/meiko/cheer.webp","explain":"lib/guide/meiko/explain.webp","chart":"lib/guide/meiko/chart.webp","read":"lib/guide/meiko/read.webp","stopwatch":"lib/guide/meiko/stopwatch.webp","sprint":"lib/guide/meiko/sprint.webp","trophy":"lib/guide/meiko/trophy.webp"}},"sprint":{"who":"MEIKO","id":"meiko","pics":{"hello":"lib/guide/meiko/hello.webp","right":"lib/guide/meiko/right.webp","wrong":"lib/guide/meiko/wrong.webp","think":"lib/guide/meiko/think.webp","cheer":"lib/guide/meiko/cheer.webp","explain":"lib/guide/meiko/explain.webp","chart":"lib/guide/meiko/chart.webp","read":"lib/guide/meiko/read.webp","stopwatch":"lib/guide/meiko/stopwatch.webp","sprint":"lib/guide/meiko/sprint.webp","trophy":"lib/guide/meiko/trophy.webp"}}},"cast_poses":["hello","right","wrong","think","cheer","explain","chart"],"alts":{"right":["peace","heart","fist"],"wrong":["anxious","shocked"],"cheer":["sparkle","trophy"],"think":["stopwatch"],"hello":["bow"]},"name_sub":"経済学","sounds":{"splash":"lib/sound/splash.mp3","streak":"lib/sound/streak.mp3","levelup":"lib/sound/levelup.mp3"},"moves":[{"img":"lib/guide/run.webp","n":6,"w":66,"h":70,"fps":11,"secs":3.2},{"img":"lib/guide/skip.webp","n":7,"w":50,"h":70,"secs":3.6},{"img":"lib/guide/jump.webp","n":5,"w":60,"h":70,"secs":4},{"img":"lib/guide/wheel.webp","n":5,"w":78,"h":70,"secs":3.4}],"spirit":"A free study tool, never sold, made in the spirit of the open source movement and of Miku's fan creators. Not made or endorsed by Crypton Future Media.","tagline":"Free and open, in the spirit of the open source movement"},"fire":true,"theme_colours":{"1":"var(--th1)","2":"var(--th2)","3":"var(--th3)","4":"var(--th4)"},"lesson_intro":true,"themes":{"1":{"name":"Introduction to markets and market failure","paper":"Papers 1 and 3","short":"Markets and market failure"},"2":{"name":"The UK economy – performance and policies","paper":"Papers 2 and 3","short":"The UK economy"},"3":{"name":"Business behaviour and the labour market","paper":"Papers 1 and 3","short":"Business and the labour market"},"4":{"name":"A global perspective","paper":"Papers 2 and 3","short":"A global perspective"}},"touches":{"spray":true,"brush":true,"stamp":true,"stickers":true,"wall":true,"night":true,"petals":40,"tiespin":true,"jokes":["No such thing as a free lunch","Ceteris paribus, you've got this","Opportunity cost: this wall","Smash the monopoly","Market forces, unite!","Keynes was here","The invisible hand waves hi","Marginal gains only","Price elastic, heart inelastic","Tax the externalities","Equilibrium is a state of mind","Shift happens (to the right)","Demand > supply (of snacks)"],"tour":[{"pose":"hello","title":"Hi, welcome to Mikonomics","text":"Edexcel Economics A in bite-size bits. Two minutes counts."},{"pose":"read","title":"Learn anywhere","text":"At the bus stop, waiting for a taxi, even on the loo. Learn some economics any time of day."},{"sel":"button.big[data-act=\"daily\"]","title":"Today's challenge","text":"Ten questions, once a day. No clock unless you want one."},{"sel":"button.big[data-act=\"gym\"]","title":"Practice","text":"Quick runs on what you've covered. Anything you miss comes back until it sticks."},{"sel":"#mapstrip","title":"Your map","text":"Micro on the left, macro on the right. Master a topic and it goes in your sticker book."},{"sel":".ttop .logo","title":"Two looks","text":"Tap the title to swap between white Paper and dark Ink."},{"pose":"cheer","title":"Ready?","text":"If you want this tour again, it's in Settings."}]}},"version":"1.0","launch":"2026-11-23","xp_per_level":{"1":10,"2":20,"3":40},"courses":{"econ":{"label":"Economics A","tag":"A LEVEL · EDEXCEL","quiz":true,"subj":{"micro":{"name":"Microeconomics","short":"Micro","col":"var(--micro)","em":"💼","pre":"mi"},"macro":{"name":"Macroeconomics","short":"Macro","col":"var(--macro)","em":"🗺️","pre":"mx"}},"em":"🎓"}},"setups":{"econ":{"id":"econ-a","defaults":{"auto":true,"size":1,"font":"plain"},"features":{"daily":true,"sprint":true,"quiz":true,"maker":true,"share":true}}}};
 const VERSION=CFG.version;
 const LAUNCH=CFG.launch;                 // daily challenge #1
 /* The courses. quiz:false = course map and tracker only (for a course with no questions yet); pre = id prefix for new questions. */
@@ -1012,7 +1157,7 @@ function tmSet(el,left,total){if(!el)return;el.querySelector("i").style.width=Ma
 function topBar(title,back="home"){return `<div class="top ttop tbar"><button class="icon-btn" data-act="${back}" aria-label="Back">←</button><div class="spacer"><h2 style="margin:0">${title}</h2>${PROFILE?`<div class="cname">${esc(PRO.label)}</div>`:""}</div><button class="icon-btn" data-act="mute" aria-label="Sound">${MUTED?"🔇":"🔊"}</button></div>`;}
 function setWide(on){document.body.classList.toggle("wide",!!on);}
 let VIEW="home";
-function render(html,view){if(view&&!['run','sprintq','play','host'].includes(view))calcClose();VIEW=view||VIEW;app.innerHTML=html;if(view&&['run','sprintq','play','host'].includes(view))document.querySelectorAll('.grun').forEach(e=>e.remove());window.scrollTo(0,0);navSync();bgSync();}
+function render(html,view){if(view&&!['run','sprintq','play','host'].includes(view))calcClose();VIEW=view||VIEW;app.innerHTML=html;if(view&&['run','sprintq','play','host'].includes(view))document.querySelectorAll('.grun').forEach(e=>e.remove());window.scrollTo(0,0);navSync();bgSync();if(typeof fxAfter==="function")fxAfter(VIEW);}
 const BG_OF=PIC.background_alias;   // subjects that share another's picture (the skin's "pictures")
 let BGK=null;
 function bgSync(){const el=document.getElementById("bgart");if(!el)return;
@@ -1084,7 +1229,16 @@ function guideRun(){   // the guide crosses the foot of the screen, flash-steppi
 setInterval(()=>{if(!document.hidden&&!busyView()&&!document.querySelector(".modal"))guideRun();},30e3);
 // the word mark; a skin's words.logo_alt ([name, tag]) makes it take turns between two scripts, e.g. English and Japanese (FNF-113)
 function logoText(){const A=CFG.skin.words.logo_alt,one=`${esc(LOGO[0])} <b>${esc(LOGO[1])}</b><small>${esc(PRO.tag)}</small>`;
-  return A&&!REDUCED?`<div class="lrot"><span class="lr lr1">${one}</span><span class="lr lr2" aria-hidden="true">${esc(A[0])}<small>${esc(A[1])}</small></span></div>`:`<div>${one}</div>`;}
+  return A&&!REDUCED?`<div class="lrot"><span class="lr lr1">${one}</span><span class="lr lr2" aria-hidden="true">${CFG.skin.words.logo_styles?titleFx(A[0],A[1]):`${esc(A[0])}<small>${esc(A[1])}</small>`}</span></div>`:`<div>${one}</div>`;}
+// a skin's words.logo_styles {style: weight} makes the second script draw itself in one of several styles, picked by weight each
+// time the header is drawn (Guy 24 Nov 13:44 neon sign; 13:53 "build similar versions and only have the neon sign version appear
+// occasionally"). Letters carry --d (when each starts) and the style's class; the look and timing are the skin's CSS, keyed to the
+// 9 s title cycle. neon: random order, one sparks (nsp), one fizzles out (nfz); ink and sketch: left to right; the rest random.
+function titleFx(s,tag){const W=CFG.skin.words.logo_styles,ks=Object.keys(W);let r=Math.random()*ks.reduce((a,k)=>a+W[k],0),st=ks[ks.length-1];
+  for(const k of ks){if((r-=W[k])<0){st=k;break;}}
+  const ch=[...s],n=ch.length,lr=st==="ink"||st==="sketch",ord=ch.map((_,i)=>i).sort(()=>Math.random()-.5),neon=st==="neon",sp=Math.floor(Math.random()*n);
+  let fz=Math.floor(Math.random()*n);if(n>1&&fz===sp)fz=(fz+1)%n;
+  return `<span class="jt jt-${esc(st)}">${ch.map((c,i)=>`<i class="nl${neon&&i===sp?" nsp":""}${neon&&n>2&&i===fz?" nfz":""}" style="--d:${((lr?i:ord.indexOf(i))/Math.max(1,n-1)+(lr?0:Math.random()*.12)).toFixed(2)}s">${esc(c)}</i>`).join("")}</span><small class="ntag">${esc(tag)}</small>`;}
 // the skin's own jingles (FNF-114): guide.sounds {splash, streak, levelup}; only when sound is on; returns true if one played
 function gSound(k){const src=GUIDE&&GUIDE.sounds&&GUIDE.sounds[k];if(!src||MUTED)return false;try{const a=new Audio(src);a.volume=.8;const p=a.play();if(p&&p.catch)p.catch(()=>{});return true;}catch(e){return false;}}
 /* =====================================================================
@@ -1729,6 +1883,7 @@ function answer(di,guess){
   if(!RUN||RUN.locked)return;RUN.locked=true;clearInterval(RT);
   const q=RUN.qs[RUN.i],perm=RUN.perms[RUN.i],right=perm.indexOf(q.a),ok=di===right;
   const secs=(Date.now()-RUN.start)/1000,dur=qDur(q),cm=confMode(),sure=cm&&!guess&&di>=0;guess=!!guess&&cm;
+  const fxWas=typeof fxAnswer==="function"&&topicMastered(q.s,q.t);   // FNF-119: a sticker when this answer masters the topic
   recordAnswer(q,ok,{guess,sure});
   let xp=0,pts=0;
   if(ok){RUN.combo++;RUN.best=Math.max(RUN.best,RUN.combo);xp=XP_LV[q.lv];pts=100;if(RUN.clock){const f=Math.max(0,1-secs/dur);xp+=Math.round(xp*.5*f);pts+=Math.round(50*f);}if(RUN.combo>=3)xp+=5;}
@@ -1748,6 +1903,7 @@ function answer(di,guess){
    ${card&&!ok?cardHtml(card):""}<div id="cardBox"></div>
    <div class="row small" style="margin-top:10px;gap:16px;flex-wrap:wrap">${!ok&&LESSONS[keyOf(q)]&&!topicMastered(q.s,q.t)?`<button class="linkb" data-act="lessonEx" data-k="${esc(keyOf(q))}">📖 See a worked example</button>`:""}${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
    <div class="small muted" style="margin-top:8px">${esc(specRef(q))}</div><div class="footpad"></div><div class="footbar"><button class="btn go block" data-act="nextQ">${last?"Finish":esc(WL.next_rep)}</button></div>`;
+  if(typeof fxAnswer==="function")fxAnswer(ok,di,q,fxWas);
   if(auto)setTimeout(()=>{if(RUN&&RUN.locked&&RUN.i===iNow&&VIEW==="run"&&!document.querySelector(".modal"))ACT.nextQ();},1100);
 }
 ACT.showCard=d=>{const el=$("#cardBox");if(el)el.innerHTML=el.innerHTML?"":cardHtml(CARDS[d.k]);};
@@ -1776,7 +1932,7 @@ function endRun(){
   }
   if(daily&&!RUN.practice){
     const grid=RUN.res.map(r=>r.ok?"🟩":r.timeout?"⬛":"🟥").join("");
-    ST.daily[RUN.date]={right,n,grid,score:RUN.score,clock:!!RUN.clock};saveST();
+    ST.daily[RUN.date]={right,n,grid,score:RUN.score,clock:!!RUN.clock};saveST();if(typeof T_STAMP!=="undefined")T_STAMP=true;
     RUN.xp+=20;
   }
   addXP(RUN.xp);
@@ -2447,6 +2603,97 @@ function spEnd(){
    <div class="row"><button class="btn go" data-act="spGo">Go again</button><button class="btn" data-act="home">Home</button></div></div>`,"sprintend");
 }
 
+/* ---------- touches (FNF-116, FNF-118, FNF-119; Guy 24 Nov 2026 13:44-13:57): small things that show love went into the site.
+   Every one is off unless the skin's "touches" turns it on, so an edition without them (Rep Max) is unchanged. The look is the skin's CSS.
+   spray: a stencil X sprayed over a wrong answer, with a hiss · brush: a tick brushed onto the right answer · stamp: a seal stamp on the
+   finished daily challenge · stickers: a sticker slapped on when a topic is mastered, and a sticker book · wall: a graffiti economics joke
+   and a doodle that change each day, at the foot of home · night: after 10pm the page goes candlelit and a bat flits past once ·
+   petals: 1 right answer in N lets cherry blossom drift across · tiespin: tap the logo 5 times and the guide spins · tour: the welcome
+   cards on a first visit (Settings can show them again) */
+const TCH=CFG.skin.touches||null;
+function tOn(k){return !!(TCH&&TCH[k]);}
+function tDay(){return Math.max(0,dayDiff(LAUNCH,londonDate()));}
+function tHash(s){let h=7;for(const c of String(s))h=(h*31+c.charCodeAt(0))|0;return Math.abs(h);}
+function tLetters(t){return [...t].map((c,i)=>`<i style="--i:${i}">${c===" "?"&nbsp;":esc(c)}</i>`).join("");}
+// a spray-can hiss, made in code (no file): filtered noise
+function tHiss(dur,vol,when){if(MUTED)return;const c=ac();if(!c)return;const n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime+(when||0);
+  s.buffer=b;f.type="highpass";f.frequency.value=2600;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  s.connect(f).connect(g).connect(c.destination);s.start(t);s.stop(t+dur+.05);}
+// after an answer (19_runner.js): spray X on her wrong choice, brush tick on the right one, petals now and then, a sticker when a topic is newly mastered
+function fxAnswer(ok,di,q,wasMastered){if(!TCH)return;
+  const mine=document.querySelector(".opt.mine"),right=document.querySelector(".opt.right");
+  if(!ok&&di>=0&&mine&&tOn("spray")){mine.insertAdjacentHTML("beforeend",`<span class="fx-spray" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path class="fx-sx" d="M14 18 L86 84"/><path class="fx-sx fx-sx2" d="M84 16 L18 86"/></svg></span>`);tHiss(.28,.07,0);tHiss(.28,.07,.24);}
+  if(ok&&right&&tOn("brush"))right.insertAdjacentHTML("beforeend",`<span class="fx-brush" aria-hidden="true"><svg viewBox="0 0 100 60"><path d="M12 32 Q24 40 36 50 Q58 22 92 8"/></svg></span>`);
+  if(ok&&TCH.petals&&!REDUCED&&Math.random()<1/TCH.petals)tPetals();
+  if(ok&&tOn("stickers")&&!wasMastered&&topicMastered(q.s,q.t))tStickerSlap(TOPIC[keyOf(q)]);}
+function tPetals(){for(let i=0;i<14;i++){const p=document.createElement("i");p.className="fx-petal";p.setAttribute("aria-hidden","true");
+  p.style.cssText=`--x:${Math.round(Math.random()*100)}vw;--dx:${Math.round(Math.random()*30-10)}vw;--t:${(4+Math.random()*3).toFixed(1)}s;--w:${(Math.random()*1.6).toFixed(2)}s`;
+  document.body.appendChild(p);setTimeout(()=>p.remove(),9000);}}
+// stickers
+function tTheme(t){const n=String(t&&t.id||"").split(".")[0];return /^[1-4]$/.test(n)?`var(--th${n})`:"var(--accent)";}
+function tSticker(t,cls){const r=(tHash(t.id)%15)-7,nm=String(t.name||""),short=!cls&&nm.length>34?nm.slice(0,32).replace(/[\s,;:]+\S*$/,"")+"…":nm;return `<span class="fx-stk${cls?" "+cls:""}" style="--c:${tTheme(t)};--r:${r}deg" title="${esc(nm)}"><small>${esc(t.id)}</small>${esc(short)}</span>`;}
+function tStickerSlap(t){if(!t)return;const o=document.createElement("div");o.className="fx-slap";o.setAttribute("aria-live","polite");
+  o.innerHTML=`<div class="fx-slapin"><b>New sticker!</b>${tSticker(t,"big")}</div>`;document.body.appendChild(o);tone(150,.12,"triangle",.18);setTimeout(()=>o.remove(),2600);}
+ACT.stickerBook=()=>{if(document.querySelector(".modal"))return;const ks=Object.keys(TOPIC).filter(k=>BANK.some(x=>keyOf(x)===k)),got=ks.filter(k=>topicMastered(TOPIC[k].s,TOPIC[k].id));
+  const o=document.createElement("div");o.className="modal fx-book";
+  o.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">Sticker book</b><div class="small muted" style="margin-top:4px">${got.length} of ${ks.length} · master a topic to earn its sticker</div>
+   <div class="fx-grid">${ks.map(k=>got.includes(k)?tSticker(TOPIC[k]):`<span class="fx-stk fx-empty"><small>${esc(TOPIC[k].id)}</small>?</span>`).join("")}</div>
+   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn go" data-m="close">Close</button></div></div>`;
+  document.body.appendChild(o);o.addEventListener("click",e=>{if(e.target===o||e.target.closest("[data-m]"))o.remove();});};
+// the wall: a graffiti joke and a doodle, both changing each day
+const T_DOODLE={cat:"M10 40 Q8 24 14 18 L12 8 L20 15 Q24 13 28 15 L36 8 L34 18 Q40 24 38 40 Z M18 26 h2 M28 26 h2 M22 31 q2 2 4 0",
+  cup:"M10 18 h22 v14 q0 8 -11 8 q-11 0 -11 -8 Z M32 22 q8 0 6 7 q-2 4 -6 3 M16 6 q3 4 0 8 M24 4 q3 4 0 8",
+  star:"M24 6 L29 19 L43 19 L32 28 L36 42 L24 34 L12 42 L16 28 L5 19 L19 19 Z",
+  pig:"M8 28 q0 -12 16 -12 q14 0 16 10 l5 1 l-1 6 l-5 0 q-2 6 -8 8 l0 5 h-5 l0 -4 h-8 l0 4 h-5 l0 -6 q-5 -4 -5 -12 Z M34 24 h1 M20 13 h8",
+  graph:"M8 6 V40 H42 M12 34 L22 22 L28 28 L40 12 M35 12 h5 v5",
+  bat:"M24 22 q-4 -6 -8 -2 q-6 -6 -12 0 q4 2 4 8 q4 -4 8 0 q2 -4 8 -2 q6 -2 8 2 q4 -4 8 0 q0 -6 4 -8 q-6 -6 -12 0 q-4 -4 -8 2 Z",
+  heart:"M24 40 Q6 28 8 16 Q10 8 18 9 Q22 10 24 15 Q26 10 30 9 Q38 8 40 16 Q42 28 24 40 Z",
+  blossom:"M24 21 a3 3 0 1 0 0.1 0 M24 18 q-6 -10 0 -12 q6 2 0 12 M30 22 q10 -4 11 2 q-2 6 -11 -2 M28 30 q6 9 1 12 q-6 -2 -1 -12 M20 30 q-6 9 -1 12 q6 -2 1 -12 M18 22 q-10 -4 -11 2 q2 6 11 -2"};
+function tWall(){const J=TCH.jokes||[],D=Object.keys(T_DOODLE);if(!J.length)return "";const d=tDay(),j=J[d%J.length],k=D[(d*3+1)%D.length];
+  return `<div class="fx-wall" aria-hidden="true"><span class="fx-graf">${tLetters(j)}</span><svg class="fx-doodle" viewBox="0 0 48 48"><path d="${T_DOODLE[k]}"/></svg></div>`;}
+// night: after 10pm and before 5am (or ?night=1), candlelight and a bat once a visit
+let T_BAT=false;
+function tNight(){let force=false;try{force=new URLSearchParams(location.search).get("night")==="1";}catch(e){}const h=new Date().getHours(),on=force||h>=22||h<5;
+  document.documentElement.toggleAttribute("data-night",on);if(!on||T_BAT||REDUCED)return;T_BAT=true;
+  setTimeout(()=>{const b=document.createElement("div");b.className="fx-bat";b.setAttribute("aria-hidden","true");b.innerHTML=`<svg viewBox="0 0 48 30"><path d="${T_DOODLE.bat}" transform="translate(0,-6)"/></svg>`;document.body.appendChild(b);setTimeout(()=>b.remove(),4200);},2600);}
+// tap the logo five times: the guide spins
+let T_TAPS=[];
+function tTie(el){if(!el||el.dataset.tie)return;el.dataset.tie="1";el.addEventListener("click",e=>{e.stopPropagation();const now=Date.now();T_TAPS=T_TAPS.filter(t=>now-t<2500);T_TAPS.push(now);
+  if(T_TAPS.length<5){tone(500+T_TAPS.length*90,.05,"triangle",.07);return;}T_TAPS=[];const pic=guideImgFor("cheer","fx-spinpic","home",null);if(!pic)return;
+  const o=document.createElement("div");o.className="fx-spin";o.setAttribute("aria-hidden","true");o.innerHTML=pic;document.body.appendChild(o);SFX.combo();setTimeout(()=>o.remove(),2200);});}
+// after every render (09_ui.js)
+let T_STAMP=false;
+function fxAfter(view){if(!TCH)return;if(tOn("night"))tNight();
+  if(tOn("tiespin"))tTie(document.querySelector(".ttop .logo .lg"));
+  const wrap=document.querySelector("#app .wrap");
+  if(view==="home"&&tOn("wall")&&wrap&&!wrap.querySelector(".fx-wall"))wrap.insertAdjacentHTML("beforeend",tWall());
+  if(T_STAMP&&tOn("stamp")){T_STAMP=false;const c=document.querySelector("#app .card.center");if(c){c.classList.add("fx-stamped");c.insertAdjacentHTML("beforeend",`<span class="fx-hanko" aria-label="Done">済</span>`);setTimeout(()=>tone(85,.22,"sine",.3),REDUCED?0:520);}}
+  if(tOn("stickers")){const mc=document.querySelector("#app .thlist")||document.querySelector("#app .mapcard,#app #mapstrip");if(mc&&!document.querySelector(".fx-sbbtn"))mc.insertAdjacentHTML(mc.classList.contains("thlist")?"beforebegin":"afterend",`<button class="btn fx-sbbtn" data-act="stickerBook">📒 Sticker book</button>`);}
+  if(TCH.tour&&document.querySelector('#app [data-act="copyBk"]')&&!document.querySelector(".fx-tagain"))wrap&&wrap.insertAdjacentHTML("beforeend",`<div class="card fx-tagain"><b>Welcome tour</b><div class="small muted" style="margin:4px 0 10px">The cards from your first visit.</div><button class="btn" data-act="tourAgain">Show me around again</button></div>`);
+  if(view==="home"&&TCH.tour)tourMaybe();}
+/* ---------- welcome tour (FNF-118; Guy 24 Nov 2026 13:44: "when we first start, there should be a few pop-ups that guide you what you can
+   do, where you can go ... I want this to draw you in. And I want to build it in a way that I can reuse that for other of my games").
+   One part, no colours of its own: an app supplies its cards (skin "touches.tour": [{title, text, sel?, pose?}]); a card with sel lights
+   that button with a ring and points at it, one with pose shows the guide. Shown once per app on a first visit (its own saved flag), after
+   the splash; Skip ends it; Settings "Show me around again" replays it. Not shown to test browsers unless the address has ?tour=1. */
+function tourMaybe(){if(lsGet("tour_seen",0)||document.querySelector(".fx-tour"))return;let force=false;try{force=new URLSearchParams(location.search).get("tour")==="1";}catch(e){}
+  if(!force&&navigator.webdriver)return;setTimeout(()=>{if(VIEW==="home"&&!document.getElementById("splash")&&!document.querySelector(".modal"))tourStart();},2300);}
+function tourStart(){const T=(CFG.skin.touches||{}).tour;if(!T||!T.length||document.querySelector(".fx-tour"))return;let i=0;
+  const o=document.createElement("div");o.className="fx-tour";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");document.body.appendChild(o);
+  const end=()=>{o.remove();lsSet("tour_seen",1);};
+  const draw=()=>{const c=T[i],tg=c.sel?document.querySelector(c.sel):null;let ring="",low=true;
+    if(tg){tg.scrollIntoView({block:"center",behavior:"auto"});const r=tg.getBoundingClientRect();low=r.top+r.height/2<innerHeight/2;
+      ring=`<div class="fx-ring" style="top:${Math.round(r.top-6)}px;left:${Math.round(r.left-6)}px;width:${Math.round(r.width+12)}px;height:${Math.round(r.height+12)}px"></div>`;}
+    const pic=c.pose&&typeof guideImgFor==="function"?guideImgFor(c.pose,"fx-tpic","home",null):"",last=i===T.length-1;
+    o.className="fx-tour"+(tg?" fx-pointing":" fx-dim");
+    o.innerHTML=`${ring}<div class="fx-tcard ${tg?(low?"fx-tbot":"fx-ttop"):"fx-tmid"}">${pic}<div class="fx-tbody"><b>${esc(c.title)}</b><p>${esc(c.text)}</p></div>
+     <div class="fx-tdots" aria-hidden="true">${T.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>
+     <div class="fx-trow">${last?"":`<button class="btn" data-tour="skip">Skip</button>`}<button class="btn go" data-tour="next">${last?"Let's go":"Next"}</button></div></div>`;
+    const b=o.querySelector('[data-tour="next"]');if(b)b.focus({preventScroll:true});};
+  o.addEventListener("click",e=>{e.stopPropagation();const b=e.target.closest("[data-tour]");if(!b)return;if(b.dataset.tour==="skip"||i>=T.length-1){end();if(typeof SFX!=="undefined")SFX.click();return;}i++;draw();});
+  draw();}
+ACT.tourAgain=()=>{lsSet("tour_seen",0);home();setTimeout(tourStart,350);};
 /* ---------- phones: typing view and ?debug=1 (FNF_Phone_Games_Guide.md, rules 1-3 and the real-phone check) ---------- */
 /* While a text box has focus and an on-screen keyboard has shrunk the visible area, the page switches to a typing view
    (header and footer folded away, see the CSS) and scrolls the box's label to the top, so the question being answered
