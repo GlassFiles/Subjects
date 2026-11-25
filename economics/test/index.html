@@ -2884,6 +2884,8 @@ if(DBG){window.addEventListener("resize",dbgShow);setInterval(dbgShow,1000);}
 function route(){
   const m=(location.hash||"").match(new RegExp("^#join-([A-Za-z]{4})(?:-(?:"+COURSES.join("|")+"))?$"));
   if(m&&FEAT("quiz")){history.replaceState(null,"",location.pathname+location.search);ACT.join({code:m[1].toUpperCase()});return;}
+  // a direct link to Graph Gym (FNF-120; Guy 25 Nov 08:32 "Can you give me a direct link to something where I can test the graph feature out?")
+  if(location.hash==="#graphgym"&&typeof ggOn==="function"&&ggOn()){history.replaceState(null,"",location.pathname+location.search);home();ACT.graphGym();return;}
   const h=location.hash||"",L=h.match(/^#learn\/([a-z_]+)\/([^\/]+)(?:\/(\d+))?$/),Q=h.match(/^#q\/([^\/]+)$/);
   if(L){history.replaceState(null,"",location.pathname+location.search);home();let key=L[1]+"|";try{key+=decodeURIComponent(L[2]);}catch(e){key+=L[2];}
     if(LESSONS[key]){openLesson(key,{});const n=+L[3]||0;if(n>0&&LSN){LSN.i=Math.min(LSN.sc.length-1,n);lessonDraw();}}else toast("That lesson is not in this course.",4200);return;}
