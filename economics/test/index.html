@@ -443,9 +443,6 @@ html[data-look="ink"] .fx-hanko{mix-blend-mode:normal;color:#ff6b74;border-color
   background:var(--c);color:#fff;border:4px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.28);transform:rotate(var(--r));font-size:10.5px;font-weight:700;line-height:1.15;overflow:hidden;word-break:break-word}
 .fx-stk small{display:block;font-size:9px;opacity:.85;margin-bottom:2px;letter-spacing:.04em}
 .fx-stk.fx-empty{background:transparent;color:var(--mute);border:2px dashed var(--line);box-shadow:none;transform:none;font-size:18px}
-.fx-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px;max-height:56vh;overflow:auto;padding:6px 2px}
-.fx-book .mbox{max-width:520px;width:calc(100% - 24px)}
-.fx-sbbtn{display:block;margin:10px auto 4px}
 .fx-slap{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:9500}
 .fx-slapin{display:flex;flex-direction:column;align-items:center;gap:10px;animation:fxSlap 2.6s ease-in-out both}
 .fx-slapin b{font-family:"Mikonomics Rounded",system-ui,sans-serif;font-size:20px;color:#fff;background:#2a282a;padding:4px 12px;border-radius:999px}
@@ -498,6 +495,40 @@ html[data-look="ink"] .fx-bat svg{fill:#0a080c;filter:drop-shadow(0 0 3px rgba(1
 .fx-trow .btn.go{background:#39c5bb;color:#0d1f1e;border-color:#39c5bb}
 @keyframes fxCard{from{opacity:0;margin-top:10px}to{opacity:1;margin-top:0}}
 @media (prefers-reduced-motion:reduce){.fx-sx,.fx-brush path{animation:none;stroke-dashoffset:0}.fx-graf i,.fx-hanko,.fx-slapin,.fx-tcard,.fx-ring,html[data-night] body::after{animation:none}}
+
+/* the sticker book (Guy 25 Nov 00:29): a spiral notebook at an angle; it opens to a blank page with stickers scattered and overlapping */
+.fx-sbbtn{display:flex;flex-direction:column;align-items:center;gap:2px;margin:12px auto 6px;background:none;border:0;padding:6px 10px;cursor:pointer;color:var(--text);font:inherit;font-weight:700;font-size:calc(13px*var(--fs,1));-webkit-tap-highlight-color:transparent;min-height:48px}
+.fx-nb{width:84px;height:106px;transform:perspective(420px) rotateY(-24deg) rotateX(10deg) rotate(-5deg);filter:drop-shadow(6px 8px 6px rgba(0,0,0,.28));transition:transform .25s}
+.fx-sbbtn:active .fx-nb,.fx-sbbtn:hover .fx-nb{transform:perspective(420px) rotateY(-12deg) rotateX(6deg) rotate(-2deg) scale(1.04)}
+.nb-s1{stop-color:#f6b8cf}.nb-s2{stop-color:#fbd9d0}.nb-s3{stop-color:#fde9d6}
+.nb-cover{fill:#e993b4}.nb-pages{fill:#e8e1d6}.nb-pages2{fill:#fbf8f2}
+.nb-sun{fill:#fff1b8;opacity:.9}.nb-fuji{fill:#9a8fd6}.nb-snow{fill:#fff}
+.nb-hill{fill:#9fd39a}.nb-hill2{fill:#7cc48a}
+.nb-branch{fill:none;stroke:#6b3f3a;stroke-width:2;stroke-linecap:round}
+.nb-fl ellipse{fill:#ffc2da;stroke:#ee8fb6;stroke-width:.4}.nb-flc{fill:#d8547f}.nb-petal{fill:#ffc2da}
+.nb-label{fill:#fffaf2;stroke:#c63d4e;stroke-width:1}.nb-labt{fill:#c63d4e;font-size:10px;font-weight:800;text-anchor:middle;font-family:"Mikonomics Rounded",serif}
+.nb-ring{fill:none;stroke:#3a3442;stroke-width:2.4;stroke-linecap:round}
+.fx-book{display:flex;align-items:center;justify-content:center}
+.fx-bookin{position:relative;width:min(440px,calc(100% - 20px));max-height:calc(100% - 40px);display:flex;flex-direction:column}
+.fx-bookx{position:absolute;right:-4px;top:-14px;z-index:5;background:#141218;color:#f1eff2;border:1px solid #4a4250}
+.fx-open{position:relative;perspective:1100px;flex:1;min-height:0}
+.fx-pagewrap{max-height:calc(100vh - 80px);overflow:auto;border-radius:6px 14px 14px 6px;box-shadow:0 14px 40px rgba(0,0,0,.45);animation:fxPageIn .5s ease-out both}
+.fx-paper{position:relative;background:#fbf8f2;background-image:radial-gradient(rgba(120,110,125,.22) 1px,rgba(0,0,0,0) 1.4px);background-size:18px 18px;
+  border-left:22px solid #fbf8f2;box-shadow:inset 22px 0 0 -20px rgba(0,0,0,.08);overflow:hidden}
+.fx-paper::before{content:"";position:absolute;left:-16px;top:10px;bottom:10px;width:10px;background:radial-gradient(circle at 5px 9px,#3a3442 3.2px,rgba(0,0,0,0) 3.6px) 0 0/10px 22px repeat-y}
+.fx-tape{position:absolute;top:-6px;left:50%;width:110px;height:24px;margin-left:-55px;transform:rotate(-3deg);opacity:.85;z-index:200;
+  background:repeating-linear-gradient(45deg,#ffc2da 0 7px,#fde9d6 7px 14px)}
+.fx-pst{position:absolute;transform:rotate(var(--r));animation:fxStkIn .35s cubic-bezier(.3,1.5,.5,1) both;animation-delay:.45s}
+.fx-pst .fx-stk{transform:none;width:var(--sz);height:var(--sz);box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 -6px 12px rgba(0,0,0,.08)}
+.fx-pst .fx-stk::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,0) 45%);pointer-events:none}
+.fx-stk{position:relative}
+.fx-pencil{position:absolute;left:20px;top:46%;color:rgba(90,80,95,.55);font-style:italic;font-size:14px;transform:rotate(-4deg)}
+.fx-flip{position:absolute;left:0;top:0;width:100%;height:min(100%,560px);transform-origin:left center;animation:fxFlip .7s ease-in both;pointer-events:none;z-index:6}
+.fx-nbflip{width:100%;height:100%}
+@keyframes fxFlip{0%{transform:rotateY(0);opacity:1}70%{opacity:1}100%{transform:rotateY(-150deg);opacity:0}}
+@keyframes fxPageIn{from{transform:scale(.92);opacity:.6}to{transform:none;opacity:1}}
+@keyframes fxStkIn{from{transform:rotate(var(--r)) scale(1.6);opacity:0}to{transform:rotate(var(--r)) scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.fx-flip{display:none}.fx-pst,.fx-pagewrap{animation:none}}
 /* v1.10 */
 .orow{display:flex;gap:6px;align-items:stretch}.orow .opt{flex:1;min-width:0}
 .gq{flex:none;width:46px;border-radius:14px;border:2px solid var(--line);background:var(--ui-panel-90);color:var(--mute);font-size:calc(20px*var(--fs,1));font-weight:900;transition:transform .08s,border-color .15s}
@@ -2635,12 +2666,30 @@ function tTheme(t){const n=String(t&&t.id||"").split(".")[0];return /^[1-4]$/.te
 function tSticker(t,cls){const r=(tHash(t.id)%15)-7,nm=String(t.name||""),short=!cls&&nm.length>34?nm.slice(0,32).replace(/[\s,;:]+\S*$/,"")+"…":nm;return `<span class="fx-stk${cls?" "+cls:""}" style="--c:${tTheme(t)};--r:${r}deg" title="${esc(nm)}"><small>${esc(t.id)}</small>${esc(short)}</span>`;}
 function tStickerSlap(t){if(!t)return;const o=document.createElement("div");o.className="fx-slap";o.setAttribute("aria-live","polite");
   o.innerHTML=`<div class="fx-slapin"><b>New sticker!</b>${tSticker(t,"big")}</div>`;document.body.appendChild(o);tone(150,.12,"triangle",.18);setTimeout(()=>o.remove(),2600);}
-ACT.stickerBook=()=>{if(document.querySelector(".modal"))return;const ks=Object.keys(TOPIC).filter(k=>BANK.some(x=>keyOf(x)===k)),got=ks.filter(k=>topicMastered(TOPIC[k].s,TOPIC[k].id));
+// the sticker book (Guy 25 Nov 00:29: "an actual sticker book like icon ... 3-dimensional, so it's at an angle"; "it should just be a blank
+// page ... perhaps not know how many stickers are attainable ... overlap one another and just be a bit more chaotic"). A spiral notebook drawn
+// in code (colours are the skin's, by class); it opens to a blank page where each sticker sits where it fell (placed by its topic, so it
+// stays put), turned, overlapping. No slots, no total.
+function tNotebook(cls){const fl=(x,y,r)=>`<g class="nb-fl" transform="translate(${x} ${y}) scale(${r})">${[0,72,144,216,288].map(a=>`<ellipse rx="2.3" ry="3.6" cy="-3.2" transform="rotate(${a})"/>`).join("")}<circle class="nb-flc" r="1.3"/></g>`;
+  return `<svg class="${cls||"fx-nb"}" viewBox="0 0 124 156" aria-hidden="true"><defs><linearGradient id="nbSky" x1="0" y1="0" x2="0" y2="1"><stop class="nb-s1" offset="0"/><stop class="nb-s2" offset=".62"/><stop class="nb-s3" offset="1"/></linearGradient></defs>
+   <rect class="nb-pages" x="14" y="6" width="106" height="146" rx="8"/><rect class="nb-pages2" x="12" y="4" width="106" height="146" rx="8"/>
+   <rect class="nb-cover" x="8" y="2" width="106" height="146" rx="8"/><rect x="14" y="8" width="94" height="134" rx="5" fill="url(#nbSky)"/>
+   <circle class="nb-sun" cx="80" cy="44" r="13"/><path class="nb-fuji" d="M24 112 L58 60 Q61 56 64 60 L100 112 Z"/><path class="nb-snow" d="M49 74 L58 60 Q61 56 64 60 L73 74 Q68 70 65 75 Q61 69 57 75 Q53 70 49 74 Z"/>
+   <path class="nb-hill" d="M14 116 Q40 104 62 114 Q86 124 108 110 L108 142 L14 142 Z"/><path class="nb-hill2" d="M14 128 Q50 118 108 130 L108 142 L14 142 Z"/>
+   <path class="nb-branch" d="M14 26 Q30 30 40 22 M24 28 Q28 38 22 46 M108 92 Q96 90 90 98"/>
+   ${fl(30,24,1.3)}${fl(40,20,1)}${fl(22,40,1.1)}${fl(34,34,.8)}${fl(96,94,1.2)}${fl(102,86,.9)}${fl(88,104,.8)}
+   <ellipse class="nb-petal" cx="70" cy="126" rx="2" ry="1.2" transform="rotate(30 70 126)"/><ellipse class="nb-petal" cx="50" cy="132" rx="2" ry="1.2" transform="rotate(-20 50 132)"/>
+   <rect class="nb-label" x="84" y="66" width="16" height="40" rx="2"/><text class="nb-labt" x="92" y="78">経</text><text class="nb-labt" x="92" y="90">済</text><text class="nb-labt" x="92" y="102">学</text>
+   ${[0,1,2,3,4,5,6,7,8].map(k=>`<path class="nb-ring" d="M4 ${16+k*15.5} q-5 3 0 6 h9"/>`).join("")}</svg>`;}
+function tStickerPage(got){const W=got.length,H=Math.max(420,260+W*26);
+  const st=got.map(k=>{const t=TOPIC[k],h=tHash(k+"#r"),x=3+tHash("x:"+k+":x")%70,y=Math.round(18+tHash("y:"+k+":y")%(H-130)),r=(h%37)-18,z=1+(tHash("z"+k)%97),sz=82+(tHash(k+"s")%24);
+    return `<div class="fx-pst" style="left:${x}%;top:${y}px;--r:${r}deg;z-index:${z};--sz:${sz}px">${tSticker(t)}</div>`;}).join("");
+  return `<div class="fx-paper" style="height:${H}px"><i class="fx-tape" aria-hidden="true"></i>${st||`<div class="fx-pencil">your first sticker lands here</div>`}</div>`;}
+ACT.stickerBook=()=>{if(document.querySelector(".modal"))return;const got=Object.keys(TOPIC).filter(k=>BANK.some(x=>keyOf(x)===k)&&topicMastered(TOPIC[k].s,TOPIC[k].id));
   const o=document.createElement("div");o.className="modal fx-book";
-  o.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">Sticker book</b><div class="small muted" style="margin-top:4px">${got.length} of ${ks.length} · master a topic to earn its sticker</div>
-   <div class="fx-grid">${ks.map(k=>got.includes(k)?tSticker(TOPIC[k]):`<span class="fx-stk fx-empty"><small>${esc(TOPIC[k].id)}</small>?</span>`).join("")}</div>
-   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn go" data-m="close">Close</button></div></div>`;
-  document.body.appendChild(o);o.addEventListener("click",e=>{if(e.target===o||e.target.closest("[data-m]"))o.remove();});};
+  o.innerHTML=`<div class="fx-bookin" role="dialog" aria-modal="true" aria-label="Sticker book"><button class="icon-btn fx-bookx" data-m="close" aria-label="Close">✕</button>
+   <div class="fx-open"><div class="fx-pagewrap">${tStickerPage(got)}</div><div class="fx-flip" aria-hidden="true">${tNotebook("fx-nbflip")}</div></div></div>`;
+  document.body.appendChild(o);tone(320,.09,"triangle",.08);o.addEventListener("click",e=>{if(e.target===o||e.target.closest("[data-m]"))o.remove();});};
 // the wall: a graffiti joke and a doodle, both changing each day
 const T_DOODLE={cat:"M10 40 Q8 24 14 18 L12 8 L20 15 Q24 13 28 15 L36 8 L34 18 Q40 24 38 40 Z M18 26 h2 M28 26 h2 M22 31 q2 2 4 0",
   cup:"M10 18 h22 v14 q0 8 -11 8 q-11 0 -11 -8 Z M32 22 q8 0 6 7 q-2 4 -6 3 M16 6 q3 4 0 8 M24 4 q3 4 0 8",
@@ -2669,7 +2718,7 @@ function fxAfter(view){if(!TCH)return;if(tOn("night"))tNight();
   const wrap=document.querySelector("#app .wrap");
   if(view==="home"&&tOn("wall")&&wrap&&!wrap.querySelector(".fx-wall"))wrap.insertAdjacentHTML("beforeend",tWall());
   if(T_STAMP&&tOn("stamp")){T_STAMP=false;const c=document.querySelector("#app .card.center");if(c){c.classList.add("fx-stamped");c.insertAdjacentHTML("beforeend",`<span class="fx-hanko" aria-label="Done">済</span>`);setTimeout(()=>tone(85,.22,"sine",.3),REDUCED?0:520);}}
-  if(tOn("stickers")){const mc=document.querySelector("#app .thlist")||document.querySelector("#app .mapcard,#app #mapstrip");if(mc&&!document.querySelector(".fx-sbbtn"))mc.insertAdjacentHTML(mc.classList.contains("thlist")?"beforebegin":"afterend",`<button class="btn fx-sbbtn" data-act="stickerBook">📒 Sticker book</button>`);}
+  if(tOn("stickers")){const mc=document.querySelector("#app .thlist")||document.querySelector("#app .mapcard,#app #mapstrip");if(mc&&!document.querySelector(".fx-sbbtn"))mc.insertAdjacentHTML(mc.classList.contains("thlist")?"beforebegin":"afterend",`<button class="fx-sbbtn" data-act="stickerBook" aria-label="Open your sticker book">${tNotebook()}<span>Sticker book</span></button>`);}
   if(TCH.tour&&document.querySelector('#app [data-act="copyBk"]')&&!document.querySelector(".fx-tagain"))wrap&&wrap.insertAdjacentHTML("beforeend",`<div class="card fx-tagain"><b>Welcome tour</b><div class="small muted" style="margin:4px 0 10px">The cards from your first visit.</div><button class="btn" data-act="tourAgain">Show me around again</button></div>`);
   if(view==="home"&&TCH.tour)tourMaybe();}
 /* ---------- welcome tour (FNF-118; Guy 24 Nov 2026 13:44: "when we first start, there should be a few pop-ups that guide you what you can
