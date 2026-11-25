@@ -2852,9 +2852,9 @@ ACT.ggCheck=()=>{const T=GG&&GG.tasks[GG.i];if(!T)return;if(T.done){ggNext();ret
   const wrong=T.fill.map((x,i)=>x!==T.ans[i]?`<li>${esc(T.ans[i])} <span class="muted">(you put ${esc(x)})</span></li>`:"").join("");
   document.getElementById("ggFb").innerHTML=`<div class="feedback ${all?"ok":"no"}"><b>${all?pick(["Every label right.","Spot on.","Diagram nailed."]):`${ok} of ${n} right`}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}
    ${wrong?`<div class="small" style="margin-top:6px">The right labels are now on the diagram:</div><ul class="small gg-wrong">${wrong}</ul>`:""}
-   ${T.swapOk?`<div class="small" style="margin-top:6px">You swapped the axes: that's fine on this diagram, either way round works.</div>`:""}
+   ${T.swapOk?`<div class="small" style="margin-top:6px">You swapped the axes: that's fine on this diagram, either way round works (the numbers then read for the other good).</div>`:""}
    ${T.swapNo?`<div class="small gg-why" style="margin-top:6px"><b>About the axes:</b> money values (price, cost, wages, rates, the price level) go up the side, and quantity or output goes along the bottom. That's how A-level diagrams are drawn, and the rest of this diagram only means what it should that way round. Draw it this way in the exam.</div>`:""}
-   ${T.q.x?`<div class="small muted" style="margin-top:6px">${tex(T.q.x)}</div>`:""}</div>`;
+   ${T.q.x&&!T.swapOk?`<div class="small muted" style="margin-top:6px">${tex(T.q.x)}</div>`:""}</div>`;
   const go=document.getElementById("ggGo");go.disabled=false;go.textContent=GG.i<GG.tasks.length-1?"Next graph →":"Finish";};
 function ggNext(){if(GG.i<GG.tasks.length-1){GG.i++;ggDraw();return;}const g=GG;addXP(g.xp);const best=lsGet("gg_best",0),pc=g.total?Math.round(g.right/g.total*100):0;
   if(!g.one&&pc>best)lsSet("gg_best",pc);if(g.right===g.total){SFX.fanfare();confetti();}GG=null;
