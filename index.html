@@ -1736,7 +1736,7 @@ function answer(di,guess){
    <div class="row small" style="margin-top:10px;gap:16px;flex-wrap:wrap">${!ok&&LESSONS[keyOf(q)]&&!topicMastered(q.s,q.t)?`<button class="linkb" data-act="lessonEx" data-k="${esc(keyOf(q))}">📖 See a worked example</button>`:""}${card&&ok?`<button class="linkb" data-act="showCard" data-k="${esc(keyOf(q))}">Key idea</button>`:""}<button class="linkb" data-act="notYet" data-k="${esc(keyOf(q))}">Not done this topic yet</button><button class="linkb" data-act="report" data-i="${RUN.i}">Report a problem</button></div>
    <div class="small muted" style="margin-top:8px">${esc(specRef(q))}</div><div class="footpad"></div><div class="footbar"><button class="btn go block" data-act="nextQ">${last?"Finish":esc(WL.next_rep)}</button></div>`;
   if(typeof fxAnswer==="function")fxAnswer(ok,di,q,fxWas);
-  if(auto)setTimeout(()=>{if(RUN&&RUN.locked&&RUN.i===iNow&&VIEW==="run"&&!document.querySelector(".modal"))ACT.nextQ();},1100);
+  if(auto)setTimeout(()=>{if(RUN&&RUN.locked&&RUN.i===iNow&&VIEW==="run"&&!document.querySelector(".modal"))ACT.nextQ();},CFG.skin.auto_ms||1100);   // a skin may slow the move-on (skin auto_ms; Guy 25 Nov 00:49 "the move on should be slower")
 }
 ACT.showCard=d=>{const el=$("#cardBox");if(el)el.innerHTML=el.innerHTML?"":cardHtml(CARDS[d.k]);};
 ACT.notYet=(d,b)=>{const was=markNotYet(d.k),t=TOPIC[d.k];
@@ -2453,7 +2453,14 @@ function tHiss(dur,vol,when){if(MUTED)return;const c=ac();if(!c)return;const n=M
   s.buffer=b;f.type="highpass";f.frequency.value=2600;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
   s.connect(f).connect(g).connect(c.destination);s.start(t);s.stop(t+dur+.05);}
 // after an answer (19_runner.js): spray X on her wrong choice, brush tick on the right one, petals now and then, a sticker when a topic is newly mastered
-function fxAnswer(ok,di,q,wasMastered){if(!TCH)return;
+// the result where she can see it (Guy 25 Nov 00:49: "the response is at the bottom of the screen ... any message that appears from getting
+// a right or wrong answer should be more easily visible ... on their phone"): a banner floats just above the button bar, over the answers,
+// with the headline, the XP and the guide's reaction; a tap takes her down to the full explanation. It goes when the next question draws.
+function tResult(ok){const fb=document.querySelector("#fb .feedback");if(!fb)return;const head=fb.querySelector(":scope > b"),xp=fb.querySelector(":scope > span.small"),img=fb.querySelector(":scope > img");
+  const o=document.createElement("div");o.className="fx-res "+(ok?"ok":"no")+(fb.classList.contains("onfire")?" fire":"");o.setAttribute("role","status");
+  o.innerHTML=`${img?img.outerHTML:""}<div class="fx-rtxt"><b>${head?esc(head.textContent):""}</b>${xp?`<span>${esc(xp.textContent)}</span>`:""}${ok?"":`<small>Tap to see why ↓</small>`}</div>`;
+  o.addEventListener("click",()=>{fb.scrollIntoView({block:"start",behavior:REDUCED?"auto":"smooth"});o.remove();});document.body.appendChild(o);}
+function fxAnswer(ok,di,q,wasMastered){if(!TCH)return;document.querySelectorAll(".fx-res").forEach(e=>e.remove());if(tOn("result"))tResult(ok);
   const mine=document.querySelector(".opt.mine"),right=document.querySelector(".opt.right");
   if(!ok&&di>=0&&mine&&tOn("spray")){mine.insertAdjacentHTML("beforeend",`<span class="fx-spray" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path class="fx-sx" d="M14 18 L86 84"/><path class="fx-sx fx-sx2" d="M84 16 L18 86"/></svg></span>`);tHiss(.28,.07,0);tHiss(.28,.07,.24);}
   if(ok&&right&&tOn("brush"))right.insertAdjacentHTML("beforeend",`<span class="fx-brush" aria-hidden="true"><svg viewBox="0 0 100 60"><path d="M12 32 Q24 40 36 50 Q58 22 92 8"/></svg></span>`);
@@ -2467,12 +2474,30 @@ function tTheme(t){const n=String(t&&t.id||"").split(".")[0];return /^[1-4]$/.te
 function tSticker(t,cls){const r=(tHash(t.id)%15)-7,nm=String(t.name||""),short=!cls&&nm.length>34?nm.slice(0,32).replace(/[\s,;:]+\S*$/,"")+"…":nm;return `<span class="fx-stk${cls?" "+cls:""}" style="--c:${tTheme(t)};--r:${r}deg" title="${esc(nm)}"><small>${esc(t.id)}</small>${esc(short)}</span>`;}
 function tStickerSlap(t){if(!t)return;const o=document.createElement("div");o.className="fx-slap";o.setAttribute("aria-live","polite");
   o.innerHTML=`<div class="fx-slapin"><b>New sticker!</b>${tSticker(t,"big")}</div>`;document.body.appendChild(o);tone(150,.12,"triangle",.18);setTimeout(()=>o.remove(),2600);}
-ACT.stickerBook=()=>{if(document.querySelector(".modal"))return;const ks=Object.keys(TOPIC).filter(k=>BANK.some(x=>keyOf(x)===k)),got=ks.filter(k=>topicMastered(TOPIC[k].s,TOPIC[k].id));
+// the scrapbook (named by Guy 25 Nov 00:36 "Perhaps a scrap book is a better [name for the] stiller book"; Guy 25 Nov 00:29: "an actual sticker book like icon ... 3-dimensional, so it's at an angle"; "it should just be a blank
+// page ... perhaps not know how many stickers are attainable ... overlap one another and just be a bit more chaotic"). A spiral notebook drawn
+// in code (colours are the skin's, by class); it opens to a blank page where each sticker sits where it fell (placed by its topic, so it
+// stays put), turned, overlapping. No slots, no total.
+function tNotebook(cls){const fl=(x,y,r)=>`<g class="nb-fl" transform="translate(${x} ${y}) scale(${r})">${[0,72,144,216,288].map(a=>`<ellipse rx="2.3" ry="3.6" cy="-3.2" transform="rotate(${a})"/>`).join("")}<circle class="nb-flc" r="1.3"/></g>`;
+  return `<svg class="${cls||"fx-nb"}" viewBox="0 0 124 156" aria-hidden="true"><defs><linearGradient id="nbSky" x1="0" y1="0" x2="0" y2="1"><stop class="nb-s1" offset="0"/><stop class="nb-s2" offset=".62"/><stop class="nb-s3" offset="1"/></linearGradient></defs>
+   <rect class="nb-pages" x="14" y="6" width="106" height="146" rx="8"/><rect class="nb-pages2" x="12" y="4" width="106" height="146" rx="8"/>
+   <rect class="nb-cover" x="8" y="2" width="106" height="146" rx="8"/><rect x="14" y="8" width="94" height="134" rx="5" fill="url(#nbSky)"/>
+   <circle class="nb-sun" cx="80" cy="44" r="13"/><path class="nb-fuji" d="M24 112 L58 60 Q61 56 64 60 L100 112 Z"/><path class="nb-snow" d="M49 74 L58 60 Q61 56 64 60 L73 74 Q68 70 65 75 Q61 69 57 75 Q53 70 49 74 Z"/>
+   <path class="nb-hill" d="M14 116 Q40 104 62 114 Q86 124 108 110 L108 142 L14 142 Z"/><path class="nb-hill2" d="M14 128 Q50 118 108 130 L108 142 L14 142 Z"/>
+   <path class="nb-branch" d="M14 26 Q30 30 40 22 M24 28 Q28 38 22 46 M108 92 Q96 90 90 98"/>
+   ${fl(30,24,1.3)}${fl(40,20,1)}${fl(22,40,1.1)}${fl(34,34,.8)}${fl(96,94,1.2)}${fl(102,86,.9)}${fl(88,104,.8)}
+   <ellipse class="nb-petal" cx="70" cy="126" rx="2" ry="1.2" transform="rotate(30 70 126)"/><ellipse class="nb-petal" cx="50" cy="132" rx="2" ry="1.2" transform="rotate(-20 50 132)"/>
+   <rect class="nb-label" x="84" y="66" width="16" height="40" rx="2"/><text class="nb-labt" x="92" y="78">経</text><text class="nb-labt" x="92" y="90">済</text><text class="nb-labt" x="92" y="102">学</text>
+   ${[0,1,2,3,4,5,6,7,8].map(k=>`<path class="nb-ring" d="M4 ${16+k*15.5} q-5 3 0 6 h9"/>`).join("")}</svg>`;}
+function tStickerPage(got){const W=got.length,H=Math.max(420,260+W*26);
+  const st=got.map(k=>{const t=TOPIC[k],h=tHash(k+"#r"),x=3+tHash("x:"+k+":x")%70,y=Math.round(18+tHash("y:"+k+":y")%(H-130)),r=(h%37)-18,z=1+(tHash("z"+k)%97),sz=82+(tHash(k+"s")%24);
+    return `<div class="fx-pst" style="left:${x}%;top:${y}px;--r:${r}deg;z-index:${z};--sz:${sz}px">${tSticker(t)}</div>`;}).join("");
+  return `<div class="fx-paper" style="height:${H}px"><i class="fx-tape" aria-hidden="true"></i>${st||`<div class="fx-pencil">your first sticker lands here</div>`}</div>`;}
+ACT.stickerBook=()=>{if(document.querySelector(".modal"))return;const got=Object.keys(TOPIC).filter(k=>BANK.some(x=>keyOf(x)===k)&&topicMastered(TOPIC[k].s,TOPIC[k].id));
   const o=document.createElement("div");o.className="modal fx-book";
-  o.innerHTML=`<div class="mbox" role="dialog" aria-modal="true"><b style="font-size:calc(18px*var(--fs,1))">Sticker book</b><div class="small muted" style="margin-top:4px">${got.length} of ${ks.length} · master a topic to earn its sticker</div>
-   <div class="fx-grid">${ks.map(k=>got.includes(k)?tSticker(TOPIC[k]):`<span class="fx-stk fx-empty"><small>${esc(TOPIC[k].id)}</small>?</span>`).join("")}</div>
-   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn go" data-m="close">Close</button></div></div>`;
-  document.body.appendChild(o);o.addEventListener("click",e=>{if(e.target===o||e.target.closest("[data-m]"))o.remove();});};
+  o.innerHTML=`<div class="fx-bookin" role="dialog" aria-modal="true" aria-label="Scrapbook"><button class="icon-btn fx-bookx" data-m="close" aria-label="Close">✕</button>
+   <div class="fx-open"><div class="fx-pagewrap">${tStickerPage(got)}</div><div class="fx-flip" aria-hidden="true">${tNotebook("fx-nbflip")}</div></div></div>`;
+  document.body.appendChild(o);tone(320,.09,"triangle",.08);o.addEventListener("click",e=>{if(e.target===o||e.target.closest("[data-m]"))o.remove();});};
 // the wall: a graffiti joke and a doodle, both changing each day
 const T_DOODLE={cat:"M10 40 Q8 24 14 18 L12 8 L20 15 Q24 13 28 15 L36 8 L34 18 Q40 24 38 40 Z M18 26 h2 M28 26 h2 M22 31 q2 2 4 0",
   cup:"M10 18 h22 v14 q0 8 -11 8 q-11 0 -11 -8 Z M32 22 q8 0 6 7 q-2 4 -6 3 M16 6 q3 4 0 8 M24 4 q3 4 0 8",
@@ -2496,13 +2521,22 @@ function tTie(el){if(!el||el.dataset.tie)return;el.dataset.tie="1";el.addEventLi
   const o=document.createElement("div");o.className="fx-spin";o.setAttribute("aria-hidden","true");o.innerHTML=pic;document.body.appendChild(o);SFX.combo();setTimeout(()=>o.remove(),2200);});}
 // after every render (09_ui.js)
 let T_STAMP=false;
-function fxAfter(view){if(!TCH)return;if(tOn("night"))tNight();
+function fxAfter(view){if(!TCH)return;document.querySelectorAll(".fx-res").forEach(e=>e.remove());if(tOn("night"))tNight();
   if(tOn("tiespin"))tTie(document.querySelector(".ttop .logo .lg"));
   const wrap=document.querySelector("#app .wrap");
   if(view==="home"&&tOn("wall")&&wrap&&!wrap.querySelector(".fx-wall"))wrap.insertAdjacentHTML("beforeend",tWall());
   if(T_STAMP&&tOn("stamp")){T_STAMP=false;const c=document.querySelector("#app .card.center");if(c){c.classList.add("fx-stamped");c.insertAdjacentHTML("beforeend",`<span class="fx-hanko" aria-label="Done">済</span>`);setTimeout(()=>tone(85,.22,"sine",.3),REDUCED?0:520);}}
-  if(tOn("stickers")){const mc=document.querySelector("#app .thlist")||document.querySelector("#app .mapcard,#app #mapstrip");if(mc&&!document.querySelector(".fx-sbbtn"))mc.insertAdjacentHTML(mc.classList.contains("thlist")?"beforebegin":"afterend",`<button class="btn fx-sbbtn" data-act="stickerBook">📒 Sticker book</button>`);}
+  // the scrapbook button (Guy 25 Nov 09:08: "takes up too much space ... no writing ... more of an angle ... fit it somewhere next to something
+  // else"): no caption, small and steeply tilted; on home resting on the top corner of the "Your map" card (no extra height at any width), on the map pages in the top bar by the sound button
+  if(tOn("stickers")&&!document.querySelector(".fx-sbbtn")){const btn=`<button class="fx-sbbtn" data-act="stickerBook" aria-label="Open your scrapbook" title="Scrapbook">${tNotebook()}</button>`;
+    const row=document.querySelector("#app #mapstrip"),bar=document.querySelector("#app .thlist,#app .mapcard")&&document.querySelector("#app .ttop.tbar");
+    if(row)row.insertAdjacentHTML("beforeend",btn);else if(bar){const mu=bar.querySelector('[data-act="mute"]');if(mu)mu.insertAdjacentHTML("beforebegin",btn);else bar.insertAdjacentHTML("beforeend",btn);}}
   if(TCH.tour&&document.querySelector('#app [data-act="copyBk"]')&&!document.querySelector(".fx-tagain"))wrap&&wrap.insertAdjacentHTML("beforeend",`<div class="card fx-tagain"><b>Welcome tour</b><div class="small muted" style="margin:4px 0 10px">The cards from your first visit.</div><button class="btn" data-act="tourAgain">Show me around again</button></div>`);
+  // Graph Gym (28_graphs.js): a tile on home under Practice, and a bonus graph offered at the end of a practice run
+  if(typeof ggOn==="function"&&ggOn()){if(view==="home"&&!document.querySelector('[data-act="graphGym"]')){const gy=document.querySelector('#app button.big[data-act="gym"]');
+      if(gy)gy.insertAdjacentHTML("afterend",`<button class="big" data-act="graphGym"><span class="em">${icn("💼")}</span><span><b>Graph Gym</b><span>Label the diagrams: axes, curves and points</span></span></button>`);}
+    if(view==="end"&&RUN&&RUN.mode==="gym"&&!RUN.practice&&document.querySelector("#app .big-num")&&!document.querySelector(".gg-bonus")){const c=document.querySelector("#app .card.center");
+      if(c)c.insertAdjacentHTML("afterend",`<div class="card gg-bonus"><b>Bonus graph</b><div class="small muted" style="margin:4px 0 10px">One diagram to label while it's fresh.</div><button class="btn go" data-act="graphGym" data-n="1">Label a graph</button></div>`);}}
   if(view==="home"&&TCH.tour)tourMaybe();}
 /* ---------- welcome tour (FNF-118; Guy 24 Nov 2026 13:44: "when we first start, there should be a few pop-ups that guide you what you can
    do, where you can go ... I want this to draw you in. And I want to build it in a way that I can reuse that for other of my games").
@@ -2526,6 +2560,105 @@ function tourStart(){const T=(CFG.skin.touches||{}).tour;if(!T||!T.length||docum
   o.addEventListener("click",e=>{e.stopPropagation();const b=e.target.closest("[data-tour]");if(!b)return;if(b.dataset.tour==="skip"||i>=T.length-1){end();if(typeof SFX!=="undefined")SFX.click();return;}i++;draw();});
   draw();}
 ACT.tourAgain=()=>{lsSet("tour_seen",0);home();setTimeout(tourStart,350);};
+/* ---------- Graph Gym: label the diagram (FNF-120; Guy 25 Nov 2026 00:22 "questions where you had to put the labels on a graph ...
+   labeling the X and Y axis ... labeling lines ... a graph quiz thing", 00:30 "120 yes"). Made from the diagrams already in the bank: the
+   axis titles, curve names and named points (not plain letters A, B, C) become blanks; she taps a blank, then a label chip, and the next
+   blank is picked for her. Check marks each one. No new content and no API cost. Off unless the skin's touches.graphgym is on.
+   Not recorded against questions (it does not change mastery or reviews); XP for right labels. */
+const GG_N=5;let GG=null;
+function ggOn(){return !!(CFG.skin.touches&&CFG.skin.touches.graphgym);}
+// the blanks of one figure: axis titles, curve labels, and point labels longer than one letter
+function ggBlanks(f){const b=[];if(f.xlabel)b.push({k:"x",t:String(f.xlabel)});if(f.ylabel)b.push({k:"y",t:String(f.ylabel)});
+  (f.lines||[]).slice(0,12).forEach((l,i)=>{if(l&&l.label)b.push({k:"l"+i,t:String(l.label)});});
+  (f.points||[]).slice(0,6).forEach((p,i)=>{if(p&&p.label&&!/^[A-Z]$/.test(String(p.label).trim()))b.push({k:"p"+i,t:String(p.label)});});return b;}
+let GG_POOL=null;
+function ggPool(){if(GG_POOL)return GG_POOL;const seen=new Set(),items=[],labs=new Set();
+  for(const q of BANK){const f=q.fig;if(!f||f.type&&f.type!=="line"||f.anim)continue;const b=ggBlanks(f);if(b.length-ggGiven(f).size<1||b.length<2)continue;
+    const sig=JSON.stringify([f.xlabel,f.ylabel,(f.lines||[]).map(l=>[l.label,l.pts])]);if(seen.has(sig))continue;seen.add(sig);items.push(q);b.forEach(x=>labs.add(x.t));}
+  return GG_POOL={items,labs:[...labs]};}
+// labels given at the start, so every blank has one right answer (Guy 25 Nov 08:50: "can't we just start the graph with one label on ...
+// there can only be one correct solution. But we do need to vet for those"). Vetted over the bank on 25 Nov: 50 diagrams carry a numbered
+// set (S1 S2, D1 D2 ...) with no arrow to say which moved, and 10 have two goods on the axes. In a numbered set of curves with no arrow,
+// and in every numbered set of points (P1 P2, Q1 Q2, E1 E2), all but one are given; on a two-goods diagram one axis is given.
+function ggGiven(f){const g=new Set(),fix=x=>GG_FIXED.test(String(x||""));
+  if(f.xlabel&&f.ylabel&&!fix(f.xlabel)&&!fix(f.ylabel))g.add(Math.random()<.5?"x":"y");
+  const groups=(arr,pre,needAll)=>{const st={};(arr||[]).slice(0,pre==="l"?12:6).forEach((o,i)=>{const m=o&&o.label&&String(o.label).trim().match(/^(.*?)(\d+)$/);if(m)(st[m[1]]=st[m[1]]||[]).push(pre+i);});
+    Object.values(st).forEach(ks=>{if(ks.length<2||!needAll)return;const keep=ks[Math.floor(Math.random()*ks.length)];ks.forEach(k=>{if(k!==keep)g.add(k);});});};
+  groups(f.lines,"l",!(f.arrows&&f.arrows.length));groups(f.points,"p",true);return g;}
+function ggTask(q){const f=JSON.parse(JSON.stringify(q.fig)),giv=ggGiven(f),all=ggBlanks(f).filter(b=>!giv.has(b.k));
+  const ax=all.filter(x=>x.k==="x"||x.k==="y"),rest=shuffle(all.filter(x=>x.k!=="x"&&x.k!=="y"));const use=[...ax,...rest].slice(0,6);
+  use.forEach((u,i)=>{const tok=("§"+i+"§").padEnd(Math.max(3,u.t.length),"§");if(u.k==="x")f.xlabel=tok;else if(u.k==="y")f.ylabel=tok;else if(u.k[0]==="l")f.lines[+u.k.slice(1)].label=tok;else f.points[+u.k.slice(1)].label=tok;});
+  const P=ggPool(),have=new Set(use.map(u=>u.t)),longC=use.some(u=>u.t.length>8);
+  const dec=shuffle(P.labs.filter(t=>!have.has(t)));const d1=dec.find(t=>longC?t.length>8:t.length<=8),d2=dec.find(t=>t!==d1&&t.length<=8);
+  return {q,f,ans:use.map(u=>u.t),fill:use.map(()=>null),chips:shuffle([...use.map(u=>u.t),...[d1,d2].filter(Boolean)]).map(t=>({t,used:false})),sel:0,done:false};}
+ACT.graphGym=d=>{const P=ggPool();if(!P.items.length){toast("No diagrams to label yet.");return;}
+  let pool=P.items.filter(q=>!NOTYET[keyOf(q)]);if(!pool.length)pool=P.items;const n=d&&d.n?+d.n:GG_N;
+  GG={tasks:shuffle(pool).slice(0,n).map(ggTask),i:0,right:0,total:0,xp:0,one:n===1};ggDraw();};
+function ggDraw(){const T=GG.tasks[GG.i],t=TOPIC[keyOf(T.q)];
+  render(`<div class="wrap">${topBar(GG.one?"Bonus graph":"Graph Gym")}
+   <div class="card"><div class="row small muted"><span>${GG.one?"":`Graph ${GG.i+1} of ${GG.tasks.length}`}</span><span class="spacer"></span><span>${esc(t?t.name:"")}</span></div>
+   <b style="display:block;margin:6px 0 2px;font-size:calc(17px*var(--fs,1))">Label the diagram</b><div class="small muted">Tap a blank, then the label that goes there.</div>
+   <div class="fig gg-fig" id="ggFig">${figSvg(T.f)}</div>
+   <div class="gg-chips" id="ggChips"></div></div>
+   <div id="ggFb"></div><div class="footpad"></div><div class="footbar"><button class="btn go block" id="ggGo" data-act="ggCheck" disabled>Check</button></div></div>`,"graphgym");
+  ggWire();}
+function ggWire(){const T=GG.tasks[GG.i],svg=document.querySelector("#ggFig svg");if(!svg)return;const NS="http://www.w3.org/2000/svg";
+  svg.querySelectorAll("text").forEach(tx=>{const m=(tx.textContent||"").match(/^§(\d+)§+$/);if(!m)return;const i=+m[1],g=document.createElementNS(NS,"g");
+    g.setAttribute("class","gg-b");g.dataset.i=i;if(tx.getAttribute("transform")){g.setAttribute("transform",tx.getAttribute("transform"));tx.removeAttribute("transform");}
+    tx.parentNode.insertBefore(g,tx);const h=document.createElementNS(NS,"rect");h.setAttribute("class","gg-hit");g.appendChild(h);const r=document.createElementNS(NS,"rect");r.setAttribute("rx","5");r.setAttribute("class","gg-tag");g.appendChild(r);g.appendChild(tx);tx.removeAttribute("class");});
+  svg.addEventListener("click",e=>{const g=e.target.closest(".gg-b");if(!g||T.done)return;const i=+g.dataset.i;
+    if(T.fill[i]!=null){const c=T.chips.find(c=>c.used&&c.t===T.fill[i]);if(c)c.used=false;T.fill[i]=null;}T.sel=i;ggPaint();});
+  document.getElementById("ggChips").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b||T.done)return;const c=T.chips[+b.dataset.c];if(c.used)return;
+    let i=T.sel;if(i==null||T.fill[i]!=null)i=T.fill.findIndex(x=>x==null);if(i<0)return;T.fill[i]=c.t;c.used=true;SFX.click();
+    const nx=T.fill.findIndex((x,k)=>x==null&&k>i),n0=T.fill.findIndex(x=>x==null);T.sel=nx>=0?nx:n0>=0?n0:null;ggPaint();});
+  ggPaint();}
+function ggPaint(){const T=GG.tasks[GG.i];document.querySelectorAll("#ggFig .gg-b").forEach(g=>{const i=+g.dataset.i,tx=g.querySelector("text"),r=g.querySelector(".gg-tag"),hr=g.querySelector(".gg-hit");
+    tx.textContent=T.done?(T.fill[i]===T.ans[i]?T.ans[i]:T.ans[i]):(T.fill[i]!=null?T.fill[i]:"?");
+    g.classList.toggle("on",!T.done&&T.sel===i);g.classList.toggle("full",T.fill[i]!=null);
+    if(T.done){g.classList.add(T.fill[i]===T.ans[i]?"ok":"no");}
+    try{const bb=tx.getBBox();r.setAttribute("x",(bb.x-5).toFixed(1));r.setAttribute("y",(bb.y-3).toFixed(1));r.setAttribute("width",(bb.width+10).toFixed(1));r.setAttribute("height",(bb.height+6).toFixed(1));const hw=Math.max(bb.width+16,50),hh=Math.max(bb.height+16,50);hr.setAttribute("x",(bb.x+bb.width/2-hw/2).toFixed(1));hr.setAttribute("y",(bb.y+bb.height/2-hh/2).toFixed(1));hr.setAttribute("width",hw.toFixed(1));hr.setAttribute("height",hh.toFixed(1));}catch(e){}});
+  document.getElementById("ggChips").innerHTML=T.chips.map((c,k)=>`<button class="chip gg-chip${c.used?" used":""}" data-c="${k}"${c.used||T.done?" disabled":""}>${esc(c.t)}</button>`).join("");
+  const go=document.getElementById("ggGo");if(go)go.disabled=!T.done&&T.fill.some(x=>x==null);}
+// axes swapped (Guy 25 Nov 08:38: "if I flip them, will you mark it wrong? ... there's potentially more than one right answer"): where neither
+// axis is a money value or an amount of output (a PPF of two goods), either way round is right; where one is (price, cost, rate, level
+// against quantity or output), the drawing depends on it, so the swap stays wrong and she is told why.
+const GG_FIXED=/price|cost|revenue|wage|rate|level|£|\$|quantity|output|gdp|income|demand|supply|employment|labour|inflation|consumption|savings|investment|tax|benefit|welfare|utility|profit|time|balance|trade/i;   // time runs along the bottom (J-curve)
+function ggAxisSwap(T){const xa=T.q.fig.xlabel,ya=T.q.fig.ylabel;
+  const ix=T.ans.indexOf(xa),iy=T.ans.indexOf(ya);if(ix<0||iy<0||!xa||!ya)return null;
+  if(T.fill[ix]===ya&&T.fill[iy]===xa){const free=!GG_FIXED.test(xa)&&!GG_FIXED.test(ya);return {ix,iy,free};}return null;}
+ACT.ggCheck=()=>{const T=GG&&GG.tasks[GG.i];if(!T)return;if(T.done){ggNext();return;}if(T.fill.some(x=>x==null))return;T.done=true;
+  const sw=ggAxisSwap(T);if(sw&&sw.free){T.ans[sw.ix]=T.fill[sw.ix];T.ans[sw.iy]=T.fill[sw.iy];T.swapOk=true;}else if(sw)T.swapNo=true;
+  const ok=T.fill.filter((x,i)=>x===T.ans[i]).length,n=T.ans.length,all=ok===n;GG.right+=ok;GG.total+=n;const xp=ok*3+(all?10:0);GG.xp+=xp;
+  if(all){SFX.correct();if(!REDUCED)popText("+"+xp+" XP");}else if(ok)SFX.click();else SFX.wrong();ggPaint();
+  const wrong=T.fill.map((x,i)=>x!==T.ans[i]?`<li>${esc(T.ans[i])} <span class="muted">(you put ${esc(x)})</span></li>`:"").join("");
+  document.getElementById("ggFb").innerHTML=`<div class="feedback ${all?"ok":"no"}"><b>${all?pick(["Every label right.","Spot on.","Diagram nailed."]):`${ok} of ${n} right`}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}
+   ${wrong?`<div class="small" style="margin-top:6px">The right labels are now on the diagram:</div><ul class="small gg-wrong">${wrong}</ul>`:""}
+   ${T.swapOk?`<div class="small" style="margin-top:6px">You swapped the axes: that's fine on this diagram, either way round works (the numbers then read for the other good).</div>`:""}
+   ${T.swapNo?`<div class="small gg-why" style="margin-top:6px"><b>About the axes:</b> money values (price, cost, wages, rates, the price level) go up the side, and quantity or output goes along the bottom. That's how A-level diagrams are drawn, and the rest of this diagram only means what it should that way round. Draw it this way in the exam.</div>`:""}
+   ${T.q.x&&!T.swapOk?`<div class="small muted" style="margin-top:6px">${tex(T.q.x)}</div>`:""}</div>`;
+  const go=document.getElementById("ggGo");go.disabled=false;go.textContent=GG.i<GG.tasks.length-1?"Next graph →":"Finish";};
+function ggNext(){if(GG.i<GG.tasks.length-1){GG.i++;ggDraw();return;}const g=GG;addXP(g.xp);const best=lsGet("gg_best",0),pc=g.total?Math.round(g.right/g.total*100):0;
+  if(!g.one&&pc>best)lsSet("gg_best",pc);if(g.right===g.total){SFX.fanfare();confetti();}GG=null;
+  render(`<div class="wrap">${topBar(g.one?"Bonus graph":"Graph Gym")}<div class="card center"><div class="big-num">${g.right}/${g.total}</div><div class="muted" style="margin-top:6px">labels right · +${fmt(g.xp)} XP${!g.one&&pc>best&&best?" · your best yet":""}</div></div>
+   <div class="footpad"></div><div class="footbar row" style="gap:10px"><button class="btn block" data-act="home">Home</button><button class="btn go block" data-act="graphGym">${g.one?"Graph Gym":"Go again"}</button></div></div>`,"graphgymdone");}
+/* ---------- usage counts per subject (Guy 25 Nov 2026 09:16 London: "a usage counter to the live version ... make the economics a separate
+   usage counter to the other subjects ... a counter per subject, so I know which subjects have been accessed"). The live page already loads
+   GoatCounter (publish.py adds it to the live page only, DES-673); this sends one count the first time in a visit that a subject is used, as
+   "<app name>/<subject name>" (e.g. Mikonomics/Microeconomics), and one for Graph Gym, the daily challenge and Sprint. No names, no answers,
+   nothing about the person. On a test page, or before GoatCounter has loaded, nothing is sent. */
+const USE_SENT=new Set();
+function useCount(what){if(USE_SENT.has(what))return;const g=window.goatcounter;if(!g||typeof g.count!=="function")return;USE_SENT.add(what);
+  try{g.count({path:APP+"/"+what,title:APP+": "+what,event:true});}catch(e){}}
+function useSubj(s){const S=SUBJ[s];if(S)useCount(S.name);}
+// wrap the entry points once they exist (all parts load before any of these run)
+(function(){
+  const sr=startRun;startRun=function(o){try{const seen=new Set();((o&&o.qs)||[]).forEach(q=>{if(q&&q.s&&!seen.has(q.s)){seen.add(q.s);useSubj(q.s);}});
+    if(o&&o.mode==="daily")useCount("Daily challenge");}catch(e){}return sr.apply(this,arguments);};
+  const ol=openLesson;openLesson=function(key){try{const t=TOPIC[key];if(t)useSubj(t.s);}catch(e){}return ol.apply(this,arguments);};
+  const ma=ACT.map;if(ma)ACT.map=function(d){try{if(d&&d.s)useSubj(d.s);else useCount("Course map");}catch(e){}return ma.apply(this,arguments);};
+  const gg=ACT.graphGym;if(gg)ACT.graphGym=function(){useCount("Graph Gym");return gg.apply(this,arguments);};
+  const sp=ACT.sprint;if(sp)ACT.sprint=function(){useCount("Sprint");return sp.apply(this,arguments);};
+})();
 /* ---------- phones: typing view and ?debug=1 (FNF_Phone_Games_Guide.md, rules 1-3 and the real-phone check) ---------- */
 /* While a text box has focus and an on-screen keyboard has shrunk the visible area, the page switches to a typing view
    (header and footer folded away, see the CSS) and scrolls the box's label to the top, so the question being answered
@@ -2560,6 +2693,8 @@ if(DBG){window.addEventListener("resize",dbgShow);setInterval(dbgShow,1000);}
 function route(){
   const m=(location.hash||"").match(new RegExp("^#join-([A-Za-z]{4})(?:-(?:"+COURSES.join("|")+"))?$"));
   if(m&&FEAT("quiz")){history.replaceState(null,"",location.pathname+location.search);ACT.join({code:m[1].toUpperCase()});return;}
+  // a direct link to Graph Gym (FNF-120; Guy 25 Nov 08:32 "Can you give me a direct link to something where I can test the graph feature out?")
+  if(location.hash==="#graphgym"&&typeof ggOn==="function"&&ggOn()){history.replaceState(null,"",location.pathname+location.search);home();ACT.graphGym();return;}
   const h=location.hash||"",L=h.match(/^#learn\/([a-z_]+)\/([^\/]+)(?:\/(\d+))?$/),Q=h.match(/^#q\/([^\/]+)$/);
   if(L){history.replaceState(null,"",location.pathname+location.search);home();let key=L[1]+"|";try{key+=decodeURIComponent(L[2]);}catch(e){key+=L[2];}
     if(LESSONS[key]){openLesson(key,{});const n=+L[3]||0;if(n>0&&LSN){LSN.i=Math.min(LSN.sc.length-1,n);lessonDraw();}}else toast("That lesson is not in this course.",4200);return;}
