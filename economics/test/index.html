@@ -2801,10 +2801,19 @@ function ggBlanks(f){const b=[];if(f.xlabel)b.push({k:"x",t:String(f.xlabel)});i
   (f.points||[]).slice(0,6).forEach((p,i)=>{if(p&&p.label&&!/^[A-Z]$/.test(String(p.label).trim()))b.push({k:"p"+i,t:String(p.label)});});return b;}
 let GG_POOL=null;
 function ggPool(){if(GG_POOL)return GG_POOL;const seen=new Set(),items=[],labs=new Set();
-  for(const q of BANK){const f=q.fig;if(!f||f.type&&f.type!=="line"||f.anim)continue;const b=ggBlanks(f);if(b.length<2)continue;
+  for(const q of BANK){const f=q.fig;if(!f||f.type&&f.type!=="line"||f.anim)continue;const b=ggBlanks(f);if(b.length-ggGiven(f).size<1||b.length<2)continue;
     const sig=JSON.stringify([f.xlabel,f.ylabel,(f.lines||[]).map(l=>[l.label,l.pts])]);if(seen.has(sig))continue;seen.add(sig);items.push(q);b.forEach(x=>labs.add(x.t));}
   return GG_POOL={items,labs:[...labs]};}
-function ggTask(q){const f=JSON.parse(JSON.stringify(q.fig)),all=ggBlanks(f);
+// labels given at the start, so every blank has one right answer (Guy 25 Nov 08:50: "can't we just start the graph with one label on ...
+// there can only be one correct solution. But we do need to vet for those"). Vetted over the bank on 25 Nov: 50 diagrams carry a numbered
+// set (S1 S2, D1 D2 ...) with no arrow to say which moved, and 10 have two goods on the axes. In a numbered set of curves with no arrow,
+// and in every numbered set of points (P1 P2, Q1 Q2, E1 E2), all but one are given; on a two-goods diagram one axis is given.
+function ggGiven(f){const g=new Set(),fix=x=>GG_FIXED.test(String(x||""));
+  if(f.xlabel&&f.ylabel&&!fix(f.xlabel)&&!fix(f.ylabel))g.add(Math.random()<.5?"x":"y");
+  const groups=(arr,pre,needAll)=>{const st={};(arr||[]).slice(0,pre==="l"?12:6).forEach((o,i)=>{const m=o&&o.label&&String(o.label).trim().match(/^(.*?)(\d+)$/);if(m)(st[m[1]]=st[m[1]]||[]).push(pre+i);});
+    Object.values(st).forEach(ks=>{if(ks.length<2||!needAll)return;const keep=ks[Math.floor(Math.random()*ks.length)];ks.forEach(k=>{if(k!==keep)g.add(k);});});};
+  groups(f.lines,"l",!(f.arrows&&f.arrows.length));groups(f.points,"p",true);return g;}
+function ggTask(q){const f=JSON.parse(JSON.stringify(q.fig)),giv=ggGiven(f),all=ggBlanks(f).filter(b=>!giv.has(b.k));
   const ax=all.filter(x=>x.k==="x"||x.k==="y"),rest=shuffle(all.filter(x=>x.k!=="x"&&x.k!=="y"));const use=[...ax,...rest].slice(0,6);
   use.forEach((u,i)=>{const tok=("§"+i+"§").padEnd(Math.max(3,u.t.length),"§");if(u.k==="x")f.xlabel=tok;else if(u.k==="y")f.ylabel=tok;else if(u.k[0]==="l")f.lines[+u.k.slice(1)].label=tok;else f.points[+u.k.slice(1)].label=tok;});
   const P=ggPool(),have=new Set(use.map(u=>u.t)),longC=use.some(u=>u.t.length>8);
