@@ -2838,12 +2838,22 @@ function ggPaint(){const T=GG.tasks[GG.i];document.querySelectorAll("#ggFig .gg-
     try{const bb=tx.getBBox();r.setAttribute("x",(bb.x-5).toFixed(1));r.setAttribute("y",(bb.y-3).toFixed(1));r.setAttribute("width",(bb.width+10).toFixed(1));r.setAttribute("height",(bb.height+6).toFixed(1));const hw=Math.max(bb.width+16,50),hh=Math.max(bb.height+16,50);hr.setAttribute("x",(bb.x+bb.width/2-hw/2).toFixed(1));hr.setAttribute("y",(bb.y+bb.height/2-hh/2).toFixed(1));hr.setAttribute("width",hw.toFixed(1));hr.setAttribute("height",hh.toFixed(1));}catch(e){}});
   document.getElementById("ggChips").innerHTML=T.chips.map((c,k)=>`<button class="chip gg-chip${c.used?" used":""}" data-c="${k}"${c.used||T.done?" disabled":""}>${esc(c.t)}</button>`).join("");
   const go=document.getElementById("ggGo");if(go)go.disabled=!T.done&&T.fill.some(x=>x==null);}
+// axes swapped (Guy 25 Nov 08:38: "if I flip them, will you mark it wrong? ... there's potentially more than one right answer"): where neither
+// axis is a money value or an amount of output (a PPF of two goods), either way round is right; where one is (price, cost, rate, level
+// against quantity or output), the drawing depends on it, so the swap stays wrong and she is told why.
+const GG_FIXED=/price|cost|revenue|wage|rate|level|£|\$|quantity|output|gdp|income|demand|supply|employment|labour|inflation|consumption|savings|investment|tax|benefit|welfare|utility|profit|time|balance|trade/i;   // time runs along the bottom (J-curve)
+function ggAxisSwap(T){const xa=T.q.fig.xlabel,ya=T.q.fig.ylabel;
+  const ix=T.ans.indexOf(xa),iy=T.ans.indexOf(ya);if(ix<0||iy<0||!xa||!ya)return null;
+  if(T.fill[ix]===ya&&T.fill[iy]===xa){const free=!GG_FIXED.test(xa)&&!GG_FIXED.test(ya);return {ix,iy,free};}return null;}
 ACT.ggCheck=()=>{const T=GG&&GG.tasks[GG.i];if(!T)return;if(T.done){ggNext();return;}if(T.fill.some(x=>x==null))return;T.done=true;
+  const sw=ggAxisSwap(T);if(sw&&sw.free){T.ans[sw.ix]=T.fill[sw.ix];T.ans[sw.iy]=T.fill[sw.iy];T.swapOk=true;}else if(sw)T.swapNo=true;
   const ok=T.fill.filter((x,i)=>x===T.ans[i]).length,n=T.ans.length,all=ok===n;GG.right+=ok;GG.total+=n;const xp=ok*3+(all?10:0);GG.xp+=xp;
   if(all){SFX.correct();if(!REDUCED)popText("+"+xp+" XP");}else if(ok)SFX.click();else SFX.wrong();ggPaint();
   const wrong=T.fill.map((x,i)=>x!==T.ans[i]?`<li>${esc(T.ans[i])} <span class="muted">(you put ${esc(x)})</span></li>`:"").join("");
   document.getElementById("ggFb").innerHTML=`<div class="feedback ${all?"ok":"no"}"><b>${all?pick(["Every label right.","Spot on.","Diagram nailed."]):`${ok} of ${n} right`}</b>${xp?` <span class="small muted">+${xp} XP</span>`:""}
    ${wrong?`<div class="small" style="margin-top:6px">The right labels are now on the diagram:</div><ul class="small gg-wrong">${wrong}</ul>`:""}
+   ${T.swapOk?`<div class="small" style="margin-top:6px">You swapped the axes: that's fine on this diagram, either way round works.</div>`:""}
+   ${T.swapNo?`<div class="small gg-why" style="margin-top:6px"><b>About the axes:</b> money values (price, cost, wages, rates, the price level) go up the side, and quantity or output goes along the bottom. That's how A-level diagrams are drawn, and the rest of this diagram only means what it should that way round. Draw it this way in the exam.</div>`:""}
    ${T.q.x?`<div class="small muted" style="margin-top:6px">${tex(T.q.x)}</div>`:""}</div>`;
   const go=document.getElementById("ggGo");go.disabled=false;go.textContent=GG.i<GG.tasks.length-1?"Next graph →":"Finish";};
 function ggNext(){if(GG.i<GG.tasks.length-1){GG.i++;ggDraw();return;}const g=GG;addXP(g.xp);const best=lsGet("gg_best",0),pc=g.total?Math.round(g.right/g.total*100):0;
