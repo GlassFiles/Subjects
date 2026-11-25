@@ -497,9 +497,12 @@ html[data-look="ink"] .fx-bat svg{fill:#0a080c;filter:drop-shadow(0 0 3px rgba(1
 @media (prefers-reduced-motion:reduce){.fx-sx,.fx-brush path{animation:none;stroke-dashoffset:0}.fx-graf i,.fx-hanko,.fx-slapin,.fx-tcard,.fx-ring,html[data-night] body::after{animation:none}}
 
 /* the sticker book (Guy 25 Nov 00:29): a spiral notebook at an angle; it opens to a blank page with stickers scattered and overlapping */
-.fx-sbbtn{display:flex;flex-direction:column;align-items:center;gap:2px;margin:12px auto 6px;background:none;border:0;padding:6px 10px;cursor:pointer;color:var(--text);font:inherit;font-weight:700;font-size:calc(13px*var(--fs,1));-webkit-tap-highlight-color:transparent;min-height:48px}
-.fx-nb{width:84px;height:106px;transform:perspective(420px) rotateY(-24deg) rotateX(10deg) rotate(-5deg);filter:drop-shadow(6px 8px 6px rgba(0,0,0,.28));transition:transform .25s}
-.fx-sbbtn:active .fx-nb,.fx-sbbtn:hover .fx-nb{transform:perspective(420px) rotateY(-12deg) rotateX(6deg) rotate(-2deg) scale(1.04)}
+.fx-sbbtn{display:inline-grid;place-items:center;flex:none;width:46px;height:48px;margin:-6px -4px -6px 6px;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fx-nb{width:34px;height:43px;transform:perspective(300px) rotateY(-42deg) rotateX(22deg) rotate(-18deg);filter:drop-shadow(3px 4px 3px rgba(0,0,0,.3));transition:transform .2s}
+.fx-sbbtn:active .fx-nb,.fx-sbbtn:hover .fx-nb{transform:perspective(300px) rotateY(-24deg) rotateX(12deg) rotate(-10deg) scale(1.12)}
+.ttop .fx-sbbtn{margin:0 2px 0 0}
+#mapstrip{position:relative;overflow:visible}
+#mapstrip>.fx-sbbtn{position:absolute;right:-12px;top:-30px;margin:0;z-index:2}
 .nb-s1{stop-color:#f6b8cf}.nb-s2{stop-color:#fbd9d0}.nb-s3{stop-color:#fde9d6}
 .nb-cover{fill:#e993b4}.nb-pages{fill:#e8e1d6}.nb-pages2{fill:#fbf8f2}
 .nb-sun{fill:#fff1b8;opacity:.9}.nb-fuji{fill:#9a8fd6}.nb-snow{fill:#fff}
@@ -2758,7 +2761,11 @@ function fxAfter(view){if(!TCH)return;document.querySelectorAll(".fx-res").forEa
   const wrap=document.querySelector("#app .wrap");
   if(view==="home"&&tOn("wall")&&wrap&&!wrap.querySelector(".fx-wall"))wrap.insertAdjacentHTML("beforeend",tWall());
   if(T_STAMP&&tOn("stamp")){T_STAMP=false;const c=document.querySelector("#app .card.center");if(c){c.classList.add("fx-stamped");c.insertAdjacentHTML("beforeend",`<span class="fx-hanko" aria-label="Done">済</span>`);setTimeout(()=>tone(85,.22,"sine",.3),REDUCED?0:520);}}
-  if(tOn("stickers")){const mc=document.querySelector("#app .thlist")||document.querySelector("#app .mapcard,#app #mapstrip");if(mc&&!document.querySelector(".fx-sbbtn"))mc.insertAdjacentHTML(mc.classList.contains("thlist")?"beforebegin":"afterend",`<button class="fx-sbbtn" data-act="stickerBook" aria-label="Open your scrapbook">${tNotebook()}<span>Scrapbook</span></button>`);}
+  // the scrapbook button (Guy 25 Nov 09:08: "takes up too much space ... no writing ... more of an angle ... fit it somewhere next to something
+  // else"): no caption, small and steeply tilted; on home resting on the top corner of the "Your map" card (no extra height at any width), on the map pages in the top bar by the sound button
+  if(tOn("stickers")&&!document.querySelector(".fx-sbbtn")){const btn=`<button class="fx-sbbtn" data-act="stickerBook" aria-label="Open your scrapbook" title="Scrapbook">${tNotebook()}</button>`;
+    const row=document.querySelector("#app #mapstrip"),bar=document.querySelector("#app .thlist,#app .mapcard")&&document.querySelector("#app .ttop.tbar");
+    if(row)row.insertAdjacentHTML("beforeend",btn);else if(bar){const mu=bar.querySelector('[data-act="mute"]');if(mu)mu.insertAdjacentHTML("beforebegin",btn);else bar.insertAdjacentHTML("beforeend",btn);}}
   if(TCH.tour&&document.querySelector('#app [data-act="copyBk"]')&&!document.querySelector(".fx-tagain"))wrap&&wrap.insertAdjacentHTML("beforeend",`<div class="card fx-tagain"><b>Welcome tour</b><div class="small muted" style="margin:4px 0 10px">The cards from your first visit.</div><button class="btn" data-act="tourAgain">Show me around again</button></div>`);
   // Graph Gym (28_graphs.js): a tile on home under Practice, and a bonus graph offered at the end of a practice run
   if(typeof ggOn==="function"&&ggOn()){if(view==="home"&&!document.querySelector('[data-act="graphGym"]')){const gy=document.querySelector('#app button.big[data-act="gym"]');
