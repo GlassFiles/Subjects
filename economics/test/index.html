@@ -2965,7 +2965,9 @@ function guideSeq(M){
   const next=()=>{
     if(!el.isConnected)return;if(i>=S.length){el.remove();return;}
     const s=S[i++];if(s.from!==undefined)x=at(s.from,s.w);const n=s.n||1,fps=s.fps||10,x0=x,x1=s.to!==undefined?at(s.to,s.w):x;
-    const dur=s.to!==undefined?Math.max(250,Math.abs(x1-x0)/(s.speed||80)*1000):n*(s.loops||1)/fps*1000;
+    // speed is px a second on a 390 px phone, scaled to the screen, so a laptop takes the same time to cross as a phone
+    // (Guy 26 Nov 00:33, on a laptop: "That still looks a bit broken"; at a fixed px speed she crawled across a wide screen in huge jumps)
+    const dur=s.to!==undefined?Math.max(250,Math.abs(x1-x0)/((s.speed||80)*VW()/390*1.25)*1000):n*(s.loops||1)/fps*1000;
     const face=((d>0)!==!!s.back)?1:-1;
     el.classList.toggle("gtrail",!!s.trail);el.style.width=s.w+"px";el.style.height=s.h+"px";el.style.backgroundImage=`url(${s.img})`;el.style.backgroundSize=`${s.w*n}px ${s.h}px`;
     // she flash-steps from spot to spot, about seven spots across the screen, as the first run did (Guy 26 Nov 00:04 "before it would
